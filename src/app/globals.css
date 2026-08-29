@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+/*
+ * EduFlow design tokens — ported 1:1 from the Stitch export's embedded
+ * Tailwind config (stitch_eduflow_design_system_shell/*\/code.html), which is
+ * identical across every one of the 40 screens (confirmed by diff).
+ * Radii and default spacing match Tailwind's own defaults already, so only
+ * colors, the named spacing scale, and the type scale are added here.
+ */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  /* Named spacing scale (used throughout as p-md, gap-lg, px-xl, etc.)
+     ⚠️ In Tailwind v4, width/height/max-width/min-width utilities are also
+     driven by this same --spacing-* scale for named keys, so defining
+     --spacing-sm here shadows the built-in max-w-sm/w-sm/etc. (24rem → 8px!).
+     Never use bare max-w-{xs,sm,md,lg,xl} (or w-/h-/min-w-/min-h- with those
+     names) in this app — use an arbitrary value instead, e.g. max-w-[24rem],
+     or a size outside this scale (max-w-2xl and up are unaffected). */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-gutter: 20px;
+  --spacing-margin: 40px;
+
+  /* Type scale (size/line-height pairs; weight & tracking are applied as
+     explicit utility classes at each usage — see src/lib/typography.ts) */
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-sm: 36px;
+  --text-display-sm--line-height: 44px;
+  --text-headline-lg: 30px;
+  --text-headline-lg--line-height: 38px;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-sm: 20px;
+  --text-headline-sm--line-height: 28px;
+  --text-title-lg: 18px;
+  --text-title-lg--line-height: 26px;
+  --text-body-lg: 16px;
+  --text-body-lg--line-height: 24px;
+  --text-body-md: 14px;
+  --text-body-md--line-height: 20px;
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+
+  /* Material-3-style color roles (Academic Precision palette) */
+  --color-surface: #f8f9ff;
+  --color-surface-dim: #cbdbf5;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e5eeff;
+  --color-surface-container-high: #dce9ff;
+  --color-surface-container-highest: #d3e4fe;
+  --color-on-surface: #0b1c30;
+  --color-on-surface-variant: #45474c;
+  --color-inverse-surface: #213145;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-outline: #75777d;
+  --color-outline-variant: #c5c6cd;
+  --color-surface-tint: #545f73;
+  --color-primary: #091426;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1e293b;
+  --color-on-primary-container: #8590a6;
+  --color-inverse-primary: #bcc7de;
+  --color-secondary: #4648d4;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #6063ee;
+  --color-on-secondary-container: #fffbff;
+  --color-tertiary: #111516;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #26292b;
+  --color-on-tertiary-container: #8d9092;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #d8e3fb;
+  --color-primary-fixed-dim: #bcc7de;
+  --color-on-primary-fixed: #111c2d;
+  --color-on-primary-fixed-variant: #3c475a;
+  --color-secondary-fixed: #e1e0ff;
+  --color-secondary-fixed-dim: #c0c1ff;
+  --color-on-secondary-fixed: #07006c;
+  --color-on-secondary-fixed-variant: #2f2ebe;
+  --color-tertiary-fixed: #e0e3e5;
+  --color-tertiary-fixed-dim: #c4c7c9;
+  --color-on-tertiary-fixed: #191c1e;
+  --color-on-tertiary-fixed-variant: #444749;
+  --color-background: #f8f9ff;
+  --color-on-background: #0b1c30;
+  --color-surface-variant: #d3e4fe;
+
+  /* shadcn-style semantic aliases, mapped onto the roles above so Radix-based
+     primitives (dialog, dropdown, popover, tabs, sonner) inherit the same
+     palette instead of a generic shadcn theme */
+  --color-foreground: #0b1c30;
+  --color-card: #f8f9ff;
+  --color-card-foreground: #0b1c30;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #0b1c30;
+  --color-muted: #e5eeff;
+  --color-muted-foreground: #45474c;
+  --color-accent: #dce9ff;
+  --color-accent-foreground: #0b1c30;
+  --color-destructive: #ba1a1a;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #c5c6cd;
+  --color-input: #c5c6cd;
+  --color-ring: #4648d4;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+}
+
+.card-shadow {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-hover-shadow:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Minimal enter/exit animation for Radix primitives (dialog, popover,
+   dropdown, select) — avoids pulling in an extra animation utility library */
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes content-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+[data-radix-popper-content-wrapper] [data-state="open"],
+.animate-content-in {
+  animation: content-in 0.12s ease-out;
+}
+.animate-overlay-in {
+  animation: overlay-in 0.12s ease-out;
+}

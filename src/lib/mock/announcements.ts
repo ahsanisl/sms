@@ -1,0 +1,58 @@
+import type { Announcement } from "@/lib/types";
+
+export const ANNOUNCEMENTS: Announcement[] = [
+  {
+    id: "an1",
+    title: "Sports Week Schedule Released",
+    body: "The annual Sports Week will run from September 14–18. Please check the class-wise schedule shared with homeroom teachers and ensure students bring appropriate sportswear on their assigned days.",
+    audience: "all",
+    priority: "important",
+    publishedAt: "2026-08-27T09:15:00",
+    author: "School Administration",
+  },
+  {
+    id: "an2",
+    title: "Mid-Term Result Cards Available",
+    body: "Mid-Term Examination result cards are now available under each student's profile. Parents are encouraged to schedule a meeting with class teachers if they have questions about performance.",
+    audience: "parents",
+    priority: "important",
+    publishedAt: "2026-08-25T14:00:00",
+    author: "Examination Cell",
+  },
+  {
+    id: "an3",
+    title: "Staff Meeting — Monday 8:00 AM",
+    body: "All teaching staff are required to attend the monthly staff meeting in the main auditorium before first period on Monday to review the Term 1 academic calendar.",
+    audience: "teachers",
+    priority: "normal",
+    publishedAt: "2026-08-24T11:30:00",
+    author: "Principal's Office",
+  },
+  {
+    id: "an4",
+    title: "Fee Due Date Reminder",
+    body: "This is a reminder that August fee vouchers are due by the 10th of the month. A late fee surcharge applies to payments received after the due date.",
+    audience: "parents",
+    priority: "normal",
+    publishedAt: "2026-08-20T08:00:00",
+    author: "Accounts Office",
+  },
+  {
+    id: "an5",
+    title: "Library Week — New Book Donations Welcome",
+    body: "In celebration of Library Week, students are invited to donate gently used books to the campus library. Collection boxes are placed in every homeroom.",
+    audience: "students",
+    priority: "normal",
+    publishedAt: "2026-08-18T10:00:00",
+    author: "Library Committee",
+  },
+  {
+    id: "an6",
+    title: "Parent-Teacher Meeting Scheduled",
+    body: "Parent-Teacher meetings for all campuses are scheduled for the first week of September. A detailed slot-booking form will be shared via the parent portal shortly.",
+    audience: "parents",
+    priority: "important",
+    publishedAt: "2026-08-15T09:00:00",
+    author: "School Administration",
+  },
+];
