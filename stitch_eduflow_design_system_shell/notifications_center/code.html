@@ -223,67 +223,71 @@
 </header>
 <div class="flex flex-1 overflow-hidden">
 <!-- SideNavBar -->
-<nav class="hidden md:flex flex-col h-full w-64 p-md gap-xs bg-surface-container-low border-r border-outline-variant flat no shadows sticky top-[65px]" style="height: calc(100vh - 65px);">
-<div class="mb-lg px-sm">
-<div class="flex items-center gap-md mb-xs">
-<img alt="School Logo" class="w-10 h-10 rounded-lg shadow-sm" data-alt="A minimalist, modern school crest logo featuring clean lines and a simple geometric design, rendered in dark indigo on a solid white background, suitable for a professional educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA67hEeoqPKcJyjzGIDgr5gCHtURMItC-YDuLxKkOBvbhJUCY-RUwTp6aCYMBEyN7AhAocNzcm3w3pvJUwq4gFLA64HUOPAS35tTeJJ8fdzHDUDZ7hBqzOged6DpLik3W_VOoGRdC7rzkHHsATCZKG3WdEYkeN3HBIhw-XrUjOBGEZogoK_EQ2spZEOrGoueUaJOfB-M8_TvtYFUBj8ZiC0krDNmn-ID1axWlXilEuD3--92BI716u9Kg"/>
+<nav class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</div>
 <div>
-<div class="text-headline-sm font-headline-sm font-black text-secondary">EduFlow Portal</div>
-<div class="text-label-md font-label-md text-on-surface-variant">Teacher Dashboard</div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
 </div>
 </div>
-</div>
-<div class="flex-1 overflow-y-auto space-y-1">
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="dashboard">dashboard</span>
-<span class="text-label-md font-label-md">Dashboard</span>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="school">school</span>
-<span class="text-label-md font-label-md">My Classes</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="group">group</span>
-<span class="text-label-md font-label-md">Students</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="event_available">event_available</span>
-<span class="text-label-md font-label-md">Attendance</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="description">description</span>
-<span class="text-label-md font-label-md">Exams</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+Attendance
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="calendar_today">calendar_today</span>
-<span class="text-label-md font-label-md">Timetable</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+Fees
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="campaign">campaign</span>
-<span class="text-label-md font-label-md">Announcements</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="event_busy">event_busy</span>
-<span class="text-label-md font-label-md">Leave</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="account_circle">account_circle</span>
-<span class="text-label-md font-label-md">Profile</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+Announcements
 </a>
-</div>
-<div class="mt-auto pt-sm border-t border-outline-variant space-y-1">
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="help">help</span>
-<span class="text-label-md font-label-md">Support</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
 </a>
-<a class="flex items-center gap-md px-sm py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all rounded-lg group" href="#">
-<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="settings">settings</span>
-<span class="text-label-md font-label-md">Settings</span>
+</nav>
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+Settings
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
 </a>
 </div>
 </nav>
 <!-- Main Content -->
-<main class="flex-1 overflow-y-auto p-md md:p-lg bg-background">
+<main class="flex-1 overflow-y-auto p-md md:p-lg bg-background md:ml-64">
 <div class="max-w-[1440px] mx-auto space-y-lg">
 <!-- Page Header -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-sm">

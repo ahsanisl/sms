@@ -51,40 +51,67 @@
 </head>
 <body class="bg-background text-on-background font-body-md text-body-md antialiased flex">
 <!-- SideNavBar (Shared Component) -->
-<nav class="fixed left-0 top-0 h-full w-64 bg-primary text-on-primary border-r border-outline-variant flex flex-col py-md px-sm z-20">
-<!-- Header -->
-<div class="flex items-center gap-md px-sm mb-xl">
-<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-primary-fixed">school</span>
+<nav class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="school">school</span>
 </div>
 <div>
-<h1 class="text-title-lg font-title-lg text-on-primary">EduFlow</h1>
-<p class="text-label-sm font-label-sm text-on-primary-container">Admin Portal</p>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
 </div>
 </div>
-<!-- Navigation Links -->
-<div class="flex-1 overflow-y-auto">
-<ul class="space-y-sm">
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="font-label-md text-label-md">Dashboard</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">group</span> <span class="font-label-md text-label-md">Students</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">school</span> <span class="font-label-md text-label-md">Teachers</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">class</span> <span class="font-label-md text-label-md">Classes</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">event_available</span> <span class="font-label-md text-label-md">Attendance</span></a></li>
-<!-- Active State -->
-<li><a class="flex items-center gap-md px-md py-sm text-on-primary bg-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span> <span class="font-label-md text-label-md">Fees</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">description</span> <span class="font-label-md text-label-md">Exams</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">assessment</span> <span class="font-label-md text-label-md">Reports</span></a></li>
-</ul>
-</div>
-<!-- CTA & Footer -->
-<div class="mt-auto pt-lg border-t border-primary-container space-y-sm">
-<button class="w-full flex justify-center items-center gap-sm bg-surface-container-highest text-on-surface py-sm rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors mb-sm">
-<span class="material-symbols-outlined text-[18px]">add</span> New Registration
-            </button>
-<ul class="space-y-sm">
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">settings</span> <span class="font-label-md text-label-md">Settings</span></a></li>
-<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">help</span> <span class="font-label-md text-label-md">Support</span></a></li>
-</ul>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+Attendance
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+Fees
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+Announcements
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+Settings
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
+</a>
 </div>
 </nav>
 <!-- TopNavBar (Shared Component) -->

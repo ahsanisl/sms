@@ -110,70 +110,67 @@
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row antialiased">
 <!-- SideNavBar (Hidden on Mobile) -->
-<aside class="hidden md:flex flex-col h-screen w-64 bg-surface-container-lowest border-r border-outline-variant fixed left-0 top-0 py-6 px-4 z-20">
-<div class="mb-8 px-4 flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold font-headline-sm text-headline-sm">
-                E
-            </div>
-<div>
-<h1 class="font-headline-sm text-headline-sm font-bold text-primary">EduFlow</h1>
-<p class="font-label-sm text-label-sm text-on-surface-variant">Admin Suite</p>
-</div>
-</div>
-<nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-md text-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-label-md text-label-md">Students</span>
-</a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<aside class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
 <span class="material-symbols-outlined" data-icon="school">school</span>
-<span class="font-label-md text-label-md">Teachers</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
 </a>
-<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="class" data-weight="fill" style="font-variation-settings: 'FILL' 1;">class</span>
-<span class="font-label-md text-label-md">Classes</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="event_available">event_available</span>
-<span class="font-label-md text-label-md">Attendance</span>
+Attendance
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-label-md text-label-md">Fees</span>
+Fees
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="quiz">quiz</span>
-<span class="font-label-md text-label-md">Exams</span>
+Exams
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
-<span class="font-label-md text-label-md">Timetable</span>
+Timetable
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="campaign">campaign</span>
-<span class="font-label-md text-label-md">Announcements</span>
+Announcements
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-label-md text-label-md">Reports</span>
+Reports
 </a>
 </nav>
-<div class="mt-auto pt-4 border-t border-outline-variant flex flex-col gap-1">
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-label-md text-label-md">Settings</span>
+Settings
 </a>
-<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg hover:bg-surface-container-low" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="font-label-md text-label-md">Support</span>
+Support
 </a>
-<button class="mt-4 w-full py-2 px-4 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-colors font-label-md text-label-md flex items-center justify-center gap-2">
-                Help Center
-            </button>
 </div>
 </aside>
 <!-- Main Content Area -->

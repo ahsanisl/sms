@@ -113,85 +113,67 @@
 </head>
 <body class="bg-background text-on-background antialiased flex h-screen overflow-hidden">
 <!-- SideNavBar -->
-<nav class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container fixed left-0 top-0 h-full w-64 border-r border-outline-variant dark:border-outline flex flex-col h-full py-md px-sm z-20">
-<div class="flex items-center gap-sm px-md py-lg mb-lg">
-<span class="material-symbols-outlined text-title-lg font-title-lg text-on-primary dark:text-primary-fixed" style="font-variation-settings: 'FILL' 1;">school</span>
+<nav class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</div>
 <div>
-<h1 class="font-headline-sm text-headline-sm text-on-primary font-bold">EduFlow</h1>
-<p class="font-label-sm text-label-sm text-on-primary-container">Admin Portal</p>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
 </div>
 </div>
-<button class="bg-secondary text-on-secondary hover:bg-secondary-container transition-colors rounded-lg py-sm px-md mx-sm mb-lg font-label-md text-label-md flex items-center justify-center gap-xs shadow-sm">
-<span class="material-symbols-outlined text-[18px]">add</span>
-            New Registration
-        </button>
-<div class="flex-1 overflow-y-auto">
-<ul class="space-y-xs px-sm font-label-md text-label-md">
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
-                        Dashboard
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
-                        Students
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">school</span>
-                        Teachers
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">class</span>
-                        Classes
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event_available</span>
-                        Attendance
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary bg-secondary-container dark:bg-secondary font-bold scale-[0.98] transition-transform" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
-                        Fees
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
-                        Exams
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">assessment</span>
-                        Reports
-                    </a>
-</li>
-</ul>
-</div>
-<div class="mt-auto border-t border-primary-container pt-md font-label-md text-label-md">
-<ul class="space-y-xs px-sm">
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
-                        Settings
-                    </a>
-</li>
-<li>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 dark:hover:bg-primary-fixed/10 transition-colors" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
-                        Support
-                    </a>
-</li>
-</ul>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+Attendance
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+Fees
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+Announcements
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+Settings
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
+</a>
 </div>
 </nav>
 <!-- Main Content Area -->

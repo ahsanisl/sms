@@ -142,55 +142,71 @@
 </head>
 <body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden flex h-screen">
 <!-- SideNavBar (Shared Component) -->
-<aside class="flex flex-col h-full py-6 px-4 bg-primary text-on-primary w-64 flex-shrink-0 border-r border-outline-variant z-20">
-<div class="flex items-center gap-3 px-2 mb-10">
-<div class="w-10 h-10 rounded-lg bg-surface-container-lowest overflow-hidden flex items-center justify-center shrink-0">
-<img class="w-full h-full object-cover" data-alt="A highly detailed, professional vector logo for a modern educational institution named EduFlow, featuring a stylized open book or graduation cap in deep indigo and crisp white, set against a pristine white background. The aesthetic is clean, corporate, and minimalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjAOPASTxZrvd7AirM6ebOUAh52jpMvv6w0iSarUym5YGYVBLXQLMwEzgq6IC1I0s7utE0Z50CX8eC8GWjw5Z0EUPqxLw4FFmVsdnmfShJTMeeo-PHjtF_RUAQnEkdp7i9PAPFeaMDjSK3Efi_k66AfWjpFIxYHZnQ2IAl-_rZqGcsgM478SxmsRq2yMSklq5wsQm2PRheb1PvDQ3Gdwq0c-A_69EAACh9EgMfHQGhydfcA8jRuNGbNw"/>
+<aside class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="school">school</span>
 </div>
 <div>
 <h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
-<p class="font-label-sm text-label-sm text-on-primary-container">Private Admin</p>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
 </div>
 </div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-body-md text-body-md">Dashboard</span>
+Dashboard
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="school">school</span>
-<span class="font-body-md text-body-md">Students</span>
+Teachers
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="badge">badge</span>
-<span class="font-body-md text-body-md">Faculty</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 bg-secondary-container text-on-secondary-container font-semibold rounded-lg scale-95 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="auto_stories" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
-<span class="font-body-md text-body-md">Academic Affairs</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+Attendance
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="payments">payments</span>
-<span class="font-body-md text-body-md">Finance</span>
+Fees
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="font-body-md text-body-md">Settings</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+Announcements
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
 </a>
 </nav>
-<div class="mt-auto space-y-1 pt-6 border-t border-on-primary-container/20">
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
-<span class="font-body-md text-body-md">Support</span>
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+Settings
 </a>
-<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-body-md text-body-md">Sign Out</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
 </a>
 </div>
 </aside>
 <!-- Main Content Canvas -->
-<div class="flex-1 flex flex-col min-w-0 bg-background">
+<div class="flex-1 flex flex-col min-w-0 bg-background md:ml-64">
 <!-- TopNavBar (Shared Component) -->
 <header class="flex justify-between items-center h-16 px-margin w-full bg-surface-container-lowest text-primary sticky top-0 border-b border-outline-variant shadow-sm z-10">
 <div class="flex items-center gap-8">

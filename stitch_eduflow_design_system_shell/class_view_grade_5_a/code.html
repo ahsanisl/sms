@@ -113,70 +113,71 @@
 </head>
 <body class="h-full bg-background text-on-surface flex overflow-hidden">
 <!-- SideNavBar -->
-<nav class="hidden md:flex flex-col h-screen w-64 p-md gap-xs bg-surface-container-low dark:bg-tertiary-container border-r border-outline-variant dark:border-outline shrink-0 relative z-20">
-<!-- Header -->
-<div class="flex items-center gap-sm mb-lg px-xs">
-<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold overflow-hidden shrink-0">
-<img alt="School Logo" class="w-full h-full object-cover" data-alt="A clean, modern geometric logo for a prestigious private school, featuring a stylized book and rising sun motif in deep indigo and bright white. The aesthetic is corporate, minimalist, and educational." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn24qL83UnUoIrXYJHrWrDkSzNFSWG-A9f1p2R3tjmSOk3KYsQgh6ck1tC26kOnzjFKkrtrd9cpsfkD2LlO9TYbe436LNx9K0K4kYGcsi1WO1M_HgN-BZ3vaK82Oyk5bUwpTJYwrfsvTQxLrh99LurPbUQVRT9IQbZTDvi25tcOHOkeVZb8dJRoUFivFzw5Z-TWgkFhGuvlfsR0VygEceKDg0rJ1hDIHN9SF1V7o0Tzanm6yerUCUXgw"/>
+<nav class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="school">school</span>
 </div>
 <div>
-<h1 class="text-headline-sm font-headline-sm font-black text-secondary dark:text-secondary-fixed">EduFlow Portal</h1>
-<p class="text-label-sm font-label-sm text-on-surface-variant">Teacher Dashboard</p>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
 </div>
 </div>
-<!-- Main Navigation -->
-<div class="flex flex-col gap-xs flex-grow overflow-y-auto">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
-                Dashboard
-            </a>
-<a class="flex items-center gap-md px-md py-sm bg-primary-container dark:bg-secondary-container text-on-primary-container dark:text-on-secondary-container rounded-lg font-semibold transition-all scale-[0.98] duration-150 text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
-                My Classes
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
-                Students
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event_available</span>
-                Attendance
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
-                Exams
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
-                Timetable
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">campaign</span>
-                Announcements
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event_busy</span>
-                Leave
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
-                Profile
-            </a>
-</div>
-<!-- Footer -->
-<div class="mt-auto flex flex-col gap-xs pt-sm border-t border-outline-variant">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
-                Support
-            </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all text-label-md font-label-md" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
-                Settings
-            </a>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+Students
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+Attendance
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+Fees
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+Announcements
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+Settings
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
+</a>
 </div>
 </nav>
 <!-- Main Content Area -->
-<div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
+<div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background md:ml-64">
 <!-- TopAppBar -->
 <header class="sticky top-0 z-50 flex justify-between items-center w-full px-lg py-sm bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shrink-0">
 <!-- Left: Mobile Menu & Brand / Breadcrumbs -->

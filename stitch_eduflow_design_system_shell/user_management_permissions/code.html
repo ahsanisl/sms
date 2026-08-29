@@ -126,62 +126,66 @@
 </head>
 <body class="bg-background text-on-surface h-full flex overflow-hidden antialiased">
 <!-- SideNavBar -->
-<aside class="flex flex-col h-screen w-64 p-md gap-xs bg-surface-container-low dark:bg-tertiary-container border-r border-outline-variant dark:border-outline fixed h-full left-0 w-64 hidden md:flex z-40">
-<div class="flex items-center gap-sm mb-lg px-sm">
-<img alt="School Logo" class="w-8 h-8 rounded-DEFAULT object-cover" data-alt="A minimalist, highly professional geometric logo for a modern educational software platform. The logo uses a clean, abstract design composed of deep indigo and soft white tones, reflecting a structured, premium B2B SaaS aesthetic. It is simple, corporate, and instantly recognizable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr-_W8v_MDooikCJUkRP8Dyt34-DiMBl1gH6svUXJfz7RvOmiCquTo0T_T7f8EqSOA5S6bUDIEy53pGJ5Ch1j5NALhZROboKBv6_54a5gibndOP-7ynrDDkcMTvKeS4A6hhLGCMhOrcaQZGEsDbLptUBF6jBavTWpGzeKaNRcjUaimp5iWU-JB5Gjzh1_f6wufDvVUkF4nt0jmuCtj1AlCAUT70DnLDuDtNwVSOJIytTWbcg8vL5nWcw"/>
-<div>
-<h1 class="text-headline-sm font-headline-sm font-black text-secondary dark:text-secondary-fixed">EduFlow Portal</h1>
-<p class="text-label-sm font-label-sm text-on-surface-variant">Teacher Dashboard</p>
-</div>
-</div>
-<nav class="flex-1 overflow-y-auto flex flex-col gap-xs">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="text-label-md font-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
+<aside class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
+<div class="mb-xl px-md flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
 <span class="material-symbols-outlined" data-icon="school">school</span>
-<span class="text-label-md font-label-md">My Classes</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-primary-fixed-dim">Admin Suite</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+Dashboard
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="text-label-md font-label-md">Students</span>
+Students
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+Teachers
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+Classes
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="event_available">event_available</span>
-<span class="text-label-md font-label-md">Attendance</span>
+Attendance
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="description">description</span>
-<span class="text-label-md font-label-md">Exams</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+Fees
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
-<span class="text-label-md font-label-md">Timetable</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+Exams
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+Timetable
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
 <span class="material-symbols-outlined" data-icon="campaign">campaign</span>
-<span class="text-label-md font-label-md">Announcements</span>
+Announcements
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
-<span class="text-label-md font-label-md">Leave</span>
-</a>
-<!-- We are in Users & Roles, conceptually under Settings/Profile. Highlighting Profile as active for now based on closest match rule, though a dedicated Settings tab active would be better if it was main nav. Wait, the JSON says "Settings" is in footer tabs. I will highlight Settings in footer. -->
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-<span class="text-label-md font-label-md">Profile</span>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+Reports
 </a>
 </nav>
-<div class="mt-auto border-t border-outline-variant pt-sm flex flex-col gap-xs">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-tertiary-container hover:bg-surface-container-high dark:hover:bg-inverse-surface transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="help">help</span>
-<span class="text-label-md font-label-md">Support</span>
-</a>
-<!-- Active State -->
-<a class="flex items-center gap-md px-md py-sm rounded-lg bg-primary-container dark:bg-secondary-container text-on-primary-container dark:text-on-secondary-container rounded-lg font-semibold Active: scale-[0.98] duration-150" href="#">
+<div class="mt-auto pt-md border-t border-primary-container/60 space-y-1">
+<a class="flex items-center gap-md px-md py-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold font-label-md text-label-md shadow-sm" href="#" aria-current="page">
 <span class="material-symbols-outlined" data-icon="settings">settings</span>
-<span class="text-label-md font-label-md">Settings</span>
+Settings
+</a>
+<a class="flex items-center gap-md px-md py-3 rounded-lg text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+Support
 </a>
 </div>
 </aside>
