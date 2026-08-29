@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - School Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-primary": "#bcc7de",
+                      "surface-dim": "#cbdbf5",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-surface-variant": "#45474c",
+                      "surface-container-highest": "#d3e4fe",
+                      "surface-bright": "#f8f9ff",
+                      "on-background": "#0b1c30",
+                      "primary-fixed": "#d8e3fb",
+                      "primary-fixed-dim": "#bcc7de",
+                      "tertiary-container": "#26292b",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary": "#4648d4",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-container": "#8590a6",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#07006c",
+                      "tertiary": "#111516",
+                      "inverse-surface": "#213145",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "surface": "#f8f9ff",
+                      "surface-container-low": "#eff4ff",
+                      "tertiary-fixed": "#e0e3e5",
+                      "surface-container": "#e5eeff",
+                      "error-container": "#ffdad6",
+                      "on-primary-fixed": "#111c2d",
+                      "on-surface": "#0b1c30",
+                      "outline-variant": "#c5c6cd",
+                      "secondary-fixed": "#e1e0ff",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "surface-container-high": "#dce9ff",
+                      "on-error": "#ffffff",
+                      "surface-tint": "#545f73",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "background": "#f8f9ff",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "on-tertiary-fixed": "#191c1e",
+                      "on-secondary-container": "#fffbff",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "secondary-container": "#6063ee",
+                      "on-error-container": "#93000a",
+                      "primary-container": "#1e293b",
+                      "on-tertiary-container": "#8d9092",
+                      "on-primary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "outline": "#75777d",
+                      "primary": "#091426"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin": "40px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "max-width": "1440px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "xl": "32px",
+                      "gutter": "20px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "display-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-sm": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "title-lg": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-screen w-64 p-md gap-xs bg-surface-container-low border-r border-outline-variant fixed left-0 top-0 z-40">
+<!-- Header -->
+<div class="flex items-center gap-sm mb-lg px-xs mt-sm">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-sm font-headline-sm font-black text-secondary">EduFlow Portal</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">Teacher Dashboard</span>
+</div>
+</div>
+<!-- Main Nav -->
+<nav class="flex-1 overflow-y-auto pr-xs">
+<ul class="flex flex-col gap-xs">
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">school</span>
+<span class="text-label-md font-label-md">My Classes</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">group</span>
+<span class="text-label-md font-label-md">Students</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">event_available</span>
+<span class="text-label-md font-label-md">Attendance</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">description</span>
+<span class="text-label-md font-label-md">Exams</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+<span class="text-label-md font-label-md">Timetable</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">campaign</span>
+<span class="text-label-md font-label-md">Announcements</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">event_busy</span>
+<span class="text-label-md font-label-md">Leave</span>
+</a>
+</li>
+<li>
+<!-- Active State mapped to intent: Settings/Configuration usually lives under Profile or dedicated Settings tab. The prompt requested Settings Navigation, but the JSON provides Profile. Since 'Settings' is in footer, we will assume this is a settings sub-section. Wait, the prompt says "Settings screen... Left sidebar with Settings navigation". The JSON provided is for the main app SideNavBar. Since I must use the exact JSON for the SideNavBar, but the prompt asks for a settings screen, I will render the SideNav with "Profile" active as a proxy, and a secondary navigation column for the specific settings. Actually, 'Settings' is in the footer of the provided JSON. I'll make Settings active in the footer. -->
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">account_circle</span>
+<span class="text-label-md font-label-md">Profile</span>
+</a>
+</li>
+</ul>
+</nav>
+<!-- Footer Nav -->
+<div class="mt-auto pt-sm border-t border-outline-variant/30">
+<ul class="flex flex-col gap-xs">
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-lg">help</span>
+<span class="text-label-md font-label-md">Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-sm rounded-lg bg-primary-container text-on-primary-container font-semibold scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- TopAppBar (Generic contextual header since Nav is on side, but prompt implies a TopAppBar might be present. JSON provided one. We'll render it at the top of the main content area) -->
+<header class="sticky top-0 z-30 flex justify-between items-center w-full px-lg py-sm bg-surface border-b border-outline-variant h-[64px]">
+<div class="flex items-center gap-md">
+<span class="text-title-lg font-title-lg font-bold text-primary hidden">EduFlow</span> <!-- Hidden to avoid duplicate branding with sidebar, but keeping structure -->
+<h1 class="text-headline-sm font-headline-sm text-primary">Settings</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="text-label-md font-label-md text-on-surface-variant">Campus A</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container-low transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="Professional headshot of a school administrator in a modern, well-lit office setting. Corporate modern aesthetic with a focus on authority and approachability. Soft, high-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS65uyS5-ohTGcx6T_hAalkLBWJ-L_1X9sLITsqGSaAb4EToeOg48irgIUy7Eu7s6iabP5QsM2fN_AUh6IXHn_x7WSg90PAWwxrLB8zbT8dFjVBODcUFZeAvoggQ95fD9ADHkExJVMeCV0ft7UojRQCFcGKpcbBAy_bN8OPzDVPu-nef27R1QuVvArqqJrWihalsWzdVjbqN4eD4P5ROgMCYYblL7IZTYoaq8FdAiEuTAtqsnHV8zEaw"/>
+</div>
+</div>
+</header>
+<!-- Page Layout: Secondary Settings Nav + Main Settings Content -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Secondary Settings Nav -->
+<div class="w-64 border-r border-outline-variant bg-surface-bright overflow-y-auto flex-shrink-0 hidden md:block">
+<div class="p-lg pb-sm">
+<h2 class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider">Configuration</h2>
+</div>
+<nav class="px-sm pb-lg">
+<ul class="flex flex-col gap-1">
+<li>
+<a class="block px-md py-sm rounded-md bg-surface-container text-primary font-label-md text-label-md border-l-2 border-primary" href="#">
+                                School Profile
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Campuses
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Academic Sessions
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Classes
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Sections
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Subjects
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Fee Settings
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Notification Settings
+                            </a>
+</li>
+<li>
+<a class="block px-md py-sm rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-primary font-label-md text-label-md border-l-2 border-transparent transition-colors" href="#">
+                                Users &amp; Roles
+                            </a>
+</li>
+</ul>
+</nav>
+</div>
+<!-- Main Settings Content Form -->
+<div class="flex-1 overflow-y-auto bg-background p-lg lg:p-xl">
+<div class="max-w-4xl mx-auto">
+<div class="mb-xl flex justify-between items-end">
+<div>
+<h2 class="text-headline-md font-headline-md text-on-surface mb-xs">School Profile</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Manage your institution's core identity and contact information.</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm rounded text-label-md font-label-md border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors">Cancel</button>
+<button class="px-md py-sm rounded bg-primary text-on-primary text-label-md font-label-md hover:opacity-90 transition-opacity flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm">save</span>
+                                Save Changes
+                            </button>
+</div>
+</div>
+<!-- Form Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<!-- Left Col: Logo & Basic Info -->
+<div class="md:col-span-1 flex flex-col gap-lg">
+<!-- Logo Upload Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg">
+<h3 class="text-title-lg font-title-lg text-on-surface mb-md">Institution Logo</h3>
+<div class="flex flex-col items-center justify-center border-2 border-dashed border-outline-variant rounded-lg p-lg bg-surface-bright hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-24 h-24 rounded-full bg-surface-container flex items-center justify-center mb-md group-hover:scale-105 transition-transform overflow-hidden border border-outline-variant">
+<img alt="Current Logo" class="w-full h-full object-cover" data-alt="A clean, minimalist vector logo of a modern private school, featuring a stylized crest or open book. Deep indigo and white colors. High-resolution, professional design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSbbsFchilBMtBRtjDTTqbZN7a9-oVZKplx4jvK9DJgCSIvyu4mjMMXV2ZyalO-jK87Wdwge0OikV9W37zWIJcF6HCx1rtDCbttH4mlyviusTfV4VHE2BxJZrgY9veQC9AgZBPJtqxPaV3kl2Ee_K4Lt8csKPkCAiJv6WL6UKfdWBbk8xD2lxokVOSOHhKGYcRtK-phixclc5yKKc-hTxLFB6YrSinrN2G4hM03VqnyBgc8iGgQQSb5g"/>
+</div>
+<span class="text-label-md font-label-md text-primary group-hover:underline">Upload new image</span>
+<span class="text-label-sm font-label-sm text-on-surface-variant mt-xs text-center">JPG, PNG or SVG. Max 2MB.</span>
+</div>
+</div>
+</div>
+<!-- Right Col: Form Fields -->
+<div class="md:col-span-2 flex flex-col gap-lg">
+<!-- General Info Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg">
+<h3 class="text-title-lg font-title-lg text-on-surface mb-md">General Information</h3>
+<div class="grid grid-cols-1 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="schoolName">School Name <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="schoolName" placeholder="Enter school name" type="text" value="EduFlow International Academy"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="principalName">Principal / Head of School</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="principalName" placeholder="Enter principal's name" type="text" value="Dr. Sarah Jenkins"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="affiliation">Board Affiliation / Accreditation</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="affiliation" placeholder="e.g., State Board, CBSE, IB" type="text" value="Cambridge Assessment International Education"/>
+</div>
+</div>
+</div>
+<!-- Contact & Address Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-lg">
+<h3 class="text-title-lg font-title-lg text-on-surface mb-md">Contact &amp; Location</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-md">
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="email">Official Email <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="email" type="email" value="admin@eduflow.edu"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="phone">Contact Number</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="phone" type="tel" value="+1 (555) 123-4567"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs mb-md">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="address">Street Address</label>
+<textarea class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors resize-none" id="address" rows="2">1200 Innovation Drive, Education Park</textarea>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<div class="md:col-span-2 flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="city">City</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="city" type="text" value="Boston"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="state">State</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="state" type="text" value="MA"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="text-label-sm font-label-sm text-on-surface-variant" for="zip">Zip Code</label>
+<input class="w-full bg-transparent border border-outline-variant rounded px-md py-sm text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" id="zip" type="text" value="02110"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

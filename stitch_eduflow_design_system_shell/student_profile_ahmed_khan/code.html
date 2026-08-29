@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Student Profile (Ahmed Khan)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#d3e4fe",
+                      "surface-dim": "#cbdbf5",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#e0e3e5",
+                      "inverse-primary": "#bcc7de",
+                      "on-tertiary-container": "#8d9092",
+                      "surface-bright": "#f8f9ff",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "background": "#f8f9ff",
+                      "on-tertiary-fixed": "#191c1e",
+                      "inverse-on-surface": "#eaf1ff",
+                      "on-primary": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#4648d4",
+                      "on-background": "#0b1c30",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "primary-container": "#1e293b",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "on-tertiary": "#ffffff",
+                      "surface-container": "#e5eeff",
+                      "primary-fixed-dim": "#bcc7de",
+                      "on-surface-variant": "#45474c",
+                      "secondary-fixed": "#e1e0ff",
+                      "on-secondary-fixed": "#07006c",
+                      "secondary-container": "#6063ee",
+                      "surface-container-low": "#eff4ff",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline-variant": "#c5c6cd",
+                      "error": "#ba1a1a",
+                      "tertiary-container": "#26292b",
+                      "on-error-container": "#93000a",
+                      "outline": "#75777d",
+                      "primary": "#091426",
+                      "on-surface": "#0b1c30",
+                      "on-secondary-container": "#fffbff",
+                      "primary-fixed": "#d8e3fb",
+                      "on-primary-container": "#8590a6",
+                      "surface-container-high": "#dce9ff",
+                      "tertiary": "#111516",
+                      "inverse-surface": "#213145",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#111c2d",
+                      "surface-tint": "#545f73"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "20px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "xl": "32px",
+                      "margin": "40px",
+                      "max-width": "1440px",
+                      "lg": "24px",
+                      "base": "4px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "display-sm": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "title-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-sm": [
+                              "11px",
+                              {
+                                      "lineHeight": "14px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-sm": [
+                              "36px",
+                              {
+                                      "lineHeight": "44px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-background font-body-md h-full flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-lowest dark:bg-primary-container text-secondary dark:text-secondary-fixed font-label-md text-label-md fixed left-0 top-0 h-screen w-64 border-r border-outline-variant dark:border-outline flat no shadows flex flex-col h-full py-6 px-4 z-20">
+<div class="mb-8 px-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-[32px]">school</span>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed">EduFlow</h1>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Admin Suite</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg transition-all active:scale-95 duration-100" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>Students</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span>Teachers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="class">class</span>
+<span>Classes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span>Attendance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>Fees</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span>Exams</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span>Timetable</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span>Announcements</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span>Reports</span>
+</a>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container transition-all hover:scale-95 duration-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<button class="mt-4 w-full bg-surface-container-low text-primary py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors border border-outline-variant">Help Center</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-64 flex flex-col min-h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-primary-container text-primary dark:text-primary-fixed font-label-md text-label-md docked full-width top-0 sticky border-b border-outline-variant dark:border-outline shadow-sm flex justify-between items-center h-16 px-gutter z-10 w-full">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:ring-2 focus:ring-primary-container focus:outline-none focus:border-secondary transition-all w-64" placeholder="Search students, staff..." type="text"/>
+</div>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container outline-none" href="#">All Campuses</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors focus:ring-2 focus:ring-primary-container outline-none" href="#">2026-27</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative focus:ring-2 focus:ring-primary-container outline-none rounded-full p-1">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant cursor-pointer focus:ring-2 focus:ring-primary-container outline-none">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a school administrator in a bright, modern office setting. The lighting is soft and natural, casting gentle shadows. The subject is wearing business casual attire, exuding confidence and approachability. The background features subtle educational elements like a bookshelf blurred in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwYIBE_MnaI9V7p3GDdVaGVpuLTd1Dj-oxe6wA-PEZqxo1m5A1czzDDJW8gosdv27Z-lFePHKLN9U8w6_Oeyq4iUuZc-DhGpfO6hU0YV-m_8cWYOVxkMDg7NpWbOdmKgo4V0nBz0zaKUoS7Y-eAxV7UIE7xi4WD2huwNkx9TSkL4h55Zw9xZTKkJtJNCgWsALSGso2ZKW2Ksz9B3bsr9ZRMYg-twaCLYRmTNUle5hK_Mi4WLD6mb04KA"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 overflow-y-auto p-margin max-w-max-width mx-auto w-full bg-background">
+<!-- Student Header -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-md shadow-sm">
+<div class="flex items-center gap-6">
+<div class="h-24 w-24 rounded-full bg-surface-variant overflow-hidden border-2 border-surface flex-shrink-0">
+<img alt="Ahmed Khan Avatar" class="w-full h-full object-cover" data-alt="A high-quality portrait of a young male student, Ahmed Khan, looking bright and engaged. The lighting is studio-quality, clear and vibrant, against a clean light grey background to maintain a professional academic profile look. He is wearing a standard school uniform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBaT2m6L2m-ub-N5XJMdU5PYKr6HlxA1crzJUk_DqUvAyfzJeZme-kRVTmai6M11VaTcnuRAMU6wKY4bxXr4xSO7r1oVrrrzWx70C7rz1j73IOUB7H7UxK2KOkGZbtUfKQsvO_MVhr_mN3J-7CgNrIk01_tH6ivU9jJ8_4GaPb66XcfBzrc9DplPteK0wRLV-iiSGVptsXyyBoSz2sSeQSnWpcroTlZ9EGm4uBL2mntKTLj9oU0ZqzxA"/>
+</div>
+<div>
+<div class="flex items-center gap-3 mb-1">
+<h2 class="font-headline-lg text-headline-lg text-on-surface m-0">Ahmed Khan</h2>
+<span class="bg-surface-container text-primary px-2 py-1 rounded-full font-label-sm text-label-sm border border-secondary-fixed">ST-1024</span>
+<span class="bg-surface-container-high text-secondary px-2 py-1 rounded-full font-label-sm text-label-sm border border-secondary-fixed-dim">Active</span>
+</div>
+<p class="text-on-surface-variant font-body-md m-0">Grade 5 — Section A</p>
+</div>
+</div>
+<div class="flex gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">print</span>
+                        Print Profile
+                    </button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-secondary text-on-secondary rounded-lg font-label-md text-label-md hover:bg-secondary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                        Edit Student
+                    </button>
+</div>
+</div>
+<!-- Tabs -->
+<div class="border-b border-outline-variant mb-lg flex gap-6 overflow-x-auto no-scrollbar">
+<button class="pb-3 border-b-2 border-primary text-primary font-label-md text-label-md font-semibold whitespace-nowrap">Overview</button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium whitespace-nowrap transition-colors">Attendance</button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium whitespace-nowrap transition-colors">Fees</button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium whitespace-nowrap transition-colors">Exams</button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium whitespace-nowrap transition-colors">Documents</button>
+<button class="pb-3 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface font-label-md text-label-md font-medium whitespace-nowrap transition-colors">Activity</button>
+</div>
+<!-- Overview Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Personal Information -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">person</span>
+                        Personal Information
+                    </h3>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Date of Birth</p>
+<p class="font-body-md text-on-surface">12 May 2013</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Gender</p>
+<p class="font-body-md text-on-surface">Male</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Blood Group</p>
+<p class="font-body-md text-on-surface">O+</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Nationality</p>
+<p class="font-body-md text-on-surface">Pakistani</p>
+</div>
+<div class="col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Address</p>
+<p class="font-body-md text-on-surface">House 45, Street 12, DHA Phase 5, Lahore</p>
+</div>
+</div>
+</div>
+<!-- Academic Information -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">local_library</span>
+                        Academic Information
+                    </h3>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Current Grade</p>
+<p class="font-body-md text-on-surface">Grade 5</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Section</p>
+<p class="font-body-md text-on-surface">A</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Class Teacher</p>
+<p class="font-body-md text-on-surface text-secondary hover:underline cursor-pointer">Sarah Jenkins</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Attendance Rate</p>
+<p class="font-body-md text-on-surface text-green-700 font-semibold">94%</p>
+</div>
+</div>
+</div>
+<!-- Parent Information -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">family_restroom</span>
+                        Parent Information
+                    </h3>
+<div class="space-y-6">
+<div>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3 bg-surface-container-low px-2 py-1 rounded inline-block">Father (Primary Contact)</h4>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Name</p>
+<p class="font-body-md text-on-surface">Tariq Khan</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Phone</p>
+<p class="font-body-md text-on-surface">+92 300 1234567</p>
+</div>
+<div class="col-span-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Email</p>
+<p class="font-body-md text-on-surface">tariq.khan@example.com</p>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface font-semibold mb-3 bg-surface-container-low px-2 py-1 rounded inline-block">Mother</h4>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Name</p>
+<p class="font-body-md text-on-surface">Ayesha Khan</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Phone</p>
+<p class="font-body-md text-on-surface">+92 321 7654321</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Admission Information -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4 border-b border-outline-variant pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">assignment</span>
+                        Admission Information
+                    </h3>
+<div class="grid grid-cols-2 gap-y-4 gap-x-6">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Admission Date</p>
+<p class="font-body-md text-on-surface">15 Aug 2021</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Admitted to Grade</p>
+<p class="font-body-md text-on-surface">Grade 2</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Status</p>
+<p class="font-body-md text-on-surface">Enrolled</p>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Previous School</p>
+<p class="font-body-md text-on-surface">Beaconhouse School System</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

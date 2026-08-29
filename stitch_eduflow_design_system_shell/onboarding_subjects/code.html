@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface-container-lowest" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Onboarding: Subjects</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f8f9ff",
+                      "on-surface": "#0b1c30",
+                      "primary-fixed": "#d8e3fb",
+                      "surface-container-high": "#dce9ff",
+                      "outline-variant": "#c5c6cd",
+                      "error": "#ba1a1a",
+                      "surface-container-low": "#eff4ff",
+                      "tertiary": "#111516",
+                      "on-primary-fixed": "#111c2d",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#cbdbf5",
+                      "on-tertiary-fixed": "#191c1e",
+                      "surface-tint": "#545f73",
+                      "primary-container": "#1e293b",
+                      "secondary": "#4648d4",
+                      "primary-fixed-dim": "#bcc7de",
+                      "surface-container": "#e5eeff",
+                      "on-secondary-fixed-variant": "#2f2ebe",
+                      "on-secondary-container": "#fffbff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#8d9092",
+                      "inverse-surface": "#213145",
+                      "tertiary-container": "#26292b",
+                      "on-error-container": "#93000a",
+                      "on-surface-variant": "#45474c",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-secondary-fixed": "#07006c",
+                      "surface-variant": "#d3e4fe",
+                      "surface-container-highest": "#d3e4fe",
+                      "error-container": "#ffdad6",
+                      "on-background": "#0b1c30",
+                      "inverse-primary": "#bcc7de",
+                      "inverse-on-surface": "#eaf1ff",
+                      "outline": "#75777d",
+                      "surface-bright": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "on-primary-container": "#8590a6",
+                      "secondary-fixed-dim": "#c0c1ff",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "secondary-fixed": "#e1e0ff",
+                      "secondary-container": "#6063ee",
+                      "on-primary-fixed-variant": "#3c475a",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#e0e3e5",
+                      "primary": "#091426",
+                      "background": "#f8f9ff",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "margin": "40px",
+                      "max-width": "1440px",
+                      "md": "16px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "lg": "24px",
+                      "gutter": "20px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Inter"],
+                      "display-sm": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "title-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-sm": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                      "title-lg": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chip-enter {
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-full bg-surface text-on-surface font-body-md antialiased flex flex-col">
+<!-- Top Navigation for Onboarding (Simplified) -->
+<header class="flex justify-between items-center h-16 px-gutter bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50 shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">EduFlow</span>
+<span class="text-on-surface-variant font-label-md text-label-md hidden md:inline">Setup Wizard</span>
+</div>
+<button class="text-on-surface-variant font-label-md text-label-md hover:text-primary transition-colors flex items-center gap-sm">
+            Save &amp; Exit
+            <span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex justify-center items-start pt-xl pb-margin px-gutter overflow-y-auto">
+<div class="w-full max-w-3xl bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant p-lg md:p-xl flex flex-col">
+<!-- Progress Indicator -->
+<div class="mb-xl">
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant mb-sm px-sm">
+<span>Institution Details</span>
+<span>Campuses</span>
+<span>Academic Year</span>
+<span>Classes</span>
+<span class="text-secondary font-bold">Subjects</span>
+<span>Review</span>
+</div>
+<div class="relative w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-secondary transition-all duration-500 ease-in-out" style="width: 83.33%;"></div>
+</div>
+</div>
+<!-- Header -->
+<div class="mb-xl text-center">
+<h1 class="font-display-sm text-display-sm text-primary mb-md">Define Your Subjects</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto">
+                    Add the core and elective subjects offered across your institution. You can map these to specific classes later.
+                </p>
+</div>
+<!-- Content -->
+<div class="flex-grow flex flex-col gap-lg">
+<!-- Input Area -->
+<div class="bg-surface-container-low p-lg rounded-lg border border-outline-variant border-opacity-50">
+<label class="block font-label-md text-label-md text-primary mb-sm" for="subject-input">Add a Subject</label>
+<div class="flex gap-md relative">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">auto_stories</span>
+<input class="w-full pl-xl pr-md py-3 bg-surface-container-lowest border border-outline-variant rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all placeholder:text-outline" id="subject-input" placeholder="e.g. Mathematics, History, Physics..." type="text"/>
+</div>
+<button class="bg-secondary text-on-secondary font-label-md text-label-md px-lg py-3 rounded-lg hover:bg-on-secondary-fixed-variant transition-colors flex items-center gap-sm" id="add-btn">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Add
+                        </button>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-sm ml-sm">Press Enter to add quickly.</p>
+</div>
+<!-- Suggested Subjects -->
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-md">Common Subjects</h3>
+<div class="flex flex-wrap gap-sm" id="suggested-tags">
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'Mathematics')">
+                            Mathematics <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'English')">
+                            English <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'Science')">
+                            Science <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'Urdu')">
+                            Urdu <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'Islamiat')">
+                            Islamiat <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+<button class="px-md py-sm rounded-full border border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-low hover:border-secondary transition-all font-body-md text-body-md flex items-center gap-xs text-sm" onclick="addTagFromSuggestion(this, 'Computer Science')">
+                            Computer Science <span class="material-symbols-outlined text-[16px] text-outline">add</span>
+</button>
+</div>
+</div>
+<!-- Added Subjects Container -->
+<div class="flex-grow mt-md">
+<div class="flex justify-between items-end mb-md border-b border-outline-variant pb-sm">
+<h2 class="font-title-lg text-title-lg text-primary">Added Subjects</h2>
+<span class="font-label-sm text-label-sm bg-surface-container-high text-on-surface-variant px-sm py-xs rounded-full" id="subject-count">0 Subjects</span>
+</div>
+<div class="py-xl text-center flex flex-col items-center justify-center" id="empty-state">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-[32px] text-outline">school</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">No subjects added yet. Type a subject name above or select from the suggestions.</p>
+</div>
+<div class="flex flex-wrap gap-md hidden" id="tags-container">
+<!-- Tags will be dynamically added here -->
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-xl pt-lg border-t border-outline-variant flex justify-between items-center">
+<button class="px-lg py-3 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    Back
+                </button>
+<button class="px-lg py-3 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md hover:bg-on-secondary-fixed-variant transition-colors flex items-center gap-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" disabled="" id="continue-btn">
+                    Continue to Review
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+        const input = document.getElementById('subject-input');
+        const addBtn = document.getElementById('add-btn');
+        const container = document.getElementById('tags-container');
+        const emptyState = document.getElementById('empty-state');
+        const subjectCount = document.getElementById('subject-count');
+        const continueBtn = document.getElementById('continue-btn');
+        let subjects = new Set();
+
+        function addTag(text) {
+            const cleanText = text.trim();
+            if (cleanText && !subjects.has(cleanText)) {
+                subjects.add(cleanText);
+                
+                const chip = document.createElement('div');
+                chip.className = 'chip-enter flex items-center gap-sm px-md py-2 bg-surface-container-high rounded-full border border-outline-variant text-on-surface font-body-md text-body-md';
+                
+                chip.innerHTML = `
+                    <span class="material-symbols-outlined text-[16px] text-secondary">book</span>
+                    <span>${cleanText}</span>
+                    <button class="text-outline hover:text-error transition-colors flex items-center justify-center rounded-full hover:bg-error-container w-6 h-6 ml-xs" onclick="removeTag(this, '${cleanText}')" aria-label="Remove ${cleanText}">
+                        <span class="material-symbols-outlined text-[16px]">close</span>
+                    </button>
+                `;
+                
+                container.appendChild(chip);
+                updateState();
+            }
+        }
+
+        function removeTag(buttonElement, text) {
+            subjects.delete(text);
+            const chip = buttonElement.closest('div');
+            chip.style.transform = 'scale(0.8)';
+            chip.style.opacity = '0';
+            chip.style.transition = 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            setTimeout(() => {
+                chip.remove();
+                updateState();
+            }, 200);
+            
+            // Re-enable suggestion button if it exists
+            const suggestions = document.querySelectorAll('#suggested-tags button');
+            suggestions.forEach(btn => {
+                if(btn.textContent.includes(text)) {
+                    btn.classList.remove('opacity-50', 'pointer-events-none');
+                }
+            });
+        }
+
+        function addTagFromSuggestion(buttonElement, text) {
+            addTag(text);
+            buttonElement.classList.add('opacity-50', 'pointer-events-none');
+        }
+
+        function updateState() {
+            const count = subjects.size;
+            subjectCount.textContent = `${count} Subject${count !== 1 ? 's' : ''}`;
+            
+            if (count > 0) {
+                emptyState.classList.add('hidden');
+                container.classList.remove('hidden');
+                continueBtn.removeAttribute('disabled');
+            } else {
+                emptyState.classList.remove('hidden');
+                container.classList.add('hidden');
+                continueBtn.setAttribute('disabled', 'true');
+            }
+        }
+
+        addBtn.addEventListener('click', () => {
+            addTag(input.value);
+            input.value = '';
+            input.focus();
+        });
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(input.value);
+                input.value = '';
+            }
+        });
+    </script>
+</body></html>

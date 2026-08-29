@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Professional Fee Invoice - EduFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#75777d", "on-primary-container": "#8590a6", "on-tertiary": "#ffffff", "on-secondary": "#ffffff", "on-tertiary-fixed": "#191c1e", "secondary": "#4648d4", "on-secondary-container": "#fffbff", "secondary-fixed-dim": "#c0c1ff", "secondary-container": "#6063ee", "error": "#ba1a1a", "on-tertiary-fixed-variant": "#444749", "outline-variant": "#c5c6cd", "surface-container": "#e5eeff", "on-error": "#ffffff", "primary-fixed-dim": "#bcc7de", "primary": "#091426", "primary-fixed": "#d8e3fb", "primary-container": "#1e293b", "surface-bright": "#f8f9ff", "on-error-container": "#93000a", "inverse-surface": "#213145", "surface-container-highest": "#d3e4fe", "tertiary-container": "#26292b", "tertiary-fixed": "#e0e3e5", "on-surface": "#0b1c30", "surface-container-high": "#dce9ff", "surface-dim": "#cbdbf5", "on-primary-fixed-variant": "#3c475a", "on-primary": "#ffffff", "on-secondary-fixed-variant": "#2f2ebe", "background": "#f8f9ff", "inverse-primary": "#bcc7de", "inverse-on-surface": "#eaf1ff", "surface-container-low": "#eff4ff", "on-primary-fixed": "#111c2d", "on-background": "#0b1c30", "tertiary-fixed-dim": "#c4c7c9", "on-surface-variant": "#45474c", "surface-tint": "#545f73", "surface-variant": "#d3e4fe", "error-container": "#ffdad6", "on-secondary-fixed": "#07006c", "surface": "#f8f9ff", "on-tertiary-container": "#8d9092", "secondary-fixed": "#e1e0ff", "tertiary": "#111516", "surface-container-lowest": "#ffffff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"
+                    },
+                    spacing: {
+                        "sm": "8px", "gutter": "20px", "md": "16px", "max-width": "1440px", "margin": "40px", "base": "4px", "xs": "4px", "xl": "32px", "lg": "24px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Inter"], "headline-lg": ["Inter"], "display-lg": ["Inter"], "title-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "display-sm": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "title-lg": ["18px", { lineHeight: "26px", fontWeight: "600" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "display-sm": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-sm": ["11px", { lineHeight: "14px", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-64 bg-primary text-on-primary border-r border-outline-variant flex flex-col py-md px-sm z-20">
+<!-- Header -->
+<div class="flex items-center gap-md px-sm mb-xl">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary-fixed">school</span>
+</div>
+<div>
+<h1 class="text-title-lg font-title-lg text-on-primary">EduFlow</h1>
+<p class="text-label-sm font-label-sm text-on-primary-container">Admin Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-sm">
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="font-label-md text-label-md">Dashboard</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">group</span> <span class="font-label-md text-label-md">Students</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">school</span> <span class="font-label-md text-label-md">Teachers</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">class</span> <span class="font-label-md text-label-md">Classes</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">event_available</span> <span class="font-label-md text-label-md">Attendance</span></a></li>
+<!-- Active State -->
+<li><a class="flex items-center gap-md px-md py-sm text-on-primary bg-secondary-container rounded-lg font-bold scale-[0.98] transition-transform" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span> <span class="font-label-md text-label-md">Fees</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">description</span> <span class="font-label-md text-label-md">Exams</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">assessment</span> <span class="font-label-md text-label-md">Reports</span></a></li>
+</ul>
+</div>
+<!-- CTA & Footer -->
+<div class="mt-auto pt-lg border-t border-primary-container space-y-sm">
+<button class="w-full flex justify-center items-center gap-sm bg-surface-container-highest text-on-surface py-sm rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors mb-sm">
+<span class="material-symbols-outlined text-[18px]">add</span> New Registration
+            </button>
+<ul class="space-y-sm">
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">settings</span> <span class="font-label-md text-label-md">Settings</span></a></li>
+<li><a class="flex items-center gap-md px-md py-sm rounded-lg text-on-primary-container hover:bg-primary-fixed-dim/10 transition-colors" href="#"><span class="material-symbols-outlined">help</span> <span class="font-label-md text-label-md">Support</span></a></li>
+</ul>
+</div>
+</nav>
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface-container-lowest text-primary border-b border-outline-variant shadow-sm z-10 flex justify-between items-center px-lg">
+<!-- Search / Left -->
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-md font-body-md focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" placeholder="Search invoices..." type="text"/>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-label-md text-label-md text-secondary border-b-2 border-secondary pb-1 opacity-80" href="#">Main Campus</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">2023-24 Year</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-tertiary-container overflow-hidden ml-sm cursor-pointer border border-outline-variant">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="A small, professional headshot of an administrative staff member, neutral lighting, corporate environment, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBgm0y5uZCkhB4F2X5uRComclP3r_l0U4UMBVwBeECgN7qj-XN6JfxuhL7-66P9iU57Kz33-XCnAwgQPcROHOwX6xY4Jwx3isttuwY8oyUCKEjsSPsrcqQQWgrd9SXOnd76qj2k8cR468uLPj6I4v5W4oXEvnRTeDUTOXAf28cCBa2lYquUfeiZVjDPUIh4qbv7yjG51PTfdDbYHcr1x5aD8pW0ZUvMNjGThCkgky_YoG4VrlMr5Kb6w"/>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="ml-64 mt-16 w-full min-h-[calc(100vh-4rem)] p-margin flex justify-center">
+<div class="w-full max-w-[800px]"> <!-- Constrained width for optimal invoice readability -->
+<!-- Page Header / Actions -->
+<div class="flex justify-between items-center mb-xl">
+<div>
+<div class="flex items-center gap-sm text-label-sm font-label-sm text-on-surface-variant mb-xs">
+<a class="hover:text-primary transition-colors" href="#">Fees</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Invoices</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Invoice #10245</h2>
+</div>
+<div class="flex gap-md">
+<button class="flex items-center gap-sm px-md py-2 border border-outline-variant bg-surface-container-lowest text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">print</span> Print
+                    </button>
+<button class="flex items-center gap-sm px-md py-2 border border-outline-variant bg-surface-container-lowest text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span> Download PDF
+                    </button>
+</div>
+</div>
+<!-- The Invoice Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-[48px] relative overflow-hidden">
+<!-- Decorative Top Bar -->
+<div class="absolute top-0 left-0 w-full h-2 bg-secondary-container"></div>
+<!-- Invoice Header Section -->
+<div class="flex justify-between items-start mb-xl pb-xl border-b border-outline-variant">
+<!-- School Info -->
+<div class="flex gap-md">
+<div class="w-16 h-16 bg-surface-container rounded-lg border border-outline-variant flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[32px] text-primary">account_balance</span>
+</div>
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-xs">EduFlow Academy</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">123 Education Boulevard</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Knowledge City, 10001</p>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Tax ID: 987-654-321</p>
+</div>
+</div>
+<!-- Invoice Meta & Status -->
+<div class="text-right flex flex-col items-end">
+<div class="inline-flex items-center gap-xs px-sm py-1 rounded-full bg-error-container text-on-error-container mb-md">
+<span class="material-symbols-outlined text-[14px]">error</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wide">Unpaid</span>
+</div>
+<div class="grid grid-cols-2 gap-x-lg gap-y-xs text-right">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Invoice No:</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">#10245</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Issue Date:</span>
+<span class="font-body-md text-body-md text-on-surface">Aug 25, 2026</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Due Date:</span>
+<span class="font-body-md text-body-md text-error font-medium">Sept 10, 2026</span>
+</div>
+</div>
+</div>
+<!-- Billed To Section -->
+<div class="mb-xl">
+<h4 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-sm">Billed To</h4>
+<p class="font-title-lg text-title-lg text-on-surface">Ahmed Khan</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Student ID: AK-9942</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Grade 5-A</p>
+</div>
+<!-- Line Items Table -->
+<div class="mb-xl overflow-hidden rounded-lg border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider w-full">Description</th>
+<th class="py-sm px-md font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap text-right">Amount (Rs.)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant bg-surface-container-lowest">
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="py-md px-md">
+<p class="font-body-md text-body-md text-on-surface font-medium">Tuition Fee</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Term 1 - Academic Year 2026</p>
+</td>
+<td class="py-md px-md font-body-md text-body-md text-on-surface text-right align-top pt-md">
+                                    8,000.00
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="py-md px-md">
+<p class="font-body-md text-body-md text-on-surface font-medium">Transport Service</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Route 4 - Monthly Pass</p>
+</td>
+<td class="py-md px-md font-body-md text-body-md text-on-surface text-right align-top pt-md">
+                                    2,000.00
+                                </td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="py-md px-md">
+<p class="font-body-md text-body-md text-on-surface font-medium">Examination Fee</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Mid-Term Assessments</p>
+</td>
+<td class="py-md px-md font-body-md text-body-md text-on-surface text-right align-top pt-md">
+                                    500.00
+                                </td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Summary & Actions -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-xl pt-lg">
+<!-- Notes (Optional space filler for visual balance) -->
+<div class="w-full md:w-1/2 bg-surface-container-low p-md rounded-lg">
+<p class="font-label-sm text-label-sm text-on-surface-variant font-semibold mb-xs">Payment Instructions</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">Please ensure payment is made by the due date to avoid late fees. Reference Invoice #10245 on all bank transfers.</p>
+</div>
+<!-- Totals Box -->
+<div class="w-full md:w-64">
+<div class="space-y-sm mb-md pb-md border-b border-outline-variant">
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Subtotal</span>
+<span>10,500.00</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Late Fee</span>
+<span>0.00</span>
+</div>
+</div>
+<div class="flex justify-between font-title-lg text-title-lg text-on-surface mb-lg">
+<span>Total</span>
+<span>Rs. 10,500</span>
+</div>
+<!-- Primary Action -->
+<button class="w-full flex items-center justify-center gap-sm bg-secondary text-on-secondary py-2.5 px-md rounded-lg font-label-md text-label-md hover:bg-secondary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+                            Record Payment
+                        </button>
+</div>
+</div>
+</div>
+<!-- Footer Note Outside Card -->
+<div class="mt-lg text-center font-label-sm text-label-sm text-on-surface-variant">
+                Generated securely by EduFlow Financial Systems
+            </div>
+</div>
+</main>
+</body></html>

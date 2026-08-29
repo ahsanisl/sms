@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reports Center - EduFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#213145",
+                        "surface-container": "#e5eeff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#545f73",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-container": "#26292b",
+                        "on-surface-variant": "#45474c",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-error": "#ffffff",
+                        "primary-container": "#1e293b",
+                        "on-primary-fixed": "#111c2d",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary": "#4648d4",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#8d9092",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "outline": "#75777d",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#bcc7de",
+                        "inverse-primary": "#bcc7de",
+                        "primary": "#091426",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d8e3fb",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#07006c",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#fffbff",
+                        "surface": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "tertiary": "#111516",
+                        "outline-variant": "#c5c6cd",
+                        "on-primary-container": "#8590a6",
+                        "secondary-container": "#6063ee"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "max-width": "1440px",
+                        "margin": "40px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-sm": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #c4c7c9;
+            border-radius: 20px;
+        }
+        .slide-over-enter {
+            transform: translateX(100%);
+        }
+        .slide-over-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .slide-over-leave {
+            transform: translateX(0);
+        }
+        .slide-over-leave-active {
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backdrop-enter { opacity: 0; }
+        .backdrop-enter-active { opacity: 1; transition: opacity 0.3s ease; }
+        .backdrop-leave { opacity: 1; }
+        .backdrop-leave-active { opacity: 0; transition: opacity 0.3s ease; pointer-events: none;}
+    </style>
+</head>
+<body class="bg-background flex h-screen overflow-hidden text-on-surface font-body-md text-body-md antialiased">
+<!-- SideNavBar (Shared Component Anchor) -->
+<nav class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-body-md text-body-md w-64 h-screen border-r border-outline-variant flex flex-col py-6 px-4 shrink-0 hidden md:flex">
+<!-- Header -->
+<div class="flex items-center gap-sm mb-xl px-sm">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary font-bold" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container opacity-80">Private Admin</p>
+</div>
+</div>
+<!-- Main Tabs -->
+<div class="flex-1 flex flex-col gap-xs overflow-y-auto custom-scrollbar">
+<!-- Dashboard -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">dashboard</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Dashboard</span>
+</a>
+<!-- Students -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">school</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Students</span>
+</a>
+<!-- Faculty -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">badge</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Faculty</span>
+</a>
+<!-- Academic Affairs (Active - best semantic match for Reports Center in this context) -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg bg-secondary-container text-on-secondary-container font-semibold active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span>Academic Affairs</span>
+</a>
+<!-- Finance -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">payments</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Finance</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group mt-md" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">settings</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Settings</span>
+</a>
+</div>
+<!-- Footer Tabs -->
+<div class="mt-auto pt-md border-t border-outline-variant/30 flex flex-col gap-xs">
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">help_outline</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Support</span>
+</a>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors active:scale-95 transition-transform group" href="#">
+<span class="material-symbols-outlined group-hover:text-on-primary transition-colors">logout</span>
+<span class="font-medium group-hover:text-on-primary transition-colors">Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- TopNavBar (Shared Component Anchor) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface text-primary dark:text-inverse-primary font-label-md text-label-md w-full h-16 border-b border-outline-variant shadow-sm flex justify-between items-center px-margin shrink-0 sticky top-0 z-20">
+<div class="flex items-center gap-xl">
+<!-- Search (Left alignment) -->
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-[6px] pl-[32px] pr-sm text-body-md focus:ring-1 focus:ring-secondary w-64 transition-all" placeholder="Search operations..." type="text"/>
+</div>
+<!-- Nav Links -->
+<nav class="hidden md:flex gap-md">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Campus</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Academic Session</a>
+</nav>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<button class="hidden lg:flex items-center gap-xs border border-outline-variant rounded-full px-sm py-[4px] hover:bg-surface-container-low transition-colors font-medium">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Entry
+                </button>
+<div class="flex items-center gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+</button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden ml-xs border border-outline-variant cursor-pointer">
+<img alt="Administrator Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAR3f6fbI-CbCKU7FA4SEtikluL2zZ8OkUrlCtdFEep1aj7hFaKGRm4O3MeJtgZKY09SiP8kp79puBhZ2_Wo0dAcUamF4_R4ljBms6DbSpV5sfqtJQpF1DPUNX5mwbtBF8xuiLoHPi_bZtlyuxaWsuL1d9n_Hldje2i0JRnC01YEvcTtv3fQqrzhg_9lZ99DqLp58bQMw_TKQ78hKPCPRMqSEXpZU9FQWkH-Ld9qc4giiZ00WqbSfN88Q"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-margin">
+<div class="max-w-max-width mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Reports Center</h2>
+<p class="text-on-surface-variant text-body-lg">Access centralized institutional data, summaries, and predictive analytics.</p>
+</div>
+<div class="flex items-center gap-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg px-sm py-[6px] flex items-center gap-sm text-body-md cursor-pointer hover:border-outline transition-colors">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">calendar_today</span>
+<span>Current Term (Fall 2024)</span>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Categories -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Student Reports Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow p-lg flex flex-col h-full">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">groups</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Student Reports</h3>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Enrollment Summary')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">summarize</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Enrollment Summary</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Demographic Breakdown')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">pie_chart</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Demographic Breakdown</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Performance Overview')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">trending_up</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Performance Overview</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+</ul>
+</div>
+<!-- Attendance Reports Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow p-lg flex flex-col h-full lg:row-span-2">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">how_to_reg</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Attendance Reports</h3>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Daily Attendance Log')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">today</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Daily Attendance</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Monthly Summary')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">calendar_month</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Monthly Summary</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Low Attendance Alert')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-error group-hover:text-error transition-colors">warning</span>
+<span class="text-on-surface font-medium group-hover:text-error transition-colors">Low Attendance Alert</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-error transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between mt-auto pt-sm border-t border-surface-variant border-dashed" onclick="openReportPanel('Custom Attendance Query')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">database</span>
+<span class="text-on-surface-variant font-medium group-hover:text-secondary transition-colors text-label-md">Custom Query Builder</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">add</span>
+</li>
+</ul>
+</div>
+<!-- Fee Reports Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow p-lg flex flex-col h-full">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Fee Reports</h3>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Defaulters List')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-error group-hover:text-error transition-colors">money_off</span>
+<span class="text-on-surface font-medium group-hover:text-error transition-colors">Defaulters List</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-error transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Collection Summary')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">receipt_long</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Collection Summary</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Revenue Forecast')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">insights</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Revenue Forecast</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+</ul>
+</div>
+<!-- Academic Reports Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow p-lg flex flex-col h-full">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">assignment</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Academic Reports</h3>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Gradebook Export')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">grade</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Gradebook Export</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Subject Averages')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">bar_chart</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Subject Averages</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Exam Allocations')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">event_seat</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Exam Allocations</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+</ul>
+</div>
+<!-- Teacher Reports Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow p-lg flex flex-col h-full">
+<div class="flex items-center gap-sm mb-md pb-xs border-b border-surface-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface">Teacher Reports</h3>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Workload Distribution')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">work_history</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Workload Distribution</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Leave Summary')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">event_busy</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Leave Summary</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+<li class="group cursor-pointer rounded-md hover:bg-surface-container-low transition-colors px-xs py-sm -mx-xs flex items-center justify-between" onclick="openReportPanel('Performance Metrics')">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant group-hover:text-secondary transition-colors">military_tech</span>
+<span class="text-on-surface font-medium group-hover:text-secondary transition-colors">Performance Metrics</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-outline-variant group-hover:text-secondary transition-colors opacity-0 group-hover:opacity-100">arrow_forward</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Slide-over Modal/Panel for Report Details -->
+<div class="fixed inset-0 bg-primary/40 z-40 hidden backdrop-leave" id="report-backdrop" onclick="closeReportPanel()"></div>
+<div class="fixed inset-y-0 right-0 w-full max-w-[500px] bg-surface-container-lowest shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] z-50 flex flex-col slide-over-leave hidden border-l border-outline-variant" id="report-panel">
+<!-- Panel Header -->
+<div class="px-lg py-md border-b border-outline-variant flex items-center justify-between shrink-0 bg-surface">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs" id="panel-title">Report Configuration</h3>
+<p class="text-label-md text-on-surface-variant">Configure parameters to generate data.</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant" onclick="closeReportPanel()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Panel Body (Scrollable) -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg flex flex-col gap-lg">
+<!-- Filters Section -->
+<div class="flex flex-col gap-md">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Filters</h4>
+<div class="grid grid-cols-2 gap-md">
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface">Start Date</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">calendar_today</span>
+<input class="w-full border border-outline-variant rounded-md py-[6px] pl-[32px] pr-sm text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary text-on-surface bg-surface-container-lowest" type="date" value="2024-09-01"/>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface">End Date</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[16px]">calendar_today</span>
+<input class="w-full border border-outline-variant rounded-md py-[6px] pl-[32px] pr-sm text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary text-on-surface bg-surface-container-lowest" type="date" value="2024-10-31"/>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface">Campus</label>
+<select class="w-full border border-outline-variant rounded-md py-[6px] px-sm text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary text-on-surface bg-surface-container-lowest appearance-none">
+<option>All Campuses</option>
+<option>Main Campus (North)</option>
+<option>Secondary Campus (South)</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-sm text-label-sm text-on-surface">Class / Grade Level</label>
+<select class="w-full border border-outline-variant rounded-md py-[6px] px-sm text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary text-on-surface bg-surface-container-lowest appearance-none">
+<option>All Classes</option>
+<option>Grade 9</option>
+<option>Grade 10</option>
+<option>Grade 11</option>
+<option>Grade 12</option>
+</select>
+</div>
+</div>
+<!-- Preview Section -->
+<div class="flex flex-col gap-md flex-1">
+<div class="flex items-center justify-between">
+<h4 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Data Preview</h4>
+<button class="text-secondary font-label-sm text-label-sm hover:underline">Refresh Preview</button>
+</div>
+<div class="flex-1 border border-outline-variant border-dashed rounded-lg bg-surface flex flex-col items-center justify-center p-md min-h-[200px]">
+<!-- Mock visual for preview area -->
+<div class="w-full max-w-[300px] flex items-end justify-between h-24 gap-xs opacity-50 mb-md">
+<div class="w-full bg-primary-fixed-dim rounded-t-sm" style="height: 40%"></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm" style="height: 70%"></div>
+<div class="w-full bg-secondary rounded-t-sm" style="height: 90%"></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm" style="height: 50%"></div>
+<div class="w-full bg-primary-fixed-dim rounded-t-sm" style="height: 80%"></div>
+</div>
+<p class="text-label-md text-on-surface-variant text-center max-w-[250px]">Preview generated based on selected filters. Total records found: ~1,240.</p>
+</div>
+</div>
+</div>
+<!-- Panel Footer (Export Actions) -->
+<div class="p-lg border-t border-outline-variant shrink-0 bg-surface flex items-center justify-end gap-md">
+<button class="flex items-center gap-xs border border-outline text-on-surface font-label-md px-md py-[8px] rounded-lg hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px]">table_view</span>
+                Export Excel
+            </button>
+<button class="flex items-center gap-xs bg-secondary text-on-secondary font-label-md px-md py-[8px] rounded-lg hover:bg-secondary-container hover:text-on-secondary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                Export PDF
+            </button>
+</div>
+</div>
+<script>
+        const panel = document.getElementById('report-panel');
+        const backdrop = document.getElementById('report-backdrop');
+        const titleEl = document.getElementById('panel-title');
+
+        function openReportPanel(reportTitle) {
+            titleEl.textContent = reportTitle;
+            
+            backdrop.classList.remove('hidden');
+            panel.classList.remove('hidden');
+            
+            // Trigger reflow
+            void backdrop.offsetWidth;
+            
+            backdrop.classList.remove('backdrop-leave');
+            backdrop.classList.add('backdrop-enter-active');
+            
+            panel.classList.remove('slide-over-leave');
+            panel.classList.add('slide-over-enter-active');
+        }
+
+        function closeReportPanel() {
+            backdrop.classList.remove('backdrop-enter-active');
+            backdrop.classList.add('backdrop-leave');
+            
+            panel.classList.remove('slide-over-enter-active');
+            panel.classList.add('slide-over-leave-active');
+            
+            // Wait for transition to finish before hiding
+            setTimeout(() => {
+                backdrop.classList.add('hidden');
+                panel.classList.add('hidden');
+            }, 300); // Matches CSS transition duration
+        }
+    </script>
+</body></html>

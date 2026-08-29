@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Campus Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f8f9ff",
+                        "on-surface": "#0b1c30",
+                        "primary-fixed": "#d8e3fb",
+                        "surface-container-high": "#dce9ff",
+                        "outline-variant": "#c5c6cd",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary": "#111516",
+                        "on-primary-fixed": "#111c2d",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed": "#191c1e",
+                        "surface-tint": "#545f73",
+                        "primary-container": "#1e293b",
+                        "secondary": "#4648d4",
+                        "primary-fixed-dim": "#bcc7de",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "on-secondary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8d9092",
+                        "inverse-surface": "#213145",
+                        "tertiary-container": "#26292b",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#45474c",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-secondary-fixed": "#07006c",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-highest": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#bcc7de",
+                        "inverse-on-surface": "#eaf1ff",
+                        "outline": "#75777d",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#8590a6",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "secondary-fixed": "#e1e0ff",
+                        "secondary-container": "#6063ee",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "primary": "#091426",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin": "40px",
+                        "max-width": "1440px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter": "20px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-sm": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus ~ label, input:not(:placeholder-shown) ~ label {
+            transform: translateY(-50%) scale(0.85);
+            top: 0;
+            left: 12px;
+            background-color: white;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen overflow-hidden flex">
+<!-- Note: TopNavBar and SideNavBar are suppressed for this transactional onboarding flow -->
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto w-full h-full">
+<div class="max-w-[1440px] mx-auto px-gutter py-xl min-h-full flex flex-col">
+<!-- Header & Branding -->
+<header class="flex justify-between items-center mb-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary text-on-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined" data-weight="fill">school</span>
+</div>
+<span class="font-headline-md text-headline-md text-primary">EduFlow</span>
+</div>
+<div>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</button>
+</div>
+</header>
+<!-- Onboarding Layout (Bento-style Split) -->
+<div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-lg max-w-5xl mx-auto w-full">
+<!-- Left Column: Progress & Context -->
+<div class="lg:col-span-4 flex flex-col gap-xl">
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm relative overflow-hidden">
+<h1 class="font-display-sm text-display-sm text-primary mb-md relative z-10">Campus Management</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl relative z-10">Add the physical locations for your institution. You can always add more campuses later.</p>
+<!-- Progress Indicator -->
+<div class="relative z-10 space-y-6">
+<!-- Step 1 (Completed) -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 z-10 relative">
+<span class="material-symbols-outlined text-[18px]">check</span>
+<div class="absolute top-8 left-1/2 w-[2px] h-10 bg-secondary -translate-x-1/2 -z-10"></div>
+</div>
+<div class="pt-1">
+<h3 class="font-title-lg text-title-lg text-on-surface">Institution Details</h3>
+</div>
+</div>
+<!-- Step 2 (Active) -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center shrink-0 z-10 relative shadow-[0_0_0_4px_#e1e0ff]">
+<span class="font-label-md text-label-md">2</span>
+<div class="absolute top-8 left-1/2 w-[2px] h-10 bg-outline-variant -translate-x-1/2 -z-10"></div>
+</div>
+<div class="pt-1">
+<h3 class="font-title-lg text-title-lg text-primary">Campus Management</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">Configure physical locations</p>
+</div>
+</div>
+<!-- Step 3 (Pending) -->
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center shrink-0 z-10 relative">
+<span class="font-label-md text-label-md">3</span>
+</div>
+<div class="pt-1 opacity-50">
+<h3 class="font-title-lg text-title-lg text-on-surface-variant">Academic Year</h3>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Form & List -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Add Campus Form -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-lg">Add New Campus</h2>
+<form class="space-y-md">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Campus Name -->
+<div class="relative">
+<input class="block w-full px-4 py-3 bg-white border border-outline-variant rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary font-body-md text-on-surface peer transition-colors" id="campus_name" placeholder=" " type="text"/>
+<label class="absolute left-4 top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant pointer-events-none transition-all duration-200 peer-focus:text-secondary" for="campus_name">Campus Name</label>
+</div>
+<!-- Campus Administrator -->
+<div class="relative">
+<input class="block w-full px-4 py-3 bg-white border border-outline-variant rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary font-body-md text-on-surface peer transition-colors" id="campus_admin" placeholder=" " type="text"/>
+<label class="absolute left-4 top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant pointer-events-none transition-all duration-200 peer-focus:text-secondary" for="campus_admin">Campus Administrator</label>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Phone -->
+<div class="relative">
+<input class="block w-full px-4 py-3 bg-white border border-outline-variant rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary font-body-md text-on-surface peer transition-colors" id="phone" placeholder=" " type="tel"/>
+<label class="absolute left-4 top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant pointer-events-none transition-all duration-200 peer-focus:text-secondary" for="phone">Phone Number</label>
+</div>
+<!-- Address -->
+<div class="relative">
+<input class="block w-full px-4 py-3 bg-white border border-outline-variant rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-secondary focus:border-secondary font-body-md text-on-surface peer transition-colors" id="address" placeholder=" " type="text"/>
+<label class="absolute left-4 top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant pointer-events-none transition-all duration-200 peer-focus:text-secondary" for="address">Street Address</label>
+</div>
+</div>
+<div class="flex justify-end pt-sm">
+<button class="px-6 py-2 bg-secondary-container text-on-secondary-container hover:bg-secondary hover:text-on-secondary font-label-md text-label-md rounded-lg transition-colors flex items-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined">add</span>
+                                    Add Campus
+                                </button>
+</div>
+</form>
+</div>
+<!-- Added Campuses List -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex-1">
+<div class="px-lg py-md border-b border-outline-variant bg-surface/50 flex justify-between items-center">
+<h3 class="font-title-lg text-title-lg text-primary">Configured Campuses</h3>
+<span class="bg-secondary-fixed text-on-secondary-fixed px-2 py-1 rounded-full font-label-sm text-label-sm">2 Added</span>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Example Campus 1 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface">Main Campus</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">123 Education Ave, City Center • +1 (555) 123-4567</p>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error rounded-full hover:bg-error-container transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+<!-- Example Campus 2 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-container-low transition-colors group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div>
+<h4 class="font-title-lg text-title-lg text-on-surface">Clifton Campus</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">456 Oak Street, Clifton Heights • +1 (555) 987-6543</p>
+</div>
+</div>
+<div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-2 text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-high transition-colors" title="Edit">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-error rounded-full hover:bg-error-container transition-colors" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex justify-between items-center pt-md mt-auto">
+<button class="px-6 py-3 bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-primary font-label-md text-label-md rounded-lg transition-all flex items-center gap-2" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+                            Back
+                        </button>
+<button class="px-8 py-3 bg-secondary text-on-secondary hover:bg-primary hover:shadow-lg font-label-md text-label-md rounded-lg transition-all flex items-center gap-2" type="button">
+                            Continue
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

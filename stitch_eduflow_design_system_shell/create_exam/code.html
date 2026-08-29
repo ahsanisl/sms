@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Create New Examination</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#213145",
+                        "surface-container": "#e5eeff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#545f73",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-container": "#26292b",
+                        "on-surface-variant": "#45474c",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-error": "#ffffff",
+                        "primary-container": "#1e293b",
+                        "on-primary-fixed": "#111c2d",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary": "#4648d4",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#8d9092",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "outline": "#75777d",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#bcc7de",
+                        "inverse-primary": "#bcc7de",
+                        "primary": "#091426",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d8e3fb",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#07006c",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#fffbff",
+                        "surface": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "tertiary": "#111516",
+                        "outline-variant": "#c5c6cd",
+                        "on-primary-container": "#8590a6",
+                        "secondary-container": "#6063ee"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "max-width": "1440px",
+                        "margin": "40px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-sm": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9ff; }
+        .focus-ring:focus-within { border-color: #091426; box-shadow: 0 0 0 1px #091426; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-background text-on-background flex min-h-screen antialiased">
+<!-- Side Navigation (Shared Component) -->
+<nav class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-body-md text-body-md docked left-0 h-screen w-64 border-r border-outline-variant flat no shadows flex flex-col h-full py-6 px-4 hidden md:flex shrink-0">
+<div class="mb-xl flex items-center gap-sm px-md">
+<span class="material-symbols-outlined text-[32px] text-on-primary">school</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</span>
+<span class="text-xs opacity-70">Private Admin</span>
+</div>
+</div>
+<ul class="flex flex-col gap-sm flex-grow">
+<!-- Academic Affairs is Active -->
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">school</span>
+                    Students
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">badge</span>
+                    Faculty
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm bg-secondary-container text-on-secondary-container font-semibold rounded-lg hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+                    Academic Affairs
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">payments</span>
+                    Finance
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+<div class="mt-auto border-t border-primary-fixed-variant pt-md">
+<ul class="flex flex-col gap-sm">
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+                        Support
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+                        Sign Out
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col w-full max-w-[1440px] mx-auto bg-surface">
+<!-- Top Navigation (Shared Component) -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface text-primary dark:text-inverse-primary font-label-md text-label-md docked top-0 full-width sticky shadow-sm flex justify-between items-center h-16 px-margin w-full z-10">
+<div class="flex items-center gap-lg">
+<div class="font-title-lg text-title-lg font-black text-primary md:hidden">EduFlow</div>
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant focus-ring w-64">
+<span class="material-symbols-outlined text-outline mr-2 text-[20px]">search</span>
+<input class="bg-transparent border-none outline-none text-body-md w-full placeholder-outline" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<nav class="hidden md:flex gap-lg">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Campus</a>
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 hover:text-primary transition-colors opacity-80 hover:opacity-100" href="#">Academic Session</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-4 py-2 rounded font-label-md text-label-md hover:bg-primary-container transition-colors hidden sm:block">New Entry</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-colors opacity-80 hover:opacity-100"><span class="material-symbols-outlined">apps</span></button>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border border-outline-variant ml-2">
+<img alt="Administrator Profile" class="w-full h-full object-cover" data-alt="Professional headshot of a private school administrator in modern corporate attire, bright natural lighting, minimalist background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDfp6K5wb8yocc9yr2gSH_BIBP_jsAvqKBd19e3pE-1utOkA9OsNHVQE8IqlSj35DpGlN4MZvrN58ADsio2lFbKGUUQifz8XXVQ43Upl6MRR6ZBTD_SHupUn4JLqBPct4FaAK7sSLuvx1P6UAjjEpQAPsJRRl9BwD8ykK6HdNCV2vOhgvRWI8oqKTAFLsNhmt8fme-Ejt3bg8Jz4qBX5PWXgAc6jvYJsIl7lFHD9qVOoXYQOXUKr5uFQ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="p-margin flex-grow overflow-y-auto">
+<div class="mb-xl">
+<nav class="text-label-sm text-on-surface-variant mb-2 flex items-center gap-2">
+<a class="hover:text-primary" href="#">Academic Affairs</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-primary" href="#">Examinations</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Create New Examination</span>
+</nav>
+<h1 class="font-display-sm text-display-sm text-on-surface">Create New Examination</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Configure academic assessments and grading criteria.</p>
+</div>
+<form class="grid grid-cols-1 lg:grid-cols-3 gap-lg relative">
+<!-- Left Column: Form Fields -->
+<div class="lg:col-span-2 flex flex-col gap-lg">
+<!-- Basic Info Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-md pb-2 border-b border-outline-variant">Exam Details</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="col-span-1 md:col-span-2 flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="examName">Exam Name *</label>
+<input class="w-full bg-surface border border-outline-variant rounded-md px-md py-2 font-body-md text-body-md text-on-surface focus:outline-none focus-ring placeholder-outline" id="examName" placeholder="e.g., Mid-Term Assessment 2024" type="text"/>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="academicSession">Academic Session *</label>
+<div class="relative focus-ring rounded-md">
+<select class="w-full bg-surface border border-outline-variant rounded-md px-md py-2 font-body-md text-body-md text-on-surface appearance-none focus:outline-none" id="academicSession">
+<option disabled="" selected="" value="">Select Session</option>
+<option value="2023-2024">2023-2024</option>
+<option value="2024-2025">2024-2025</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="term">Term *</label>
+<div class="relative focus-ring rounded-md">
+<select class="w-full bg-surface border border-outline-variant rounded-md px-md py-2 font-body-md text-body-md text-on-surface appearance-none focus:outline-none" id="term">
+<option disabled="" selected="" value="">Select Term</option>
+<option value="fall">Fall Term</option>
+<option value="spring">Spring Term</option>
+<option value="summer">Summer Term</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="startDate">Start Date *</label>
+<input class="w-full bg-surface border border-outline-variant rounded-md px-md py-2 font-body-md text-body-md text-on-surface focus:outline-none focus-ring" id="startDate" type="date"/>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface" for="endDate">End Date *</label>
+<input class="w-full bg-surface border border-outline-variant rounded-md px-md py-2 font-body-md text-body-md text-on-surface focus:outline-none focus-ring" id="endDate" type="date"/>
+</div>
+</div>
+</div>
+<!-- Scope Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-md pb-2 border-b border-outline-variant">Exam Scope</h2>
+<div class="flex flex-col gap-lg">
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface">Target Classes *</label>
+<div class="bg-surface border border-outline-variant rounded-md p-md">
+<div class="flex flex-wrap gap-2 mb-3">
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1">Grade 10 <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span></span>
+<span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1">Grade 11 <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span></span>
+</div>
+<div class="relative">
+<input class="w-full bg-transparent border-none outline-none font-body-md text-body-md text-on-surface placeholder-outline-variant" placeholder="Type to search and add classes..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface">Included Subjects *</label>
+<div class="bg-surface border border-outline-variant rounded-md p-md">
+<div class="flex flex-wrap gap-2 mb-3">
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-outline-variant">Mathematics <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span></span>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-outline-variant">Advanced Physics <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span></span>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full font-label-md text-label-md flex items-center gap-1 border border-outline-variant">World Literature <span class="material-symbols-outlined text-[14px] cursor-pointer hover:text-error">close</span></span>
+</div>
+<div class="relative">
+<input class="w-full bg-transparent border-none outline-none font-body-md text-body-md text-on-surface placeholder-outline-variant" placeholder="Select subjects..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Subject Configuration Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="p-lg pb-0">
+<h2 class="font-title-lg text-title-lg text-on-surface mb-2">Subject Configuration</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Define marking criteria for the selected subjects.</p>
+</div>
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-y border-outline-variant">
+<tr>
+<th class="p-md font-label-sm text-label-sm text-on-surface uppercase tracking-wider">Subject Name</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface uppercase tracking-wider w-40">Maximum Marks</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface uppercase tracking-wider w-40">Passing Marks</th>
+<th class="p-md font-label-sm text-label-sm text-on-surface uppercase tracking-wider w-16 text-center">Actions</th>
+</tr>
+</thead>
+<tbody class="bg-surface-container-lowest">
+<tr class="border-b border-outline-variant hover:bg-surface-container-low/50 transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                            Mathematics
+                                        </td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="100"/>
+</td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="40"/>
+</td>
+<td class="p-md text-center">
+<button class="text-on-surface-variant hover:text-error transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container-low/50 transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                            Advanced Physics
+                                        </td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="100"/>
+</td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="40"/>
+</td>
+<td class="p-md text-center">
+<button class="text-on-surface-variant hover:text-error transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="p-md font-body-md text-body-md text-on-surface font-medium flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+                                            World Literature
+                                        </td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="100"/>
+</td>
+<td class="p-md">
+<input class="w-full bg-surface border border-outline-variant rounded px-2 py-1 font-body-md text-body-md text-center focus:outline-none focus-ring" type="number" value="35"/>
+</td>
+<td class="p-md text-center">
+<button class="text-on-surface-variant hover:text-error transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md border-t border-outline-variant bg-surface-container-low flex justify-end">
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span> Apply Bulk Values
+                             </button>
+</div>
+</div>
+</div>
+<!-- Right Column: Summary & Actions -->
+<div class="lg:col-span-1">
+<div class="sticky top-24 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col gap-lg">
+<div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-2">Summary</h3>
+<div class="flex justify-between py-2 border-b border-outline-variant border-dashed">
+<span class="font-body-md text-body-md text-on-surface-variant">Total Subjects</span>
+<span class="font-label-md text-label-md text-on-surface">3 Selected</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline-variant border-dashed">
+<span class="font-body-md text-body-md text-on-surface-variant">Affected Classes</span>
+<span class="font-label-md text-label-md text-on-surface">2 Classes</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline-variant border-dashed">
+<span class="font-body-md text-body-md text-on-surface-variant">Duration</span>
+<span class="font-label-md text-label-md text-on-surface">-</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-md rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary mt-1">info</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
+                                Once created, the exam schedule will be visible to faculty for mark entry. Students will see the schedule if published.
+                            </p>
+</div>
+<div class="flex flex-col gap-sm pt-4 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-md hover:bg-primary-container transition-colors flex items-center justify-center gap-2 shadow-sm" type="submit">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">done</span>
+                                Create Exam
+                            </button>
+<button class="w-full bg-transparent text-on-surface-variant border border-outline-variant font-label-md text-label-md py-3 rounded-md hover:bg-surface-container-low transition-colors" type="button">
+                                Cancel
+                            </button>
+</div>
+</div>
+</div>
+</form>
+</div>
+</main>
+</body></html>

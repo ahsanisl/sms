@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Announcements</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-surface": "#213145",
+                        "surface-container": "#e5eeff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#545f73",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-container": "#26292b",
+                        "on-surface-variant": "#45474c",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-error": "#ffffff",
+                        "primary-container": "#1e293b",
+                        "on-primary-fixed": "#111c2d",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary": "#4648d4",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#8d9092",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "outline": "#75777d",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#bcc7de",
+                        "inverse-primary": "#bcc7de",
+                        "primary": "#091426",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#d8e3fb",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed": "#07006c",
+                        "on-background": "#0b1c30",
+                        "on-secondary-container": "#fffbff",
+                        "surface": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "tertiary": "#111516",
+                        "outline-variant": "#c5c6cd",
+                        "on-primary-container": "#8590a6",
+                        "secondary-container": "#6063ee"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "max-width": "1440px",
+                        "margin": "40px",
+                        "gutter": "20px",
+                        "md": "16px",
+                        "sm": "8px"
+                    },
+                    fontFamily: {
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "label-sm": ["11px", { lineHeight: "14px", fontWeight: "600" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                        "headline-lg": ["30px", { lineHeight: "38px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "display-sm": ["36px", { lineHeight: "44px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                        "title-lg": ["18px", { lineHeight: "26px", fontWeight: "600" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base styles mapped to Tailwind config */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Tonal Layers & Shadows */
+        .elevation-0 { background-color: theme('colors.background'); }
+        .elevation-1 { 
+            background-color: theme('colors.surface-container-lowest'); 
+            border: 1px solid theme('colors.outline-variant');
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .elevation-2 {
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+        }
+        .elevation-3 {
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        
+        /* Custom Table Styling */
+        .zebra-row:nth-child(even) {
+            background-color: theme('colors.surface-container-low');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-full flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-body-md text-body-md docked left-0 h-screen w-64 border-r border-outline-variant flat no shadows flex flex-col py-6 px-4 hidden md:flex z-10 shrink-0">
+<!-- Header / Brand -->
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-lg overflow-hidden bg-surface-container-lowest flex items-center justify-center shrink-0">
+<img alt="School Institution Logo" class="object-cover w-full h-full" data-alt="A clean, modern, minimalist logo for a high-end private educational institution, focusing on geometric shapes and a deep navy and white color palette. The design evokes authority, tradition, and forward-thinking education, rendered in sharp vector graphics on a solid background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChrP1WAlPOJmSMFKhknQlEZ1z9Bs3NvVS7uf-FHrjRBXcooyppRcfFPRo2ahZZ6nzNG-blz5QXWFPcixldF9TKKk68q7htfrQDjYKd_WxMcDdePUWIpWbvsowMazR7wlC4H5viha98VcFt6XrPri07-2fb0S8g1GDFPMOBSUl9sY1fKgNd4wd6UF58oKDgpbnj-mOE-xJvGgGJfcKOaR3znwBqQRI1xgXIQyPlzThto5LqfWZwhsn5_Q"/>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-primary">EduFlow</h1>
+<p class="font-label-sm text-label-sm text-on-primary-container opacity-80 uppercase tracking-wider">Private Admin</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">school</span>
+<span>Students</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">badge</span>
+<span>Faculty</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">auto_stories</span>
+<span>Academic Affairs</span>
+</a>
+<!-- Active State: Announcements logically sits under Academic Affairs or is a general dashboard tool, but since it's not explicitly in the list and it's a general comms tool, we'll place it near or consider 'Dashboard' as the closest general fit if this is an overview, but let's highlight 'Academic Affairs' as comms often fall there for students/parents, or leave inactive. The prompt asks to highlight the closest match. Let's assume 'Dashboard' for general comms overview. -->
+<a class="flex items-center gap-3 px-3 py-2 bg-secondary-container text-on-secondary-container font-semibold rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">campaign</span>
+<span>Announcements</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span>Finance</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<!-- Footer Tabs -->
+<div class="mt-auto pt-4 border-t border-primary-fixed-variant flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-primary-container opacity-80 hover:opacity-100 hover:bg-primary-fixed-variant transition-colors rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface text-primary dark:text-inverse-primary font-label-md text-label-md docked top-0 full-width sticky border-b border-outline-variant shadow-sm flex justify-between items-center h-16 px-margin w-full z-20 shrink-0">
+<div class="flex items-center gap-8">
+<!-- Mobile Menu Button -->
+<button class="md:hidden flex items-center justify-center p-2 rounded-lg hover:bg-surface-container opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Product Name (Mobile) -->
+<div class="md:hidden font-title-lg text-title-lg font-black text-primary">
+                    EduFlow
+                </div>
+<!-- Web Navigation Links -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors opacity-80 hover:opacity-100 py-5" href="#">Campus</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors opacity-80 hover:opacity-100 py-5" href="#">Academic Session</a>
+</nav>
+</div>
+<!-- Search Bar (on_left in JSON, placing near nav) -->
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant focus-within:border-secondary transition-colors max-w-xs w-full ml-8 mr-auto">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none p-0 focus:ring-0 text-body-md font-body-md text-on-surface w-full placeholder:text-on-surface-variant" placeholder="Search..." type="text"/>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="hidden md:flex items-center justify-center w-8 h-8 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="hidden md:flex items-center justify-center w-8 h-8 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">apps</span>
+</button>
+<button class="hidden sm:flex items-center gap-2 bg-[#4648d4] hover:bg-[#2f2ebe] text-white px-4 py-2 rounded-lg font-label-md text-label-md transition-colors shadow-sm">
+<span>New Entry</span>
+</button>
+<div class="w-9 h-9 rounded-full overflow-hidden border border-outline-variant shrink-0 ml-2">
+<img alt="Administrator Profile" class="object-cover w-full h-full" data-alt="A professional headshot of a mature school administrator, smiling subtly, wearing a smart casual blazer, set against a clean, light grey studio background. High resolution, bright corporate lighting, conveying approachability and competence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_zkXvywgGCg9wKVsD_eskA_xpM7bY3Y9nU0flXZOUXAJ-ruK15Geth4Wm2mRKvuAe7_FmLobf53i7E8bxyyB2zZk2psiCOdQJorEiH929kpNaHqGNhs9jJt4Gp_c8-uDFZyA-zRiiToPGKkypWmpmF-JyV69KUplbP1CWJRIeIB4nqnus7h6tfix5-yQqKHLJmUoPYWmFXf37G_0BAND5eFGyT5vZ4rwQmnZIFojSgzJ700LQYZNIxw"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-margin max-w-max-width mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="font-display-sm text-display-sm text-on-background">Announcements</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage and publish school-wide communications.</p>
+</div>
+<button class="flex items-center justify-center gap-2 bg-secondary hover:bg-on-secondary-fixed-variant text-on-secondary px-5 py-2.5 rounded-lg font-label-md text-label-md transition-colors elevation-2 self-start sm:self-auto">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Create Announcement</span>
+</button>
+</div>
+<!-- Bento Grid Layout for Data Management -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+<!-- Main Data Table Container (Spans 3 cols on large screens) -->
+<div class="lg:col-span-3 elevation-1 rounded-xl overflow-hidden flex flex-col bg-surface-container-lowest">
+<!-- Table Toolbar -->
+<div class="px-6 py-4 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-bright">
+<div class="flex items-center gap-2">
+<span class="font-title-lg text-title-lg text-on-surface">Published Announcements</span>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full">12 Total</span>
+</div>
+<!-- Filters / Search -->
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_list</span>
+<select class="pl-9 pr-8 py-1.5 text-body-md font-body-md border border-outline-variant rounded-lg bg-surface-container-lowest focus:ring-secondary focus:border-secondary appearance-none">
+<option>All Statuses</option>
+<option>Published</option>
+<option>Scheduled</option>
+<option>Draft</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-bright">
+<th class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Title</th>
+<th class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Audience</th>
+<th class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Published Date</th>
+<th class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-3 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-outline-variant/50">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-medium">Parent Teacher Meeting</td>
+<td class="px-6 py-4 text-on-surface-variant">Entire School</td>
+<td class="px-6 py-4 text-on-surface-variant">Sept 01, 2026</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-[#e6f4ea] text-[#137333]">
+                                            Published
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-medium">Winter Break Schedule</td>
+<td class="px-6 py-4 text-on-surface-variant">Students, Parents</td>
+<td class="px-6 py-4 text-on-surface-variant">Dec 15, 2026</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-highest text-on-surface">
+                                            Scheduled
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-medium">New Campus Policy Draft</td>
+<td class="px-6 py-4 text-on-surface-variant">Faculty</td>
+<td class="px-6 py-4 text-on-surface-variant">--</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container text-on-surface-variant border border-outline-variant">
+                                            Draft
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4 font-medium">Annual Science Fair Registration</td>
+<td class="px-6 py-4 text-on-surface-variant">High School</td>
+<td class="px-6 py-4 text-on-surface-variant">Oct 10, 2026</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-[#e6f4ea] text-[#137333]">
+                                            Published
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 text-on-surface-variant hover:text-secondary hover:bg-surface-container rounded-md transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container rounded-md transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 border-t border-outline-variant bg-surface-bright flex items-center justify-between">
+<span class="font-body-md text-body-md text-on-surface-variant">Showing 1 to 4 of 12 entries</span>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded bg-secondary-container text-on-secondary-container font-label-md text-label-md flex items-center justify-center">1</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center">2</button>
+<button class="w-8 h-8 rounded hover:bg-surface-container text-on-surface font-label-md text-label-md flex items-center justify-center">3</button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Side Panel (Quick Stats / Actions) -->
+<div class="lg:col-span-1 flex flex-col gap-6">
+<!-- Stats Card -->
+<div class="elevation-1 rounded-xl p-6 bg-surface-container-lowest">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4">Overview</h3>
+<div class="space-y-4">
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-on-surface-variant uppercase">Published</span>
+<span class="font-bold text-secondary">8</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-secondary h-1.5 rounded-full" style="width: 66%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-on-surface-variant uppercase">Scheduled</span>
+<span class="font-bold text-on-surface">3</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-primary-fixed-dim h-1.5 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-sm text-label-sm mb-1">
+<span class="text-on-surface-variant uppercase">Drafts</span>
+<span class="font-bold text-on-surface-variant">1</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5">
+<div class="bg-outline h-1.5 rounded-full" style="width: 9%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity or Secondary Info -->
+<div class="elevation-1 rounded-xl p-6 bg-surface-container-lowest flex-1">
+<h3 class="font-title-lg text-title-lg text-on-surface mb-4">Recent Activity</h3>
+<ul class="space-y-4">
+<li class="flex gap-3 items-start">
+<div class="w-2 h-2 rounded-full bg-secondary mt-1.5 shrink-0"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface">"Parent Teacher Meeting" published.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">2 hours ago</p>
+</div>
+</li>
+<li class="flex gap-3 items-start">
+<div class="w-2 h-2 rounded-full bg-outline mt-1.5 shrink-0"></div>
+<div>
+<p class="font-body-md text-body-md text-on-surface">"New Campus Policy" draft saved.</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Yesterday, 4:30 PM</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

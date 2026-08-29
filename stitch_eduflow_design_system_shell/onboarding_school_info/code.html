@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduFlow - Onboarding: School Information</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f8f9ff",
+                        "on-surface": "#0b1c30",
+                        "primary-fixed": "#d8e3fb",
+                        "surface-container-high": "#dce9ff",
+                        "outline-variant": "#c5c6cd",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary": "#111516",
+                        "on-primary-fixed": "#111c2d",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "on-tertiary-fixed": "#191c1e",
+                        "surface-tint": "#545f73",
+                        "primary-container": "#1e293b",
+                        "secondary": "#4648d4",
+                        "primary-fixed-dim": "#bcc7de",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "on-secondary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#8d9092",
+                        "inverse-surface": "#213145",
+                        "tertiary-container": "#26292b",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#45474c",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-secondary-fixed": "#07006c",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-highest": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "on-background": "#0b1c30",
+                        "inverse-primary": "#bcc7de",
+                        "inverse-on-surface": "#eaf1ff",
+                        "outline": "#75777d",
+                        "surface-bright": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-primary-container": "#8590a6",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "secondary-fixed": "#e1e0ff",
+                        "secondary-container": "#6063ee",
+                        "on-primary-fixed-variant": "#3c475a",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "primary": "#091426",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin": "40px",
+                        "max-width": "1440px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter": "20px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Inter"],
+                        "display-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "title-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-sm": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "title-lg": ["18px", { "lineHeight": "26px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Ambient shadows for levels */
+        .shadow-level-1 { box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .shadow-level-2 { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+        
+        /* Floating label styles */
+        .floating-input {
+            transition: border-color 0.2s ease;
+        }
+        .floating-input:focus {
+            border-color: #4648d4; /* secondary color */
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="h-full bg-surface text-on-surface flex items-center justify-center font-body-md">
+<!-- Main Container -->
+<main class="w-full max-w-[1024px] mx-auto p-lg flex flex-col min-h-screen justify-center">
+<!-- Header -->
+<header class="mb-xl text-center">
+<h1 class="font-display-sm text-display-sm text-primary mb-sm">Welcome to EduFlow</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Let's set up your institutional profile to get started.</p>
+</header>
+<!-- Glassmorphism Container for Form -->
+<div class="bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant rounded-xl shadow-level-2 p-xl relative overflow-hidden">
+<!-- Decorative subtle gradient background behind form -->
+<div class="absolute -top-40 -right-40 w-80 h-80 bg-primary-fixed rounded-full mix-blend-multiply filter blur-3xl opacity-30 pointer-events-none"></div>
+<div class="absolute -bottom-40 -left-40 w-80 h-80 bg-surface-container-high rounded-full mix-blend-multiply filter blur-3xl opacity-50 pointer-events-none"></div>
+<!-- Progress Indicator -->
+<div class="relative z-10 mb-xl">
+<div class="flex items-center justify-between">
+<!-- Step 1 (Active) -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-title-lg text-title-lg shadow-sm border-2 border-surface-container-lowest">1</div>
+<span class="mt-sm font-label-sm text-label-sm text-secondary">School</span>
+</div>
+<!-- Connector -->
+<div class="flex-1 h-px bg-outline-variant mx-4 mt-[-24px]"></div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg border-2 border-surface-container-lowest">2</div>
+<span class="mt-sm font-label-sm text-label-sm text-on-surface-variant">Campus</span>
+</div>
+<!-- Connector -->
+<div class="flex-1 h-px bg-outline-variant mx-4 mt-[-24px]"></div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg border-2 border-surface-container-lowest">3</div>
+<span class="mt-sm font-label-sm text-label-sm text-on-surface-variant">Academic Year</span>
+</div>
+<!-- Connector -->
+<div class="flex-1 h-px bg-outline-variant mx-4 mt-[-24px]"></div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center hidden sm:flex">
+<div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg border-2 border-surface-container-lowest">4</div>
+<span class="mt-sm font-label-sm text-label-sm text-on-surface-variant">Classes</span>
+</div>
+<!-- Connector -->
+<div class="flex-1 h-px bg-outline-variant mx-4 mt-[-24px] hidden sm:block"></div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center hidden sm:flex">
+<div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg border-2 border-surface-container-lowest">5</div>
+<span class="mt-sm font-label-sm text-label-sm text-on-surface-variant">Subjects</span>
+</div>
+<!-- Connector -->
+<div class="flex-1 h-px bg-outline-variant mx-4 mt-[-24px] hidden sm:block"></div>
+<!-- Step 6 -->
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-title-lg text-title-lg border-2 border-surface-container-lowest">
+<span class="material-symbols-outlined" data-icon="check">check</span>
+</div>
+<span class="mt-sm font-label-sm text-label-sm text-on-surface-variant">Complete</span>
+</div>
+</div>
+</div>
+<!-- Form Content -->
+<div class="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-xl">
+<!-- Left Column: Context -->
+<div class="md:col-span-4 flex flex-col gap-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-sm">School Information</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Provide the core details of your institution. This information will be used across all official documents and portals generated by EduFlow.</p>
+</div>
+<!-- Logo Upload Area -->
+<div class="mt-lg">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">School Logo</label>
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-lg flex flex-col items-center justify-center bg-surface-container-lowest/50 hover:bg-surface-container-lowest transition-colors cursor-pointer group shadow-level-1">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-md group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-secondary text-2xl" data-icon="add_photo_alternate">add_photo_alternate</span>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium text-center">Click to upload or drag &amp; drop</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center mt-xs">SVG, PNG, JPG or GIF (max. 800x400px)</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Fields -->
+<form class="md:col-span-8 flex flex-col gap-lg bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-level-1">
+<!-- Row 1: Name -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="school_name">Official School Name *</label>
+<input class="floating-input w-full bg-surface border border-outline-variant rounded px-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="school_name" placeholder="e.g., Oakwood International Academy" required="" type="text"/>
+</div>
+<!-- Row 2: Contact -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="phone">Primary Phone *</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="phone">phone</span>
+<input class="floating-input w-full bg-surface border border-outline-variant rounded pl-10 pr-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="phone" placeholder="+1 (555) 000-0000" required="" type="tel"/>
+</div>
+</div>
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="email">Official Email *</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="mail">mail</span>
+<input class="floating-input w-full bg-surface border border-outline-variant rounded pl-10 pr-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="email" placeholder="admin@school.edu" required="" type="email"/>
+</div>
+</div>
+</div>
+<!-- Row 3: Web -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="website">Website URL</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="language">language</span>
+<input class="floating-input w-full bg-surface border border-outline-variant rounded pl-10 pr-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="website" placeholder="https://www.school.edu" type="url"/>
+</div>
+</div>
+<!-- Row 4: Address -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-xs" for="address">Main Campus Address *</label>
+<input class="floating-input w-full bg-surface border border-outline-variant rounded px-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant mb-md" id="address" placeholder="Street Address" required="" type="text"/>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<input class="floating-input w-full bg-surface border border-outline-variant rounded px-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="city" placeholder="City" required="" type="text"/>
+<div class="flex gap-md">
+<input class="floating-input w-full bg-surface border border-outline-variant rounded px-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="state" placeholder="State/Province" required="" type="text"/>
+<input class="floating-input w-24 bg-surface border border-outline-variant rounded px-md py-sm font-body-md text-body-md text-on-surface placeholder-on-surface-variant" id="zip" placeholder="Zip" required="" type="text"/>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="flex justify-end pt-md border-t border-outline-variant mt-sm">
+<button class="bg-secondary text-on-secondary font-label-md text-label-md px-xl py-sm rounded flex items-center gap-sm hover:bg-on-secondary-fixed-variant transition-colors shadow-level-1" type="button">
+                            Continue to Campus
+                            <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+</body></html>
