@@ -8,4 +8,5 @@ export * from "@/lib/mock/fees";
 export * from "@/lib/mock/exams";
 export * from "@/lib/mock/timetable";
 export * from "@/lib/mock/announcements";
+export * from "@/lib/mock/schools";
 export * from "@/lib/mock/users";

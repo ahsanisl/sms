@@ -2,6 +2,7 @@ import type { Exam, GradeBand, MarksEntry } from "@/lib/types";
 import { intBetween, mulberry32 } from "@/lib/mock/names";
 import { CAMPUSES, CLASSES } from "@/lib/mock/reference-data";
 import { STUDENTS } from "@/lib/mock/students";
+import { SCHOOLS } from "@/lib/mock/schools";
 
 const rand = mulberry32(404);
 
@@ -115,15 +116,25 @@ export function marksForStudentExam(studentId: string, examId: string) {
 // Configurable in Settings → Grade Scale; grade() below always reflects the
 // live scale so a school-wide grading-policy change shows up everywhere
 // (Result Card, Student Profile, Parent portal) without touching call sites.
-export let GRADE_SCALE: GradeBand[] = [
-  { id: "gb1", grade: "A+", minPercentage: 90 },
-  { id: "gb2", grade: "A", minPercentage: 80 },
-  { id: "gb3", grade: "B", minPercentage: 70 },
-  { id: "gb4", grade: "C", minPercentage: 60 },
-  { id: "gb5", grade: "D", minPercentage: 50 },
-  { id: "gb6", grade: "E", minPercentage: 40 },
-  { id: "gb7", grade: "F", minPercentage: 0 },
+export const GRADE_BAND_TEMPLATE: Omit<GradeBand, "id" | "schoolId">[] = [
+  { grade: "A+", minPercentage: 90 },
+  { grade: "A", minPercentage: 80 },
+  { grade: "B", minPercentage: 70 },
+  { grade: "C", minPercentage: 60 },
+  { grade: "D", minPercentage: 50 },
+  { grade: "E", minPercentage: 40 },
+  { grade: "F", minPercentage: 0 },
 ];
+
+function buildGradeScale(): GradeBand[] {
+  const bands: GradeBand[] = [];
+  for (const school of SCHOOLS) {
+    GRADE_BAND_TEMPLATE.forEach((band, i) => bands.push({ ...band, id: `${school.id}-gb${i + 1}`, schoolId: school.id }));
+  }
+  return bands;
+}
+
+export let GRADE_SCALE: GradeBand[] = buildGradeScale();
 
 export function syncGradeScale(next: GradeBand[]) {
   GRADE_SCALE = next;

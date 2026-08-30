@@ -1,14 +1,14 @@
 import type { Department } from "@/lib/types";
-import { CAMPUSES, CLASSES, TEACHERS } from "@/lib/mock/reference-data";
+import { CAMPUSES, CLASSES, TEACHERS, subjectId } from "@/lib/mock/reference-data";
 
-/** Canonical department groupings — a campus only gets a department if it actually teaches at least one of these subjects. */
-const DEPARTMENT_GROUPS: { name: string; subjectIds: string[] }[] = [
-  { name: "Languages Department", subjectIds: ["eng", "urdu"] },
-  { name: "Mathematics Department", subjectIds: ["math", "addmath"] },
-  { name: "Science Department", subjectIds: ["sci", "phy", "chem", "bio"] },
-  { name: "Social Studies & Islamiyat Department", subjectIds: ["soc", "isl"] },
-  { name: "Computer Science Department", subjectIds: ["cs"] },
-  { name: "Arts & Physical Education Department", subjectIds: ["art", "pe"] },
+/** Canonical department groupings, keyed by the stable subject code (see reference-data.ts's SUBJECT_CATALOG) rather than a row id, since each school has its own independent Subject records. A campus only gets a department if it actually teaches at least one of these subjects. */
+const DEPARTMENT_GROUPS: { name: string; subjectCodes: string[] }[] = [
+  { name: "Languages Department", subjectCodes: ["eng", "urdu"] },
+  { name: "Mathematics Department", subjectCodes: ["math", "addmath"] },
+  { name: "Science Department", subjectCodes: ["sci", "phy", "chem", "bio"] },
+  { name: "Social Studies & Islamiyat Department", subjectCodes: ["soc", "isl"] },
+  { name: "Computer Science Department", subjectCodes: ["cs"] },
+  { name: "Arts & Physical Education Department", subjectCodes: ["art", "pe"] },
 ];
 
 function buildDepartments(): Department[] {
@@ -19,7 +19,7 @@ function buildDepartments(): Department[] {
     const subjectsAtCampus = new Set(CLASSES.filter((c) => c.campusId === campus.id).flatMap((c) => c.subjectIds));
 
     for (const group of DEPARTMENT_GROUPS) {
-      const subjectIds = group.subjectIds.filter((s) => subjectsAtCampus.has(s));
+      const subjectIds = group.subjectCodes.map((code) => subjectId(campus.schoolId, code)).filter((sid) => subjectsAtCampus.has(sid));
       if (subjectIds.length === 0) continue;
 
       const head = TEACHERS.find((t) => t.campusId === campus.id && t.subjectIds.some((s) => subjectIds.includes(s)));

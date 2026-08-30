@@ -59,6 +59,12 @@ export const PARENT_NAV: NavItem[] = [
   { label: "Announcements", href: "/announcements", icon: "forum" },
 ];
 
+/** Platform-level SaaS operator: manages the roster of schools, never one school's live data — see lib/permissions.ts's platform_admin entry. */
+export const PLATFORM_ADMIN_NAV: NavItem[] = [
+  { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
+  { label: "Schools", href: "/settings/schools", icon: "corporate_fare" },
+];
+
 /** Finance-only nav: no Students/Teachers/Exams management. */
 export const ACCOUNTANT_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
@@ -74,6 +80,8 @@ export const FOOTER_NAV: NavItem[] = [
 
 export function navForRole(role: Role): NavItem[] {
   switch (role) {
+    case "platform_admin":
+      return PLATFORM_ADMIN_NAV;
     case "school_owner":
       return OWNER_NAV;
     case "teacher":
@@ -88,6 +96,7 @@ export function navForRole(role: Role): NavItem[] {
 }
 
 export const ROLE_LABEL: Record<Role, string> = {
+  platform_admin: "Platform Admin",
   school_owner: "School Owner",
   school_admin: "School Admin",
   campus_admin: "Campus Admin",

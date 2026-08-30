@@ -4,12 +4,13 @@ import { useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
-import { usePermissions } from "@/lib/store/hooks";
+import { usePermissions, useSchoolProfile } from "@/lib/store/hooks";
 import { isAlwaysAllowed, isParentOnlyRoute, moduleForPath } from "@/lib/permissions";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useSession();
   const { routePermissions } = usePermissions();
+  const { schoolProfile } = useSchoolProfile();
   const router = useRouter();
   const pathname = usePathname();
   const lastDeniedPath = useRef<string | null>(null);
@@ -22,6 +23,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!user) return;
+
+    // A School Owner whose school hasn't finished the setup wizard can't reach
+    // any (app) route — /onboarding lives outside this route group entirely,
+    // so it isn't caught by this same check.
+    if (user.role === "school_owner" && schoolProfile && !schoolProfile.onboardingComplete) {
+      router.replace("/onboarding");
+      return;
+    }
 
     if (isParentOnlyRoute(pathname) && user.role !== "parent") {
       if (lastDeniedPath.current !== pathname) {
@@ -42,7 +51,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
       router.replace("/dashboard");
     }
-  }, [user, pathname, routePermissions, router]);
+  }, [user, pathname, routePermissions, schoolProfile, router]);
 
   if (isLoading || !user) {
     return (

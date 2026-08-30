@@ -6,7 +6,7 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export type SubjectFormValues = Omit<Subject, "id" | "status">;
+export type SubjectFormValues = Omit<Subject, "id" | "status" | "schoolId">;
 
 interface SubjectFormProps {
   initialValues?: Subject;

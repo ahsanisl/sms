@@ -1,5 +1,6 @@
 import type { Campus, ClassSection, Room, Subject, Teacher } from "@/lib/types";
 import { emailFrom, fullName, intBetween, mulberry32, phoneNumber, pick } from "@/lib/mock/names";
+import { SCHOOLS } from "@/lib/mock/schools";
 
 /*
  * Campuses/Subjects/Classes/Teachers are the "reference data" every other
@@ -18,30 +19,55 @@ import { emailFrom, fullName, intBetween, mulberry32, phoneNumber, pick } from "
  */
 
 export let CAMPUSES: Campus[] = [
-  { id: "main", name: "Main Campus", city: "Karachi", address: "Shahrah-e-Faisal, Karachi", phone: "+92 21 3456 7890", email: "main@eduflow.edu.pk", status: "active" },
-  { id: "clifton", name: "Clifton Campus", city: "Karachi", address: "Block 5, Clifton, Karachi", phone: "+92 21 3456 1234", email: "clifton@eduflow.edu.pk", status: "active" },
-  { id: "gulshan", name: "Gulshan Campus", city: "Karachi", address: "Gulshan-e-Iqbal, Karachi", phone: "+92 21 3456 5678", email: "gulshan@eduflow.edu.pk", status: "active" },
+  { id: "main", name: "Main Campus", schoolId: "school-eduflow", city: "Karachi", address: "Shahrah-e-Faisal, Karachi", phone: "+92 21 3456 7890", email: "main@eduflow.edu.pk", status: "active" },
+  { id: "clifton", name: "Clifton Campus", schoolId: "school-eduflow", city: "Karachi", address: "Block 5, Clifton, Karachi", phone: "+92 21 3456 1234", email: "clifton@eduflow.edu.pk", status: "active" },
+  { id: "gulshan", name: "Gulshan Campus", schoolId: "school-horizon", city: "Karachi", address: "Gulshan-e-Iqbal, Karachi", phone: "+92 21 3456 5678", email: "gulshan@eduflow.edu.pk", status: "active" },
 ];
 
 export function syncCampuses(next: Campus[]) {
   CAMPUSES = next;
 }
 
-export let SUBJECTS: Subject[] = [
-  { id: "eng", name: "English", code: "ENG", status: "active" },
-  { id: "urdu", name: "Urdu", code: "URD", status: "active" },
-  { id: "math", name: "Mathematics", code: "MATH", status: "active" },
-  { id: "sci", name: "Science", code: "SCI", status: "active" },
-  { id: "soc", name: "Social Studies", code: "SST", status: "active" },
-  { id: "isl", name: "Islamiyat", code: "ISL", status: "active" },
-  { id: "cs", name: "Computer Science", code: "CS", status: "active" },
-  { id: "art", name: "Art & Craft", code: "ART", status: "active" },
-  { id: "pe", name: "Physical Education", code: "PE", status: "active" },
-  { id: "phy", name: "Physics", code: "PHY", status: "active" },
-  { id: "chem", name: "Chemistry", code: "CHEM", status: "active" },
-  { id: "bio", name: "Biology", code: "BIO", status: "active" },
-  { id: "addmath", name: "Additional Mathematics", code: "AMATH", status: "active" },
+/**
+ * The canonical subject content, keyed by a short stable code — GRADE_SUBJECTS
+ * and LAB_SUBJECT_ROOM_NAME below are written against these codes rather than
+ * a Subject's own row id, because each school now gets its OWN independent
+ * Subject record (see subjectId() below): the code is the one thing that
+ * stays stable across schools so the "recipe" data doesn't need to be
+ * duplicated per school too.
+ */
+const SUBJECT_CATALOG: { code: string; name: string }[] = [
+  { code: "eng", name: "English" },
+  { code: "urdu", name: "Urdu" },
+  { code: "math", name: "Mathematics" },
+  { code: "sci", name: "Science" },
+  { code: "soc", name: "Social Studies" },
+  { code: "isl", name: "Islamiyat" },
+  { code: "cs", name: "Computer Science" },
+  { code: "art", name: "Art & Craft" },
+  { code: "pe", name: "Physical Education" },
+  { code: "phy", name: "Physics" },
+  { code: "chem", name: "Chemistry" },
+  { code: "bio", name: "Biology" },
+  { code: "addmath", name: "Additional Mathematics" },
 ];
+
+/** The row id a given school's copy of a catalog subject gets — the one place code→id resolution happens. */
+export function subjectId(schoolId: string, code: string): string {
+  return `${schoolId}-subj-${code}`;
+}
+
+function buildSubjects(): Subject[] {
+  const subjects: Subject[] = [];
+  for (const school of SCHOOLS) {
+    for (const { code, name } of SUBJECT_CATALOG) {
+      subjects.push({ id: subjectId(school.id, code), name, code: code.toUpperCase(), schoolId: school.id, status: "active" });
+    }
+  }
+  return subjects;
+}
+
+export let SUBJECTS: Subject[] = buildSubjects();
 
 export function syncSubjects(next: Subject[]) {
   SUBJECTS = next;
@@ -96,7 +122,7 @@ function buildClassesWithoutTeacher(): Omit<ClassSection, "classTeacherId">[] {
           grade: offering.grade,
           section,
           campusId: campus.id,
-          subjectIds: GRADE_SUBJECTS[offering.grade],
+          subjectIds: GRADE_SUBJECTS[offering.grade].map((code) => subjectId(campus.schoolId, code)),
           studentCapacity: offering.grade === "O-Level" ? 25 : 35,
           status: "active",
         });
@@ -119,7 +145,7 @@ function buildTeachersAndAssignClassTeachers() {
     const subjectsAtCampus = new Set<string>();
     baseClasses.filter((c) => c.campusId === campus.id).forEach((c) => c.subjectIds.forEach((s) => subjectsAtCampus.add(s)));
 
-    for (const subjectId of subjectsAtCampus) {
+    for (const subjId of subjectsAtCampus) {
       const gender = rand() > 0.45 ? "female" : "male";
       const name = fullName(gender, rand);
       const id = `t${seq++}`;
@@ -129,7 +155,7 @@ function buildTeachersAndAssignClassTeachers() {
         name,
         employeeId,
         campusId: campus.id,
-        subjectIds: [subjectId],
+        subjectIds: [subjId],
         classIds: [],
         phone: phoneNumber(rand),
         email: emailFrom(name, "eduflow.edu.pk"),
@@ -137,7 +163,7 @@ function buildTeachersAndAssignClassTeachers() {
         joinDate: `20${intBetween(15, 25, rand)}-0${intBetween(1, 8, rand)}-1${intBetween(0, 5, rand)}`,
         status: "active",
       });
-      teacherIdBySubjectByCampus[campus.id][subjectId] = id;
+      teacherIdBySubjectByCampus[campus.id][subjId] = id;
     }
   }
 
@@ -194,13 +220,13 @@ function buildRooms(): Room[] {
       });
     });
     const subjectsAtCampus = new Set(classesAtCampus.flatMap((c) => c.subjectIds));
-    for (const [subjectId, roomName] of Object.entries(LAB_SUBJECT_ROOM_NAME)) {
-      if (!subjectsAtCampus.has(subjectId)) continue;
+    for (const [code, roomName] of Object.entries(LAB_SUBJECT_ROOM_NAME)) {
+      if (!subjectsAtCampus.has(subjectId(campus.schoolId, code))) continue;
       rooms.push({
-        id: `${campus.id}-${subjectId}-room`,
+        id: `${campus.id}-${code}-room`,
         name: roomName,
         campusId: campus.id,
-        type: roomName === "Gymnasium" ? "hall" : subjectId === "art" ? "other" : "lab",
+        type: roomName === "Gymnasium" ? "hall" : code === "art" ? "other" : "lab",
         capacity: roomName === "Gymnasium" ? 100 : 30,
         status: "active",
       });
@@ -226,10 +252,11 @@ export function homeRoomFor(classId: string): Room | undefined {
 }
 
 /** The dedicated specialist room for a subject at a class's campus, if that subject uses one. */
-export function labRoomFor(classId: string, subjectId: string): Room | undefined {
+export function labRoomFor(classId: string, subjectIdValue: string): Room | undefined {
   const cls = CLASSES.find((c) => c.id === classId);
-  if (!cls || !(subjectId in LAB_SUBJECT_ROOM_NAME)) return undefined;
-  return ROOMS.find((r) => r.campusId === cls.campusId && r.id === `${cls.campusId}-${subjectId}-room`);
+  const code = SUBJECTS.find((s) => s.id === subjectIdValue)?.code?.toLowerCase();
+  if (!cls || !code || !(code in LAB_SUBJECT_ROOM_NAME)) return undefined;
+  return ROOMS.find((r) => r.campusId === cls.campusId && r.id === `${cls.campusId}-${code}-room`);
 }
 
 export function roomName(id: string | undefined) {

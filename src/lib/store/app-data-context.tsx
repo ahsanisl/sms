@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useReducer, useState, ty
 import type {
   AcademicSession,
   Announcement,
+  AppUser,
   AttendanceCorrectionRequest,
   AttendanceRecord,
   Campus,
@@ -24,11 +25,12 @@ import type {
   PermissionModule,
   Role,
   Room,
-  SchoolProfile,
+  School,
   Student,
   StudentLifecycleEvent,
   Subject,
   Teacher,
+  TimetableConfig,
   TimetableDay,
   TimetableSlot,
   TimetableStatus,
@@ -51,7 +53,9 @@ import {
   INQUIRIES,
   MARKS_ENTRIES,
   PERIODS,
+  DEMO_USERS,
   ROOMS,
+  SCHOOLS,
   STUDENTS,
   SUBJECTS,
   syncAttendance,
@@ -74,12 +78,16 @@ import {
   TIMETABLE,
 } from "@/lib/mock";
 import { DEFAULT_SESSIONS } from "@/lib/mock/sessions";
+import { useSchoolScope } from "@/lib/school-scope";
+import { scopeDataToSchool } from "@/lib/store/school-scope";
 
-const STORAGE_KEY = "eduflow-app-data-v14";
+const STORAGE_KEY = "eduflow-app-data-v17";
 
-interface AppDataState {
+export interface AppDataState {
   routePermissions: Record<Role, Record<PermissionModule, boolean>>;
-  schoolProfile: SchoolProfile;
+  /** Every account that can log in. Deliberately NOT scoped by school (see lib/store/school-scope.ts) — the login page has no school context yet when it needs to resolve an email. */
+  users: AppUser[];
+  schools: School[];
   campuses: Campus[];
   subjects: Subject[];
   departments: Department[];
@@ -99,9 +107,8 @@ interface AppDataState {
   marks: MarksEntry[];
   gradeScale: GradeBand[];
   rooms: Room[];
-  workingDays: TimetableDay[];
-  periods: Period[];
-  breakAfterPeriod: number;
+  /** One entry per school — see lib/store/school-scope.ts. */
+  timetableConfigs: TimetableConfig[];
   timetable: TimetableSlot[];
   /** Per-class in-progress edits from the Timetable Builder, not yet published (invisible to Teacher/Parent views). */
   timetableDrafts: Record<string, TimetableSlot[]>;
@@ -116,16 +123,8 @@ interface AppDataState {
 function seedState(): AppDataState {
   return {
     routePermissions: DEFAULT_ROLE_PERMISSIONS,
-    schoolProfile: {
-      name: "EduFlow Academy",
-      tagline: "Excellence in Education Since 2005",
-      address: "Shahrah-e-Faisal, Karachi, Pakistan",
-      phone: "+92 21 3456 7890",
-      email: "info@eduflow.edu.pk",
-      logoEmoji: "🎓",
-      reportCardFooter: "This is a computer-generated report card and does not require a signature.",
-      showSignatureLines: true,
-    },
+    users: DEMO_USERS,
+    schools: SCHOOLS,
     campuses: CAMPUSES,
     subjects: SUBJECTS,
     departments: DEPARTMENTS,
@@ -145,9 +144,7 @@ function seedState(): AppDataState {
     marks: MARKS_ENTRIES,
     gradeScale: GRADE_SCALE,
     rooms: ROOMS,
-    workingDays: DAYS,
-    periods: PERIODS,
-    breakAfterPeriod: BREAK_AFTER_PERIOD,
+    timetableConfigs: SCHOOLS.map((school) => ({ schoolId: school.id, workingDays: DAYS, periods: PERIODS, breakAfterPeriod: BREAK_AFTER_PERIOD })),
     timetable: TIMETABLE,
     timetableDrafts: {},
     timetableStatus: {},
@@ -175,7 +172,10 @@ function applyConcessionToInvoice(invoice: FeeInvoice, concession: FeeConcession
 
 type Action =
   | { type: "SET_ROLE_PERMISSION"; payload: { role: Role; module: PermissionModule; allowed: boolean } }
-  | { type: "UPDATE_SCHOOL_PROFILE"; payload: SchoolProfile }
+  | { type: "ADD_SCHOOL"; payload: Omit<School, "id"> }
+  | { type: "UPDATE_SCHOOL"; payload: School }
+  | { type: "ARCHIVE_SCHOOL"; payload: { id: string } }
+  | { type: "ADD_SCHOOL_WITH_OWNER"; payload: { school: Omit<School, "id">; ownerName: string; ownerEmail: string } }
   | { type: "ADD_CAMPUS"; payload: Omit<Campus, "id"> }
   | { type: "UPDATE_CAMPUS"; payload: Campus }
   | { type: "ARCHIVE_CAMPUS"; payload: { id: string } }
@@ -230,14 +230,14 @@ type Action =
   | { type: "ADD_EXAM"; payload: Omit<Exam, "id" | "resultsPublished"> }
   | { type: "SET_EXAM_RESULTS_PUBLISHED"; payload: { examId: string; published: boolean } }
   | { type: "ENTER_MARKS_BULK"; payload: Omit<MarksEntry, "id">[] }
-  | { type: "SET_GRADE_SCALE"; payload: GradeBand[] }
+  | { type: "SET_GRADE_SCALE"; payload: { schoolId: string; bands: GradeBand[] } }
   | { type: "ADD_TIMETABLE_SLOT"; payload: Omit<TimetableSlot, "id"> }
   | { type: "UPDATE_TIMETABLE_SLOT"; payload: TimetableSlot }
   | { type: "ADD_ROOM"; payload: Omit<Room, "id"> }
   | { type: "UPDATE_ROOM"; payload: Room }
   | { type: "ARCHIVE_ROOM"; payload: { id: string } }
-  | { type: "SET_WORKING_DAYS"; payload: TimetableDay[] }
-  | { type: "SET_PERIODS"; payload: { periods: Period[]; breakAfterPeriod: number } }
+  | { type: "SET_WORKING_DAYS"; payload: { schoolId: string; workingDays: TimetableDay[] } }
+  | { type: "SET_PERIODS"; payload: { schoolId: string; periods: Period[]; breakAfterPeriod: number } }
   | { type: "SAVE_TIMETABLE_DRAFT"; payload: { classId: string; slots: TimetableSlot[] } }
   | { type: "DISCARD_TIMETABLE_DRAFT"; payload: { classId: string } }
   | { type: "PUBLISH_TIMETABLE_DRAFT"; payload: { classId: string; slots: TimetableSlot[] } }
@@ -265,8 +265,26 @@ function reducer(state: AppDataState, action: Action): AppDataState {
       };
     }
 
-    case "UPDATE_SCHOOL_PROFILE":
-      return { ...state, schoolProfile: action.payload };
+    case "ADD_SCHOOL":
+      return { ...state, schools: [...state.schools, { ...action.payload, id: genId("school") }] };
+    case "UPDATE_SCHOOL":
+      return { ...state, schools: state.schools.map((s) => (s.id === action.payload.id ? action.payload : s)) };
+    case "ARCHIVE_SCHOOL":
+      return { ...state, schools: state.schools.map((s) => (s.id === action.payload.id ? { ...s, status: "archived" } : s)) };
+
+    case "ADD_SCHOOL_WITH_OWNER": {
+      const { school, ownerName, ownerEmail } = action.payload;
+      const newSchool: School = { ...school, id: genId("school") };
+      const owner: AppUser = {
+        id: genId("user"),
+        name: ownerName,
+        role: "school_owner",
+        email: ownerEmail,
+        schoolId: newSchool.id,
+        avatarSeed: ownerName,
+      };
+      return { ...state, schools: [...state.schools, newSchool], users: [...state.users, owner] };
+    }
 
     case "ADD_CAMPUS":
       return { ...state, campuses: [...state.campuses, { ...action.payload, id: genId("campus") }] };
@@ -293,8 +311,15 @@ function reducer(state: AppDataState, action: Action): AppDataState {
       return { ...state, sessions: [...state.sessions, { ...action.payload, id: genId("sess") }] };
     case "UPDATE_SESSION":
       return { ...state, sessions: state.sessions.map((s) => (s.id === action.payload.id ? action.payload : s)) };
-    case "SET_ACTIVE_SESSION":
-      return { ...state, sessions: state.sessions.map((s) => ({ ...s, isActive: s.id === action.payload.id })) };
+    case "SET_ACTIVE_SESSION": {
+      // Only toggle isActive within the target session's own school — each school has an independently active session.
+      const target = state.sessions.find((s) => s.id === action.payload.id);
+      if (!target) return state;
+      return {
+        ...state,
+        sessions: state.sessions.map((s) => (s.schoolId === target.schoolId ? { ...s, isActive: s.id === action.payload.id } : s)),
+      };
+    }
 
     case "ADD_STUDENT":
       return { ...state, students: [{ ...action.payload, id: genId("s") }, ...state.students] };
@@ -471,8 +496,10 @@ function reducer(state: AppDataState, action: Action): AppDataState {
       return { ...state, marks: Array.from(byKey.values()) };
     }
 
-    case "SET_GRADE_SCALE":
-      return { ...state, gradeScale: action.payload };
+    case "SET_GRADE_SCALE": {
+      const { schoolId, bands } = action.payload;
+      return { ...state, gradeScale: [...state.gradeScale.filter((b) => b.schoolId !== schoolId), ...bands] };
+    }
 
     case "ADD_TIMETABLE_SLOT":
       return { ...state, timetable: [...state.timetable, { ...action.payload, id: genId("tt") }] };
@@ -487,9 +514,21 @@ function reducer(state: AppDataState, action: Action): AppDataState {
       return { ...state, rooms: state.rooms.map((r) => (r.id === action.payload.id ? { ...r, status: "archived" } : r)) };
 
     case "SET_WORKING_DAYS":
-      return { ...state, workingDays: action.payload };
+      return {
+        ...state,
+        timetableConfigs: state.timetableConfigs.map((c) =>
+          c.schoolId === action.payload.schoolId ? { ...c, workingDays: action.payload.workingDays } : c,
+        ),
+      };
     case "SET_PERIODS":
-      return { ...state, periods: action.payload.periods, breakAfterPeriod: action.payload.breakAfterPeriod };
+      return {
+        ...state,
+        timetableConfigs: state.timetableConfigs.map((c) =>
+          c.schoolId === action.payload.schoolId
+            ? { ...c, periods: action.payload.periods, breakAfterPeriod: action.payload.breakAfterPeriod }
+            : c,
+        ),
+      };
 
     case "SAVE_TIMETABLE_DRAFT":
       return {
@@ -570,7 +609,10 @@ function loadInitialState(): AppDataState {
 }
 
 interface AppDataContextValue {
+  /** Scoped to the current viewer's own school — what every hook/page reads. */
   data: AppDataState;
+  /** The true, unfiltered store — needed only by the platform-admin Schools console, which must see every tenant at once. */
+  rawData: AppDataState;
   dispatch: React.Dispatch<Action>;
 }
 
@@ -579,6 +621,7 @@ const AppDataContext = createContext<AppDataContextValue | null>(null);
 export function AppDataProvider({ children }: { children: ReactNode }) {
   const [data, dispatch] = useReducer(reducer, undefined, loadInitialState);
   const [hydrated, setHydrated] = useState(false);
+  const { effectiveSchoolId } = useSchoolScope();
 
   // Hydrate from localStorage once on mount (client only) so a demo
   // walkthrough survives a refresh. The persistence effect below is gated on
@@ -633,24 +676,32 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   // plain, idempotent reassignment of a module-scope binding — it doesn't
   // read from or write to component state, so re-running it on a
   // double-invoked (Strict Mode) or discarded render changes nothing.
-  syncCampuses(data.campuses);
-  syncSubjects(data.subjects);
-  syncClasses(data.classes);
-  syncTeachers(data.teachers);
-  syncRooms(data.rooms);
-  syncTimetable(data.timetable);
-  syncStudents(data.students);
-  syncAttendance(data.attendance);
-  syncExams(data.exams);
-  syncMarks(data.marks);
-  syncFeeInvoices(data.invoices);
-  syncFeePayments(data.payments);
-  syncInquiries(data.inquiries);
-  syncFeeCategories(data.feeCategories);
-  syncGradeScale(data.gradeScale);
-  syncDepartments(data.departments);
+  // Scoped once, here, to the current viewer's own school — see
+  // lib/store/school-scope.ts for why this lives in one place instead of
+  // being duplicated as a campusId-style filter across ~26 pages. Every
+  // mirror below is synced from `scoped`, not the raw reducer `data`, so a
+  // School Owner (or any other single-school role) never sees another
+  // school's records through a direct-mirror lookup helper either.
+  const scoped = useMemo(() => scopeDataToSchool(data, effectiveSchoolId), [data, effectiveSchoolId]);
 
-  const value = useMemo(() => ({ data, dispatch }), [data]);
+  syncCampuses(scoped.campuses);
+  syncSubjects(scoped.subjects);
+  syncClasses(scoped.classes);
+  syncTeachers(scoped.teachers);
+  syncRooms(scoped.rooms);
+  syncTimetable(scoped.timetable);
+  syncStudents(scoped.students);
+  syncAttendance(scoped.attendance);
+  syncExams(scoped.exams);
+  syncMarks(scoped.marks);
+  syncFeeInvoices(scoped.invoices);
+  syncFeePayments(scoped.payments);
+  syncInquiries(scoped.inquiries);
+  syncFeeCategories(scoped.feeCategories);
+  syncGradeScale(scoped.gradeScale);
+  syncDepartments(scoped.departments);
+
+  const value = useMemo(() => ({ data: scoped, rawData: data, dispatch }), [scoped, data]);
 
   return <AppDataContext.Provider value={value}>{children}</AppDataContext.Provider>;
 }

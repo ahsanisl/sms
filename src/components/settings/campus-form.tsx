@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-export type CampusFormValues = Omit<Campus, "id" | "status">;
+export type CampusFormValues = Omit<Campus, "id" | "status" | "schoolId">;
 
 interface CampusFormProps {
   initialValues?: Campus;

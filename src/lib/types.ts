@@ -1,18 +1,28 @@
-export type Role = "school_owner" | "school_admin" | "campus_admin" | "teacher" | "accountant" | "parent";
+export type Role = "platform_admin" | "school_owner" | "school_admin" | "campus_admin" | "teacher" | "accountant" | "parent";
 
 export interface AppUser {
   id: string;
   name: string;
   role: Role;
   email: string;
+  /** Every role except platform_admin belongs to exactly one school — denormalized here (like campusId below) rather than derived, to avoid a circular dependency between school-scoping and campus lookups. */
+  schoolId?: string;
   campusId?: string;
   avatarSeed: string;
   /** Only set for parent-role demo accounts. */
   childStudentIds?: string[];
 }
 
-/** School-wide identity used both on the Settings → School Profile form and as the letterhead on printed documents (currently the exam Result Card). */
-export interface SchoolProfile {
+/**
+ * A tenant. Everything else in the data model (Campus, and transitively
+ * everything a Campus owns) is scoped to exactly one School — see
+ * lib/store/school-scope.ts. Also doubles as the school's printed identity
+ * (used both on the Settings → School Profile form and as the letterhead on
+ * printed documents, currently the exam Result Card) — one school, one
+ * profile, no separate entity needed for that.
+ */
+export interface School {
+  id: string;
   name: string;
   tagline: string;
   address: string;
@@ -24,6 +34,9 @@ export interface SchoolProfile {
   reportCardFooter: string;
   /** Whether the Result Card shows a "Principal" / "Class Teacher" signature line. */
   showSignatureLines: boolean;
+  status: ArchivableStatus;
+  /** False for a newly created school until its Owner finishes the setup wizard at /onboarding — see components/layout/auth-guard.tsx. Seeded true for schools that existed before the wizard did. */
+  onboardingComplete: boolean;
 }
 
 /** Screen-level modules gated by the route permission map (see lib/permissions.ts). */
@@ -52,13 +65,16 @@ export type PermissionModule =
   | "settings"
   | "settingsUsers"
   | "settingsCampuses"
-  | "settingsSubjects";
+  | "settingsSubjects"
+  | "settingsSchools";
 
 export type ArchivableStatus = "active" | "archived";
 
 export interface Campus {
   id: string;
   name: string;
+  /** The tenant this campus belongs to — see lib/store/school-scope.ts. */
+  schoolId: string;
   city: string;
   address: string;
   phone: string;
@@ -70,6 +86,8 @@ export interface Subject {
   id: string;
   name: string;
   code: string;
+  /** Per-school catalog — see lib/store/school-scope.ts. */
+  schoolId: string;
   status: ArchivableStatus;
 }
 
@@ -97,6 +115,8 @@ export interface ClassSection {
 export interface AcademicSession {
   id: string;
   label: string; // e.g. "2026-2027"
+  /** Per-school calendar — see lib/store/school-scope.ts. Each school has its own independently-active session. */
+  schoolId: string;
   startDate: string;
   endDate: string;
   terms: { name: string; startDate: string; endDate: string }[];
@@ -212,6 +232,8 @@ export type FeeFrequency = "monthly" | "quarterly" | "annual" | "one_time";
 export interface FeeCategory {
   id: string;
   name: string;
+  /** Per-school list — see lib/store/school-scope.ts. */
+  schoolId: string;
   status: ArchivableStatus;
 }
 
@@ -318,6 +340,8 @@ export interface GradeBand {
   id: string;
   grade: string;
   minPercentage: number;
+  /** Per-school scale — see lib/store/school-scope.ts. */
+  schoolId: string;
 }
 
 export type TimetableDay = "Mon" | "Tue" | "Wed" | "Thu" | "Fri";
@@ -349,6 +373,14 @@ export interface Period {
   endTime: string;
 }
 
+/** Per-school working-days/periods schedule — see lib/store/school-scope.ts. */
+export interface TimetableConfig {
+  schoolId: string;
+  workingDays: TimetableDay[];
+  periods: Period[];
+  breakAfterPeriod: number;
+}
+
 /** Whether a class's timetable has unpublished builder edits sitting on top of the last published version. */
 export type TimetableStatus = "draft" | "published";
 
@@ -360,6 +392,9 @@ export interface Announcement {
   title: string;
   body: string;
   audience: AnnouncementAudience;
+  /** School this announcement belongs to — required (unlike campusId below) since "no campus" means "every campus in this school," not "every school." */
+  schoolId: string;
+  /** Unset means every campus within schoolId. */
   campusId?: string;
   priority: AnnouncementPriority;
   publishedAt: string;

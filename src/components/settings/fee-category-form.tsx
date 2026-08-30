@@ -6,7 +6,7 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export type FeeCategoryFormValues = Omit<FeeCategory, "id" | "status">;
+export type FeeCategoryFormValues = Omit<FeeCategory, "id" | "status" | "schoolId">;
 
 interface FeeCategoryFormProps {
   initialValues?: FeeCategory;

@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { AppUser } from "@/lib/types";
 
-const STORAGE_KEY = "eduflow-session-v1";
+const STORAGE_KEY = "eduflow-session-v2";
 const VIEW_CAMPUS_KEY = "eduflow-view-campus-v1";
 
 interface SessionContextValue {

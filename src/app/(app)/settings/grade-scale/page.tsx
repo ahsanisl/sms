@@ -7,20 +7,27 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGradeScale } from "@/lib/store/hooks";
+import { GRADE_BAND_TEMPLATE } from "@/lib/mock/exams";
 import type { GradeBand } from "@/lib/types";
+
+type EditableBand = Omit<GradeBand, "schoolId">;
 
 export default function GradeScalePage() {
   const { gradeScale, setGradeScale } = useGradeScale();
-  const [bands, setBands] = useState<GradeBand[]>(gradeScale);
+  const [bands, setBands] = useState<EditableBand[]>(gradeScale);
 
   const sorted = [...bands].sort((a, b) => b.minPercentage - a.minPercentage);
 
-  function updateBand(id: string, patch: Partial<GradeBand>) {
+  function updateBand(id: string, patch: Partial<EditableBand>) {
     setBands((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
   }
 
   function addBand() {
     setBands((prev) => [...prev, { id: `gb-${Date.now()}`, grade: "", minPercentage: 0 }]);
+  }
+
+  function loadStandardScale() {
+    setBands(GRADE_BAND_TEMPLATE.map((b, i) => ({ ...b, id: `gb-${Date.now()}-${i}` })));
   }
 
   function removeBand(id: string) {
@@ -56,10 +63,23 @@ export default function GradeScalePage() {
       <div className="max-w-2xl bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-title-lg font-semibold text-on-surface">Bands</h3>
-          <Button size="sm" variant="secondary" onClick={addBand}>
-            <Plus size={16} /> Add Band
-          </Button>
+          <div className="flex items-center gap-2">
+            {bands.length === 0 && (
+              <Button size="sm" variant="secondary" onClick={loadStandardScale}>
+                Load Standard Scale
+              </Button>
+            )}
+            <Button size="sm" variant="secondary" onClick={addBand}>
+              <Plus size={16} /> Add Band
+            </Button>
+          </div>
         </div>
+
+        {bands.length === 0 && (
+          <p className="text-body-md text-on-surface-variant mb-4">
+            No grade bands yet — every score will show as &quot;F&quot; until at least one exists. Start from the standard A+–F scale or add your own.
+          </p>
+        )}
 
         <div className="space-y-2">
           <div className="grid grid-cols-[1fr_1fr_auto] gap-3 px-1 text-label-sm text-on-surface-variant uppercase tracking-wide">

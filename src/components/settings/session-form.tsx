@@ -6,7 +6,7 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export type SessionFormValues = Omit<AcademicSession, "id" | "isActive">;
+export type SessionFormValues = Omit<AcademicSession, "id" | "isActive" | "schoolId">;
 
 interface SessionFormProps {
   initialValues?: AcademicSession;

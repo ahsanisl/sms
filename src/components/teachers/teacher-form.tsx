@@ -11,17 +11,25 @@ import { CAMPUSES, SUBJECTS } from "@/lib/mock/reference-data";
 
 export type TeacherFormValues = Omit<Teacher, "id" | "classIds">;
 
-const emptyValues: TeacherFormValues = {
-  name: "",
-  employeeId: "",
-  campusId: CAMPUSES[0]?.id ?? "",
-  subjectIds: [],
-  phone: "",
-  email: "",
-  qualification: "",
-  joinDate: new Date().toISOString().slice(0, 10),
-  status: "active",
-};
+// A function, not a module-level constant — CAMPUSES[0]?.id must be read
+// fresh on every mount (e.g. each time this form's Modal reopens), not
+// captured once when this module first loads. A constant here would freeze
+// whatever campus happened to exist at that moment, which is empty for a
+// brand-new school whose first campus hasn't synced into CAMPUSES yet — the
+// same class of bug documented in reference-data.ts's frozen-mirror comment.
+function emptyValues(): TeacherFormValues {
+  return {
+    name: "",
+    employeeId: "",
+    campusId: CAMPUSES[0]?.id ?? "",
+    subjectIds: [],
+    phone: "",
+    email: "",
+    qualification: "",
+    joinDate: new Date().toISOString().slice(0, 10),
+    status: "active",
+  };
+}
 
 interface TeacherFormProps {
   initialValues?: Teacher;
@@ -31,7 +39,7 @@ interface TeacherFormProps {
 }
 
 export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Teacher" }: TeacherFormProps) {
-  const [values, setValues] = useState<TeacherFormValues>(initialValues ?? emptyValues);
+  const [values, setValues] = useState<TeacherFormValues>(initialValues ?? emptyValues());
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function set<K extends keyof TeacherFormValues>(key: K, value: TeacherFormValues[K]) {

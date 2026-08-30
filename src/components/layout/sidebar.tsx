@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Icon } from "@/components/shared/icon";
 import { FOOTER_NAV, navForRole, ROLE_LABEL, type NavItem } from "@/lib/nav-config";
 import { useSession } from "@/lib/auth/session-context";
-import { usePermissions } from "@/lib/store/hooks";
+import { usePermissions, useSchoolProfile } from "@/lib/store/hooks";
 import { moduleForPath } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
   const { routePermissions } = usePermissions();
+  const { schoolProfile } = useSchoolProfile();
   if (!user) return null;
 
   const perms = routePermissions[user.role];
@@ -33,7 +34,10 @@ export function Sidebar() {
         </div>
         <div>
           <h1 className="text-headline-sm font-bold text-on-primary">EduFlow</h1>
-          <p className="text-label-sm text-primary-fixed-dim">{ROLE_LABEL[user.role]}</p>
+          <p className="text-label-sm text-primary-fixed-dim">
+            {ROLE_LABEL[user.role]}
+            {user.role !== "platform_admin" && schoolProfile ? ` · ${schoolProfile.name}` : ""}
+          </p>
         </div>
       </div>
 

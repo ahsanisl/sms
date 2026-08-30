@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppData } from "@/lib/store/app-data-context";
+import { useSchoolScope } from "@/lib/school-scope";
 import type {
   AcademicSession,
   Announcement,
@@ -24,7 +25,7 @@ import type {
   PermissionModule,
   Role,
   Room,
-  SchoolProfile,
+  School,
   Student,
   Subject,
   Teacher,
@@ -41,19 +42,59 @@ export function usePermissions() {
   };
 }
 
+/** The current viewer's own school (data.schools is already scoped to exactly it — see lib/store/school-scope.ts). Backs the Settings → School Profile form. */
 export function useSchoolProfile() {
   const { data, dispatch } = useAppData();
+  const school = data.schools[0];
   return {
-    schoolProfile: data.schoolProfile,
-    updateSchoolProfile: (payload: SchoolProfile) => dispatch({ type: "UPDATE_SCHOOL_PROFILE", payload }),
+    schoolProfile: school,
+    updateSchoolProfile: (payload: Omit<School, "id" | "status" | "onboardingComplete">) =>
+      dispatch({ type: "UPDATE_SCHOOL", payload: { ...payload, id: school.id, status: school.status, onboardingComplete: school.onboardingComplete } }),
+    /** Separate from updateSchoolProfile so the branding form can't accidentally flip this — called only by the /onboarding wizard's Finish step. */
+    completeOnboarding: () => dispatch({ type: "UPDATE_SCHOOL", payload: { ...school, onboardingComplete: true } }),
+  };
+}
+
+/** Every account that can log in — deliberately unscoped (see AppDataState.users), so the login page can resolve any email before a session/school context exists. */
+export function useUsers() {
+  const { data } = useAppData();
+  return { users: data.users };
+}
+
+/** Platform-admin only: every school at once, with cross-school aggregate stats. Reads rawData deliberately — the one place that needs to see every tenant, not just the viewer's own. */
+export function useSchools() {
+  const { rawData, dispatch } = useAppData();
+  const statsFor = (schoolId: string) => {
+    const campusIds = new Set(rawData.campuses.filter((c) => c.schoolId === schoolId).map((c) => c.id));
+    const schoolStudentIds = new Set(rawData.students.filter((s) => campusIds.has(s.campusId)).map((s) => s.id));
+    const currentMonthInvoices = rawData.invoices.filter((inv) => inv.month === "August 2026" && schoolStudentIds.has(inv.studentId));
+    return {
+      campuses: campusIds.size,
+      students: schoolStudentIds.size,
+      teachers: rawData.teachers.filter((t) => campusIds.has(t.campusId)).length,
+      collected: currentMonthInvoices.reduce((s, i) => s + i.paidAmount, 0),
+      outstanding: currentMonthInvoices.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0),
+    };
+  };
+  return {
+    schools: rawData.schools,
+    statsFor,
+    addSchool: (payload: Omit<School, "id">) => dispatch({ type: "ADD_SCHOOL", payload }),
+    /** Creates the school AND its first School Owner account together, atomically — a school should never exist with nobody able to log into it. The owner lands on the /onboarding wizard on first login, since the new school starts genuinely empty. */
+    addSchoolWithOwner: (school: Omit<School, "id" | "onboardingComplete">, ownerName: string, ownerEmail: string) =>
+      dispatch({ type: "ADD_SCHOOL_WITH_OWNER", payload: { school: { ...school, onboardingComplete: false }, ownerName, ownerEmail } }),
+    updateSchool: (payload: School) => dispatch({ type: "UPDATE_SCHOOL", payload }),
+    archiveSchool: (id: string) => dispatch({ type: "ARCHIVE_SCHOOL", payload: { id } }),
   };
 }
 
 export function useCampuses() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     campuses: data.campuses,
-    addCampus: (payload: Omit<Campus, "id">) => dispatch({ type: "ADD_CAMPUS", payload }),
+    addCampus: (payload: Omit<Campus, "id" | "schoolId">) =>
+      dispatch({ type: "ADD_CAMPUS", payload: { ...payload, schoolId: effectiveSchoolId! } }),
     updateCampus: (payload: Campus) => dispatch({ type: "UPDATE_CAMPUS", payload }),
     archiveCampus: (id: string) => dispatch({ type: "ARCHIVE_CAMPUS", payload: { id } }),
   };
@@ -61,9 +102,11 @@ export function useCampuses() {
 
 export function useSubjects() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     subjects: data.subjects,
-    addSubject: (payload: Omit<Subject, "id">) => dispatch({ type: "ADD_SUBJECT", payload }),
+    addSubject: (payload: Omit<Subject, "id" | "schoolId">) =>
+      dispatch({ type: "ADD_SUBJECT", payload: { ...payload, schoolId: effectiveSchoolId! } }),
     updateSubject: (payload: Subject) => dispatch({ type: "UPDATE_SUBJECT", payload }),
     archiveSubject: (id: string) => dispatch({ type: "ARCHIVE_SUBJECT", payload: { id } }),
   };
@@ -81,9 +124,11 @@ export function useDepartments() {
 
 export function useFeeCategories() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     feeCategories: data.feeCategories,
-    addFeeCategory: (payload: Omit<FeeCategory, "id">) => dispatch({ type: "ADD_FEE_CATEGORY", payload }),
+    addFeeCategory: (payload: Omit<FeeCategory, "id" | "schoolId">) =>
+      dispatch({ type: "ADD_FEE_CATEGORY", payload: { ...payload, schoolId: effectiveSchoolId! } }),
     updateFeeCategory: (payload: FeeCategory) => dispatch({ type: "UPDATE_FEE_CATEGORY", payload }),
     archiveFeeCategory: (id: string) => dispatch({ type: "ARCHIVE_FEE_CATEGORY", payload: { id } }),
   };
@@ -91,9 +136,11 @@ export function useFeeCategories() {
 
 export function useSessions() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     sessions: data.sessions,
-    addSession: (payload: Omit<AcademicSession, "id">) => dispatch({ type: "ADD_SESSION", payload }),
+    addSession: (payload: Omit<AcademicSession, "id" | "schoolId">) =>
+      dispatch({ type: "ADD_SESSION", payload: { ...payload, schoolId: effectiveSchoolId! } }),
     updateSession: (payload: AcademicSession) => dispatch({ type: "UPDATE_SESSION", payload }),
     setActiveSession: (id: string) => dispatch({ type: "SET_ACTIVE_SESSION", payload: { id } }),
   };
@@ -193,9 +240,14 @@ export function useExamsStore() {
 
 export function useGradeScale() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     gradeScale: data.gradeScale,
-    setGradeScale: (bands: GradeBand[]) => dispatch({ type: "SET_GRADE_SCALE", payload: bands }),
+    setGradeScale: (bands: Omit<GradeBand, "schoolId">[]) =>
+      dispatch({
+        type: "SET_GRADE_SCALE",
+        payload: { schoolId: effectiveSchoolId!, bands: bands.map((b) => ({ ...b, schoolId: effectiveSchoolId! })) },
+      }),
   };
 }
 
@@ -226,22 +278,29 @@ export function useRooms() {
   };
 }
 
+/** Backed by one TimetableConfig row per school (data.timetableConfigs is already scoped to exactly the viewer's own school). Public shape unchanged, so every consumer keeps reading workingDays/periods/breakAfterPeriod directly. */
 export function useTimetableConfig() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
+  const config = data.timetableConfigs[0];
   return {
-    workingDays: data.workingDays,
-    periods: data.periods,
-    breakAfterPeriod: data.breakAfterPeriod,
-    setWorkingDays: (days: TimetableDay[]) => dispatch({ type: "SET_WORKING_DAYS", payload: days }),
-    setPeriods: (periods: Period[], breakAfterPeriod: number) => dispatch({ type: "SET_PERIODS", payload: { periods, breakAfterPeriod } }),
+    workingDays: config?.workingDays ?? [],
+    periods: config?.periods ?? [],
+    breakAfterPeriod: config?.breakAfterPeriod ?? 0,
+    setWorkingDays: (workingDays: TimetableDay[]) =>
+      dispatch({ type: "SET_WORKING_DAYS", payload: { schoolId: effectiveSchoolId!, workingDays } }),
+    setPeriods: (periods: Period[], breakAfterPeriod: number) =>
+      dispatch({ type: "SET_PERIODS", payload: { schoolId: effectiveSchoolId!, periods, breakAfterPeriod } }),
   };
 }
 
 export function useAnnouncementsStore() {
   const { data, dispatch } = useAppData();
+  const { effectiveSchoolId } = useSchoolScope();
   return {
     announcements: data.announcements,
-    addAnnouncement: (payload: Omit<Announcement, "id">) => dispatch({ type: "ADD_ANNOUNCEMENT", payload }),
+    addAnnouncement: (payload: Omit<Announcement, "id" | "schoolId">) =>
+      dispatch({ type: "ADD_ANNOUNCEMENT", payload: { ...payload, schoolId: effectiveSchoolId! } }),
     deleteAnnouncement: (id: string) => dispatch({ type: "DELETE_ANNOUNCEMENT", payload: { id } }),
   };
 }

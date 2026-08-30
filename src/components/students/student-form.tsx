@@ -12,22 +12,28 @@ export type StudentFormValues = Omit<Student, "id">;
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
-const emptyValues: StudentFormValues = {
-  name: "",
-  rollNumber: "",
-  admissionNo: "",
-  classId: CLASSES[0]?.id ?? "",
-  campusId: CLASSES[0]?.campusId ?? "",
-  gender: "male",
-  dob: "",
-  bloodGroup: "O+",
-  parentName: "",
-  parentPhone: "",
-  parentEmail: "",
-  address: "",
-  admissionDate: new Date().toISOString().slice(0, 10),
-  status: "active",
-};
+// A function, not a module-level constant — see teacher-form.tsx's
+// emptyValues() for why: CLASSES[0] must be read fresh on every mount, not
+// frozen at module-import time (empty/wrong for a brand-new school whose
+// first class hasn't synced into CLASSES yet).
+function emptyValues(): StudentFormValues {
+  return {
+    name: "",
+    rollNumber: "",
+    admissionNo: "",
+    classId: CLASSES[0]?.id ?? "",
+    campusId: CLASSES[0]?.campusId ?? "",
+    gender: "male",
+    dob: "",
+    bloodGroup: "O+",
+    parentName: "",
+    parentPhone: "",
+    parentEmail: "",
+    address: "",
+    admissionDate: new Date().toISOString().slice(0, 10),
+    status: "active",
+  };
+}
 
 interface StudentFormProps {
   initialValues?: Student;
@@ -37,7 +43,7 @@ interface StudentFormProps {
 }
 
 export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Student" }: StudentFormProps) {
-  const [values, setValues] = useState<StudentFormValues>(initialValues ?? emptyValues);
+  const [values, setValues] = useState<StudentFormValues>(initialValues ?? emptyValues());
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function set<K extends keyof StudentFormValues>(key: K, value: StudentFormValues[K]) {

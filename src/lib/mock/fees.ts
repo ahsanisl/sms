@@ -2,20 +2,33 @@ import type { FeeCategory, FeeInvoice, FeePayment, FeeStructureItem, InvoiceStat
 import { intBetween, mulberry32, pick } from "@/lib/mock/names";
 import { STUDENTS } from "@/lib/mock/students";
 import { CLASSES } from "@/lib/mock/reference-data";
+import { SCHOOLS } from "@/lib/mock/schools";
 
 const rand = mulberry32(303);
 
-// Mutable — see the render-body mirror-sync comment in lib/store/app-data-context.tsx.
-export let FEE_CATEGORIES: FeeCategory[] = [
-  { id: "fc-tuition", name: "Tuition Fee", status: "active" },
-  { id: "fc-admission", name: "Admission Fee", status: "active" },
-  { id: "fc-exam", name: "Examination Fee", status: "active" },
-  { id: "fc-annual", name: "Annual Fund", status: "active" },
-  { id: "fc-transport", name: "Transport Fee", status: "active" },
-  { id: "fc-library", name: "Library Fee", status: "active" },
-  { id: "fc-sports", name: "Sports Fee", status: "active" },
-  { id: "fc-registration", name: "Registration Fee", status: "active" },
+const FEE_CATEGORY_NAMES = [
+  "Tuition Fee",
+  "Admission Fee",
+  "Examination Fee",
+  "Annual Fund",
+  "Transport Fee",
+  "Library Fee",
+  "Sports Fee",
+  "Registration Fee",
 ];
+
+function buildFeeCategories(): FeeCategory[] {
+  const categories: FeeCategory[] = [];
+  for (const school of SCHOOLS) {
+    FEE_CATEGORY_NAMES.forEach((name, i) => {
+      categories.push({ id: `${school.id}-fc${i + 1}`, name, schoolId: school.id, status: "active" });
+    });
+  }
+  return categories;
+}
+
+// Mutable — see the render-body mirror-sync comment in lib/store/app-data-context.tsx.
+export let FEE_CATEGORIES: FeeCategory[] = buildFeeCategories();
 
 export function syncFeeCategories(next: FeeCategory[]) {
   FEE_CATEGORIES = next;

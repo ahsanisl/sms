@@ -5,19 +5,20 @@ import { useRouter } from "next/navigation";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
-import { DEMO_USERS, findDemoUser } from "@/lib/mock";
+import { useUsers } from "@/lib/store/hooks";
 import { ROLE_LABEL } from "@/lib/nav-config";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useSession();
+  const { users } = useUsers();
   const [identifier, setIdentifier] = useState("admin@eduflow.pk");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   function signIn(email: string) {
-    const user = findDemoUser(email);
+    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
     if (!user) {
       setError("We couldn't find a demo account with that email. Try one of the accounts below.");
       return;
@@ -152,7 +153,7 @@ export default function LoginPage() {
               This is a frontend prototype — try a demo account
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {DEMO_USERS.map((user) => (
+              {users.map((user) => (
                 <button
                   key={user.id}
                   type="button"

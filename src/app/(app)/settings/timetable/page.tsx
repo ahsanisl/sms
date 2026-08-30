@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTimetableConfig } from "@/lib/store/hooks";
+import { BREAK_AFTER_PERIOD, DAYS, PERIODS } from "@/lib/mock/timetable";
 import type { Period, TimetableDay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +43,12 @@ export default function TimetableSettingsPage() {
     setLocalPeriods((prev) => [...prev, { period: prev.length + 1, startTime: last?.endTime ?? "08:00", endTime: "—" }]);
   }
 
+  function loadStandardSchedule() {
+    setDays([...DAYS]);
+    setLocalPeriods(PERIODS.map((p) => ({ ...p })));
+    setBreakAfter(BREAK_AFTER_PERIOD);
+  }
+
   function removePeriod(index: number) {
     setLocalPeriods((prev) => prev.filter((_, i) => i !== index).map((p, i) => ({ ...p, period: i + 1 })));
     if (breakAfter === periods[index]?.period) setBreakAfter(0);
@@ -66,8 +73,23 @@ export default function TimetableSettingsPage() {
       <PageHeader
         title="Timetable Settings"
         description="Configure the working days and period schedule used across the school's timetables."
-        actions={<Button onClick={handleSave}>Save Changes</Button>}
+        actions={
+          <div className="flex items-center gap-2">
+            {days.length === 0 && periods.length === 0 && (
+              <Button variant="secondary" onClick={loadStandardSchedule}>
+                Load Standard Schedule
+              </Button>
+            )}
+            <Button onClick={handleSave}>Save Changes</Button>
+          </div>
+        }
       />
+
+      {days.length === 0 && periods.length === 0 && (
+        <p className="text-body-md text-on-surface-variant mb-4 -mt-2">
+          Nothing configured yet — the Timetable Builder needs at least one working day and period. Start from the standard Mon–Fri schedule or build your own below.
+        </p>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">

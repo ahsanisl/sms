@@ -26,6 +26,7 @@ export const PERMISSION_MODULE_LABEL: Record<PermissionModule, string> = {
   settingsUsers: "Users & Roles",
   settingsCampuses: "Campus Management",
   settingsSubjects: "Subject Management",
+  settingsSchools: "School Management (Platform)",
 };
 
 /** Every module a route-gated page belongs to, in the order the route matcher checks them (most specific first). */
@@ -33,6 +34,7 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "settingsUsers", prefixes: ["/settings/users"] },
   { module: "settingsCampuses", prefixes: ["/settings/campuses"] },
   { module: "settingsSubjects", prefixes: ["/settings/subjects"] },
+  { module: "settingsSchools", prefixes: ["/settings/schools"] },
   { module: "settings", prefixes: ["/settings"] },
   { module: "attendanceMark", prefixes: ["/attendance/mark"] },
   { module: "attendance", prefixes: ["/attendance"] },
@@ -92,9 +94,14 @@ export function isParentOnlyRoute(pathname: string): boolean {
  * components/layout/auth-guard.tsx).
  */
 export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boolean>> = {
-  school_owner: allTrueExcept([]),
-  school_admin: allTrueExcept([]),
-  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects"]),
+  // Platform-level SaaS operator: manages the roster of schools (tenants) and
+  // a cross-school summary, never a single school's live student/fee/exam
+  // data — see the multi-tenant plan for why this console is deliberately
+  // shallow rather than a way to "log in as" any one school.
+  platform_admin: allFalseExcept(["dashboard", "settingsSchools"]),
+  school_owner: allTrueExcept(["settingsSchools"]),
+  school_admin: allTrueExcept(["settingsSchools"]),
+  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects", "settingsSchools"]),
   teacher: allTrueExcept([
     "studentsManage",
     "admissions",
@@ -111,6 +118,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "settingsUsers",
     "settingsCampuses",
     "settingsSubjects",
+    "settingsSchools",
   ]),
   accountant: allTrueExcept([
     "studentsManage",
@@ -131,6 +139,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "settingsUsers",
     "settingsCampuses",
     "settingsSubjects",
+    "settingsSchools",
   ]),
   parent: allTrueExcept([
     "students", // parent's own /students view is still allowed (scoped to their children) — see note below
@@ -155,6 +164,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "settingsUsers",
     "settingsCampuses",
     "settingsSubjects",
+    "settingsSchools",
   ]),
 };
 // Parent needs "students" allowed (their own nav's "My Children" is /students, scoped by childStudentIds
@@ -164,4 +174,9 @@ DEFAULT_ROLE_PERMISSIONS.parent.students = true;
 function allTrueExcept(excluded: PermissionModule[]): Record<PermissionModule, boolean> {
   const modules = Object.keys(PERMISSION_MODULE_LABEL) as PermissionModule[];
   return Object.fromEntries(modules.map((m) => [m, !excluded.includes(m)])) as Record<PermissionModule, boolean>;
+}
+
+function allFalseExcept(included: PermissionModule[]): Record<PermissionModule, boolean> {
+  const modules = Object.keys(PERMISSION_MODULE_LABEL) as PermissionModule[];
+  return Object.fromEntries(modules.map((m) => [m, included.includes(m)])) as Record<PermissionModule, boolean>;
 }

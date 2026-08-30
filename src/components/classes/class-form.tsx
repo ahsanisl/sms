@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useCampuses, useTeachers } from "@/lib/store/hooks";
-import { GRADE_ORDER, GRADE_SUBJECTS } from "@/lib/mock/reference-data";
+import { GRADE_ORDER, GRADE_SUBJECTS, subjectId } from "@/lib/mock/reference-data";
 
 export type ClassFormValues = Omit<ClassSection, "id">;
 
@@ -37,6 +37,7 @@ export function ClassForm({ initialValues, onSubmit, onCancel }: ClassFormProps)
   const [teacherError, setTeacherError] = useState("");
 
   const campusTeachers = teachers.filter((t) => t.campusId === campusId);
+  const selectedCampus = campuses.find((c) => c.id === campusId);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,12 +50,13 @@ export function ClassForm({ initialValues, onSubmit, onCancel }: ClassFormProps)
       return;
     }
     setTeacherError("");
+    const fallbackCodes = GRADE_SUBJECTS[grade] ?? ["eng", "urdu", "math"];
     onSubmit({
       grade,
       section: section.toUpperCase(),
       campusId,
       classTeacherId,
-      subjectIds: initialValues?.subjectIds ?? GRADE_SUBJECTS[grade] ?? ["eng", "urdu", "math"],
+      subjectIds: initialValues?.subjectIds ?? (selectedCampus ? fallbackCodes.map((code) => subjectId(selectedCampus.schoolId, code)) : []),
       studentCapacity,
       status: initialValues?.status ?? "active",
     });
