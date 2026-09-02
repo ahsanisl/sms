@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Room } from "@/lib/types";
+import type { Campus, Room } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -14,10 +14,13 @@ interface RoomFormProps {
   initialValues?: Room;
   onSubmit: (values: RoomFormValues) => void;
   onCancel?: () => void;
+  /** Real-data callers pass their own campus list; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
+  campuses?: Campus[];
 }
 
-export function RoomForm({ initialValues, onSubmit, onCancel }: RoomFormProps) {
-  const { campuses } = useCampuses();
+export function RoomForm({ initialValues, onSubmit, onCancel, campuses: campusesProp }: RoomFormProps) {
+  const { campuses: mockCampuses } = useCampuses();
+  const campuses = campusesProp ?? mockCampuses;
   const activeCampuses = campuses.filter((c) => c.status === "active");
 
   const [name, setName] = useState(initialValues?.name ?? "");

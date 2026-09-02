@@ -2,22 +2,38 @@
 
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { campusName, classLabel, teacherName } from "@/lib/mock/reference-data";
 import type { Student, AttendanceRecord, FeeInvoice, MarksEntry, Exam, Campus, ClassSection, Teacher, Subject } from "@/lib/types";
-import { attendanceForStudent, attendanceRate, SCHOOL_DAYS } from "@/lib/mock/attendance";
+import { attendanceRate } from "@/lib/mock/attendance";
 import { formatDate, formatPKR } from "@/lib/format";
 
 export interface ReportData {
   students: Student[];
   attendance: AttendanceRecord[];
-  invoices: FeeInvoice[];
+  // No report here ever reads an invoice's line items — the bulk fetch that
+  // backs this page doesn't include them (same as every other real fees
+  // list in the app), so this is intentionally narrower than the full mock type.
+  invoices: Omit<FeeInvoice, "items">[];
   marks: MarksEntry[];
   exams: Exam[];
-  /** Pre-scoped to the viewer's campus (or all campuses for school-wide roles) — report renderers must use these, never the static reference arrays, so a Campus Admin never sees another campus's rows. */
+  /** Pre-scoped to the viewer's campus (or all campuses for school-wide roles) — report renderers must use these, never a global lookup, so a Campus Admin never sees another campus's rows. */
   campuses: Campus[];
   classes: ClassSection[];
   teachers: Teacher[];
   subjects: Subject[];
+}
+
+// Every name lookup resolves against the ReportData bag itself, not a global
+// mock array — these ids are real database ids with no meaning outside the
+// already campus-scoped lists passed in.
+function campusNameIn(d: ReportData, id: string) {
+  return d.campuses.find((c) => c.id === id)?.name ?? "—";
+}
+function classLabelIn(d: ReportData, id: string) {
+  const c = d.classes.find((c) => c.id === id);
+  return c ? `${c.grade}-${c.section}` : "—";
+}
+function teacherNameIn(d: ReportData, id: string) {
+  return d.teachers.find((t) => t.id === id)?.name ?? "—";
 }
 
 function SimpleTable({ headers, rows }: { headers: string[]; rows: React.ReactNode[][] }) {
@@ -58,7 +74,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
         headers={["Campus", "Total Students", "Active", "Inactive"]}
         rows={d.campuses.map((c) => {
           const s = d.students.filter((s) => s.campusId === c.id);
-          return [campusName(c.id), s.length, s.filter((x) => x.status === "active").length, s.filter((x) => x.status === "inactive").length];
+          return [campusNameIn(d, c.id), s.length, s.filter((x) => x.status === "active").length, s.filter((x) => x.status === "inactive").length];
         })}
       />
     ),
@@ -99,7 +115,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     title: "Daily Attendance Log",
     category: "Attendance Reports",
     render: (d) => {
-      const today = SCHOOL_DAYS[SCHOOL_DAYS.length - 1];
+      const today = new Date().toISOString().slice(0, 10);
       return (
         <SimpleTable
           headers={["Class", "Present", "Absent", "Leave", "Rate"]}
@@ -107,7 +123,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
             const records = d.attendance.filter((a) => a.classId === c.id && a.date === today);
             const present = records.filter((r) => r.status === "present" || r.status === "late").length;
             return [
-              classLabel(c),
+              classLabelIn(d, c.id),
               present,
               records.filter((r) => r.status === "absent").length,
               records.filter((r) => r.status === "leave").length,
@@ -126,7 +142,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
         headers={["Class", "Records", "Attendance Rate"]}
         rows={d.classes.map((c) => {
           const records = d.attendance.filter((a) => a.classId === c.id);
-          return [classLabel(c), records.length, `${attendanceRate(records)}%`];
+          return [classLabelIn(d, c.id), records.length, `${attendanceRate(records)}%`];
         })}
       />
     ),
@@ -137,11 +153,11 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     render: (d) => {
       const flagged = d.students
         .filter((s) => s.status === "active")
-        .map((s) => ({ s, rate: attendanceRate(attendanceForStudent(s.id)) }))
+        .map((s) => ({ s, rate: attendanceRate(d.attendance.filter((a) => a.studentId === s.id)) }))
         .filter((x) => x.rate < 85)
         .sort((a, b) => a.rate - b.rate);
       return flagged.length ? (
-        <SimpleTable headers={["Student", "Class", "Attendance Rate"]} rows={flagged.map(({ s, rate }) => [s.name, classLabel(s.classId), <StatusBadge key={s.id} label={`${rate}%`} tone="error" />])} />
+        <SimpleTable headers={["Student", "Class", "Attendance Rate"]} rows={flagged.map(({ s, rate }) => [s.name, classLabelIn(d, s.classId), <StatusBadge key={s.id} label={`${rate}%`} tone="error" />])} />
       ) : (
         <EmptyState icon="check_circle" title="No students flagged" description="Everyone is at or above 85% attendance." />
       );
@@ -167,15 +183,18 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
   collection_summary: {
     title: "Collection Summary",
     category: "Fee Reports",
-    render: (d) => (
-      <SimpleTable
-        headers={["Campus", "Collected", "Outstanding"]}
-        rows={d.campuses.map((c) => {
-          const invs = d.invoices.filter((i) => d.students.find((s) => s.id === i.studentId)?.campusId === c.id && i.month === "August 2026");
-          return [campusName(c.id), formatPKR(invs.reduce((s, i) => s + i.paidAmount, 0)), formatPKR(invs.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0))];
-        })}
-      />
-    ),
+    render: (d) => {
+      const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      return (
+        <SimpleTable
+          headers={["Campus", "Collected", "Outstanding"]}
+          rows={d.campuses.map((c) => {
+            const invs = d.invoices.filter((i) => d.students.find((s) => s.id === i.studentId)?.campusId === c.id && i.month === currentMonthLabel);
+            return [campusNameIn(d, c.id), formatPKR(invs.reduce((s, i) => s + i.paidAmount, 0)), formatPKR(invs.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0))];
+          })}
+        />
+      );
+    },
   },
   revenue_forecast: { title: "Revenue Forecast", category: "Fee Reports", render: () => comingSoon },
   gradebook_export: { title: "Gradebook Export", category: "Academic Reports", render: () => comingSoon },
@@ -199,7 +218,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     render: (d) => (
       <SimpleTable
         headers={["Exam", "Term", "Classes", "Date Range"]}
-        rows={d.exams.map((e) => [e.name, e.term, e.classIds.map((id) => classLabel(id)).join(", "), `${formatDate(e.startDate)} – ${formatDate(e.endDate)}`])}
+        rows={d.exams.map((e) => [e.name, e.term, e.classIds.map((id) => classLabelIn(d, id)).join(", "), `${formatDate(e.startDate)} – ${formatDate(e.endDate)}`])}
       />
     ),
   },
@@ -209,7 +228,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     render: (d) => (
       <SimpleTable
         headers={["Teacher", "Classes", "Students"]}
-        rows={d.teachers.map((t) => [teacherName(t.id), t.classIds.length, d.students.filter((s) => t.classIds.includes(s.classId)).length])}
+        rows={d.teachers.map((t) => [teacherNameIn(d, t.id), t.classIds.length, d.students.filter((s) => t.classIds.includes(s.classId)).length])}
       />
     ),
   },

@@ -1,27 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import type { Teacher, TeacherStatus } from "@/lib/types";
+import type { Campus, Subject, Teacher, TeacherStatus } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { CAMPUSES, SUBJECTS } from "@/lib/mock/reference-data";
+import { useCampuses, useSubjects } from "@/lib/store/hooks";
 
 export type TeacherFormValues = Omit<Teacher, "id" | "classIds">;
 
-// A function, not a module-level constant — CAMPUSES[0]?.id must be read
+// A function, not a module-level constant — campuses[0]?.id must be read
 // fresh on every mount (e.g. each time this form's Modal reopens), not
 // captured once when this module first loads. A constant here would freeze
 // whatever campus happened to exist at that moment, which is empty for a
-// brand-new school whose first campus hasn't synced into CAMPUSES yet — the
-// same class of bug documented in reference-data.ts's frozen-mirror comment.
-function emptyValues(): TeacherFormValues {
+// brand-new school whose first campus hasn't synced yet — the same class of
+// bug documented in reference-data.ts's frozen-mirror comment.
+function emptyValues(campuses: { id: string }[]): TeacherFormValues {
   return {
     name: "",
     employeeId: "",
-    campusId: CAMPUSES[0]?.id ?? "",
+    campusId: campuses[0]?.id ?? "",
     subjectIds: [],
     phone: "",
     email: "",
@@ -36,10 +36,18 @@ interface TeacherFormProps {
   onSubmit: (values: TeacherFormValues) => void;
   onCancel?: () => void;
   submitLabel?: string;
+  /** Real-data callers pass their own campus/subject lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
+  campuses?: Campus[];
+  subjects?: Subject[];
 }
 
-export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Teacher" }: TeacherFormProps) {
-  const [values, setValues] = useState<TeacherFormValues>(initialValues ?? emptyValues());
+export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Teacher", campuses: campusesProp, subjects: subjectsProp }: TeacherFormProps) {
+  const { campuses: mockCampuses } = useCampuses();
+  const { subjects: mockSubjects } = useSubjects();
+  const campuses = campusesProp ?? mockCampuses;
+  const subjects = subjectsProp ?? mockSubjects;
+
+  const [values, setValues] = useState<TeacherFormValues>(initialValues ?? emptyValues(campuses));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function set<K extends keyof TeacherFormValues>(key: K, value: TeacherFormValues[K]) {
@@ -77,7 +85,7 @@ export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "
         </FormField>
         <FormField label="Campus" htmlFor="campusId">
           <Select id="campusId" value={values.campusId} onChange={(e) => set("campusId", e.target.value)} className="w-full">
-            {CAMPUSES.map((c) => (
+            {campuses.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </Select>
@@ -104,7 +112,7 @@ export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "
 
       <FormField label="Subjects Taught" required error={errors.subjectIds}>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-          {SUBJECTS.map((subject) => (
+          {subjects.map((subject) => (
             <label key={subject.id} className="flex items-center gap-2 text-body-md text-on-surface cursor-pointer">
               <Checkbox checked={values.subjectIds.includes(subject.id)} onCheckedChange={() => toggleSubject(subject.id)} />
               {subject.name}

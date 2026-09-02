@@ -13,24 +13,37 @@ import {
 import { Modal } from "@/components/shared/modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { StudentForm, type StudentFormValues } from "@/components/students/student-form";
-import { useStudents } from "@/lib/store/hooks";
-import type { Student } from "@/lib/types";
+import { updateStudentAction, deleteStudentAction } from "@/app/(app)/students/actions";
+import type { Campus, ClassSection, Student } from "@/lib/types";
 
-export function StudentRowActions({ student }: { student: Student }) {
+export function StudentRowActions({ student, campuses, classes }: { student: Student; campuses?: Campus[]; classes?: ClassSection[] }) {
   const router = useRouter();
-  const { updateStudent, deleteStudent } = useStudents();
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function handleEditSubmit(values: StudentFormValues) {
-    updateStudent({ ...values, id: student.id });
+  async function handleEditSubmit(values: StudentFormValues) {
+    const result = await updateStudentAction(student.id, values);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
     toast.success(`${values.name}'s record was updated.`);
     setEditOpen(false);
+    router.refresh();
   }
 
-  function handleDelete() {
-    deleteStudent(student.id);
+  async function handleDelete() {
+    setBusy(true);
+    const result = await deleteStudentAction(student.id);
+    setBusy(false);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
     toast.success(`${student.name} was removed.`);
+    setConfirmOpen(false);
+    router.refresh();
   }
 
   return (
@@ -66,15 +79,15 @@ export function StudentRowActions({ student }: { student: Student }) {
       </div>
 
       <Modal open={editOpen} onOpenChange={setEditOpen} title="Edit Student" className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <StudentForm initialValues={student} submitLabel="Save Changes" onSubmit={handleEditSubmit} onCancel={() => setEditOpen(false)} />
+        <StudentForm initialValues={student} submitLabel="Save Changes" onSubmit={handleEditSubmit} onCancel={() => setEditOpen(false)} campuses={campuses} classes={classes} />
       </Modal>
 
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Remove this student?"
-        description={`This removes ${student.name} from the roster for this demo session.`}
-        confirmLabel="Remove"
+        description={`This permanently deletes ${student.name}'s record. Students with fee payment history can't be removed this way — withdraw them instead.`}
+        confirmLabel={busy ? "Removing…" : "Remove"}
         onConfirm={handleDelete}
       />
     </>

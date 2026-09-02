@@ -13,24 +13,37 @@ import {
 import { Modal } from "@/components/shared/modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { TeacherForm, type TeacherFormValues } from "@/components/teachers/teacher-form";
-import { useTeachers } from "@/lib/store/hooks";
-import type { Teacher } from "@/lib/types";
+import { updateTeacherAction, deleteTeacherAction } from "@/app/(app)/teachers/actions";
+import type { Campus, Subject, Teacher } from "@/lib/types";
 
-export function TeacherRowActions({ teacher }: { teacher: Teacher }) {
+export function TeacherRowActions({ teacher, campuses, subjects }: { teacher: Teacher; campuses?: Campus[]; subjects?: Subject[] }) {
   const router = useRouter();
-  const { updateTeacher, deleteTeacher } = useTeachers();
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  function handleEditSubmit(values: TeacherFormValues) {
-    updateTeacher({ ...values, id: teacher.id, classIds: teacher.classIds });
+  async function handleEditSubmit(values: TeacherFormValues) {
+    const result = await updateTeacherAction(teacher.id, values);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
     toast.success(`${values.name}'s record was updated.`);
     setEditOpen(false);
+    router.refresh();
   }
 
-  function handleDelete() {
-    deleteTeacher(teacher.id);
+  async function handleDelete() {
+    setBusy(true);
+    const result = await deleteTeacherAction(teacher.id);
+    setBusy(false);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
     toast.success(`${teacher.name} was removed.`);
+    setConfirmOpen(false);
+    router.refresh();
   }
 
   return (
@@ -66,15 +79,15 @@ export function TeacherRowActions({ teacher }: { teacher: Teacher }) {
       </div>
 
       <Modal open={editOpen} onOpenChange={setEditOpen} title="Edit Teacher" className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <TeacherForm initialValues={teacher} submitLabel="Save Changes" onSubmit={handleEditSubmit} onCancel={() => setEditOpen(false)} />
+        <TeacherForm initialValues={teacher} submitLabel="Save Changes" onSubmit={handleEditSubmit} onCancel={() => setEditOpen(false)} campuses={campuses} subjects={subjects} />
       </Modal>
 
       <ConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title="Remove this teacher?"
-        description={`This removes ${teacher.name} from the faculty list for this demo session.`}
-        confirmLabel="Remove"
+        description={`This permanently deletes ${teacher.name}'s record. Teachers assigned as a class's teacher or with existing timetable slots can't be removed this way.`}
+        confirmLabel={busy ? "Removing…" : "Remove"}
         onConfirm={handleDelete}
       />
     </>

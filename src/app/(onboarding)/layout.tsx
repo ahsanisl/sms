@@ -1,43 +1,19 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "@/lib/auth/session-context";
-import { useSchoolProfile } from "@/lib/store/hooks";
-
 /**
  * Full-screen, no sidebar/topbar — mirrors (auth)/layout.tsx's minimal shell.
  * Lives outside the (app) route group deliberately: AuthGuard (which wraps
  * every (app) route) redirects an unfinished School Owner here, so this
  * layout can't itself be caught by that same check.
+ *
+ * All the actual gating (must be signed in, must be a school_owner, must not
+ * have already finished onboarding) now happens server-side in
+ * onboarding/page.tsx via requireSession() + redirect() — this layout used
+ * to do that itself client-side against the mock AppDataProvider store, but
+ * that meant a school that only ever existed in Postgres (created through
+ * the real Platform Admin console) had no matching mock record, so the old
+ * check's `!schoolProfile` branch never resolved and this route was a
+ * permanent "Loading EduFlow…" dead end for its owner. Plain server-rendered
+ * markup here has no such gap.
  */
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useSession();
-  const { schoolProfile } = useSchoolProfile();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-    if (user.role !== "school_owner") {
-      router.replace("/dashboard");
-      return;
-    }
-    if (schoolProfile?.onboardingComplete) {
-      router.replace("/dashboard");
-    }
-  }, [isLoading, user, schoolProfile, router]);
-
-  if (isLoading || !user || user.role !== "school_owner" || !schoolProfile || schoolProfile.onboardingComplete) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background text-on-surface-variant text-body-md">
-        Loading EduFlow…
-      </div>
-    );
-  }
-
   return <div className="h-screen w-full overflow-y-auto bg-background text-on-surface">{children}</div>;
 }

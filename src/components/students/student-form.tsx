@@ -1,28 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import type { Student, StudentStatus } from "@/lib/types";
+import type { Campus, ClassSection, Student, StudentStatus } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { CAMPUSES, CLASSES, classLabel } from "@/lib/mock/reference-data";
+import { useCampuses, useClasses } from "@/lib/store/hooks";
+import { classLabel as mockClassLabel } from "@/lib/mock/reference-data";
 
 export type StudentFormValues = Omit<Student, "id">;
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 // A function, not a module-level constant — see teacher-form.tsx's
-// emptyValues() for why: CLASSES[0] must be read fresh on every mount, not
+// emptyValues() for why: classes[0] must be read fresh on every mount, not
 // frozen at module-import time (empty/wrong for a brand-new school whose
-// first class hasn't synced into CLASSES yet).
-function emptyValues(): StudentFormValues {
+// first class hasn't synced yet).
+function emptyValues(classes: { id: string; campusId: string }[]): StudentFormValues {
   return {
     name: "",
     rollNumber: "",
     admissionNo: "",
-    classId: CLASSES[0]?.id ?? "",
-    campusId: CLASSES[0]?.campusId ?? "",
+    classId: classes[0]?.id ?? "",
+    campusId: classes[0]?.campusId ?? "",
     gender: "male",
     dob: "",
     bloodGroup: "O+",
@@ -40,10 +41,19 @@ interface StudentFormProps {
   onSubmit: (values: StudentFormValues) => void;
   onCancel?: () => void;
   submitLabel?: string;
+  /** Real-data callers pass their own campus/class lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
+  campuses?: Campus[];
+  classes?: ClassSection[];
 }
 
-export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Student" }: StudentFormProps) {
-  const [values, setValues] = useState<StudentFormValues>(initialValues ?? emptyValues());
+export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Student", campuses: campusesProp, classes: classesProp }: StudentFormProps) {
+  const { campuses: mockCampuses } = useCampuses();
+  const { classes: mockClasses } = useClasses();
+  const campuses = campusesProp ?? mockCampuses;
+  const classes = classesProp ?? mockClasses;
+  const classLabel = (c: ClassSection) => (classesProp ? `${c.grade}-${c.section}` : mockClassLabel(c));
+
+  const [values, setValues] = useState<StudentFormValues>(initialValues ?? emptyValues(classes));
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function set<K extends keyof StudentFormValues>(key: K, value: StudentFormValues[K]) {
@@ -51,7 +61,7 @@ export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "
   }
 
   function handleClassChange(classId: string) {
-    const cls = CLASSES.find((c) => c.id === classId);
+    const cls = classes.find((c) => c.id === classId);
     setValues((prev) => ({ ...prev, classId, campusId: cls?.campusId ?? prev.campusId }));
   }
 
@@ -117,19 +127,19 @@ export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "
               value={values.campusId}
               onChange={(e) => {
                 set("campusId", e.target.value);
-                const firstClass = CLASSES.find((c) => c.campusId === e.target.value);
+                const firstClass = classes.find((c) => c.campusId === e.target.value);
                 if (firstClass) set("classId", firstClass.id);
               }}
               className="w-full"
             >
-              {CAMPUSES.map((c) => (
+              {campuses.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
           </FormField>
           <FormField label="Class" htmlFor="classId">
             <Select id="classId" value={values.classId} onChange={(e) => handleClassChange(e.target.value)} className="w-full">
-              {CLASSES.filter((c) => c.campusId === values.campusId).map((c) => (
+              {classes.filter((c) => c.campusId === values.campusId).map((c) => (
                 <option key={c.id} value={c.id}>{classLabel(c)}</option>
               ))}
             </Select>

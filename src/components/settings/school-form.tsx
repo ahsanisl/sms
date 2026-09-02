@@ -12,6 +12,7 @@ export type SchoolFormValues = Omit<School, "id" | "status" | "onboardingComplet
   /** Only present when creating (no initialValues) — the school's first School Owner account. */
   ownerName?: string;
   ownerEmail?: string;
+  ownerPassword?: string;
 };
 
 interface SchoolFormProps {
@@ -34,6 +35,7 @@ export function SchoolForm({ initialValues, onSubmit, onCancel }: SchoolFormProp
   const [showSignatureLines, setShowSignatureLines] = useState(initialValues?.showSignatureLines ?? true);
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [ownerPassword, setOwnerPassword] = useState("");
   const [error, setError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
@@ -46,6 +48,10 @@ export function SchoolForm({ initialValues, onSubmit, onCancel }: SchoolFormProp
       setError("The School Owner's name and email are required to create a school.");
       return;
     }
+    if (isCreating && ownerPassword.length < 8) {
+      setError("The School Owner's password must be at least 8 characters.");
+      return;
+    }
     onSubmit({
       name,
       tagline,
@@ -55,7 +61,7 @@ export function SchoolForm({ initialValues, onSubmit, onCancel }: SchoolFormProp
       logoEmoji,
       reportCardFooter,
       showSignatureLines,
-      ...(isCreating ? { ownerName, ownerEmail } : {}),
+      ...(isCreating ? { ownerName, ownerEmail, ownerPassword } : {}),
     });
   }
 
@@ -107,6 +113,15 @@ export function SchoolForm({ initialValues, onSubmit, onCancel }: SchoolFormProp
               <Input id="ownerEmail" type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} placeholder="owner@school.edu.pk" />
             </FormField>
           </div>
+          <FormField
+            label="Owner Password"
+            htmlFor="ownerPassword"
+            required
+            hint="At least 8 characters. Share this with the new owner directly — it won't be shown again."
+            error={error && ownerPassword.length < 8 ? error : undefined}
+          >
+            <Input id="ownerPassword" type="text" value={ownerPassword} onChange={(e) => setOwnerPassword(e.target.value)} placeholder="e.g., Sunrise2026!" />
+          </FormField>
         </div>
       )}
 

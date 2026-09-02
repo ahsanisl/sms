@@ -5,33 +5,50 @@ import { useRouter } from "next/navigation";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
-import { useUsers } from "@/lib/store/hooks";
-import { ROLE_LABEL } from "@/lib/nav-config";
+
+/** Mirrors src/db/seed.ts's seeded accounts — every one uses the same dev-only password (also printed by the seed script). Convenience only; the password is still genuinely required and checked server-side. */
+const DEV_ACCOUNTS = [
+  { role: "Platform Admin", email: "platform@eduflow.dev" },
+  { role: "School Owner", email: "owner@eduflow.dev" },
+  { role: "School Admin", email: "admin@eduflow.dev" },
+  { role: "Campus Admin", email: "campus.admin@eduflow.dev" },
+  { role: "Accountant", email: "accountant@eduflow.dev" },
+  { role: "Teacher", email: "teacher@eduflow.dev" },
+  { role: "Parent", email: "parent@eduflow.dev" },
+];
+const DEV_PASSWORD = "Password123!";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useSession();
-  const { users } = useUsers();
-  const [identifier, setIdentifier] = useState("admin@eduflow.pk");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function signIn(email: string) {
-    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-    if (!user) {
-      setError("We couldn't find a demo account with that email. Try one of the accounts below.");
+  async function signIn(email: string, pwd: string) {
+    setSubmitting(true);
+    setError("");
+    const failure = await login(email, pwd);
+    setSubmitting(false);
+    if (failure) {
+      setError(failure);
       return;
     }
-    setError("");
-    login(user);
-    toast.success(`Welcome back, ${user.name.split(" ")[0]}!`);
+    toast.success("Welcome back!");
     router.push("/dashboard");
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    signIn(identifier);
+    void signIn(identifier, password);
+  }
+
+  function fillDevAccount(email: string) {
+    setIdentifier(email);
+    setPassword(DEV_PASSWORD);
+    setError("");
   }
 
   return (
@@ -77,7 +94,7 @@ export default function LoginPage() {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label className="block text-label-sm text-on-surface" htmlFor="identifier">
-                Email or Phone number
+                Email
               </label>
               <input
                 id="identifier"
@@ -141,27 +158,28 @@ export default function LoginPage() {
             <div className="pt-4">
               <button
                 type="submit"
-                className="flex w-full justify-center items-center rounded-lg bg-secondary px-4 py-3 text-label-md font-semibold text-on-secondary shadow-sm hover:bg-secondary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-surface-container-lowest transition-all"
+                disabled={submitting}
+                className="flex w-full justify-center items-center rounded-lg bg-secondary px-4 py-3 text-label-md font-semibold text-on-secondary shadow-sm hover:bg-secondary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-surface-container-lowest transition-all disabled:opacity-60"
               >
-                Log In
+                {submitting ? "Signing in…" : "Log In"}
               </button>
             </div>
           </form>
 
           <div className="mt-8">
             <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 text-center lg:text-left">
-              This is a frontend prototype — try a demo account
+              Dev environment — quick-fill a seeded account (password still required)
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {users.map((user) => (
+              {DEV_ACCOUNTS.map((account) => (
                 <button
-                  key={user.id}
+                  key={account.email}
                   type="button"
-                  onClick={() => signIn(user.email)}
+                  onClick={() => fillDevAccount(account.email)}
                   className="rounded-lg border border-outline-variant px-3 py-2 text-left hover:bg-surface-container-low transition-colors"
                 >
-                  <p className="text-label-md font-semibold text-primary">{ROLE_LABEL[user.role]}</p>
-                  <p className="text-label-sm text-on-surface-variant truncate">{user.name}</p>
+                  <p className="text-label-md font-semibold text-primary">{account.role}</p>
+                  <p className="text-label-sm text-on-surface-variant truncate">{account.email}</p>
                 </button>
               ))}
             </div>

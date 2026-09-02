@@ -1,26 +1,52 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { Icon } from "@/components/shared/icon";
 import { FOOTER_NAV, navForRole, ROLE_LABEL, type NavItem } from "@/lib/nav-config";
 import { useSession } from "@/lib/auth/session-context";
-import { usePermissions, useSchoolProfile } from "@/lib/store/hooks";
 import { moduleForPath } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
+import type { PermissionModule } from "@/lib/types";
+
+interface PermissionsResponse {
+  permissions: Partial<Record<PermissionModule, boolean>>;
+  schoolName: string | null;
+}
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user } = useSession();
-  const { routePermissions } = usePermissions();
-  const { schoolProfile } = useSchoolProfile();
+  const [perms, setPerms] = useState<PermissionsResponse | null>(null);
+  const userId = user?.id;
+
+  // Same real, DB-backed source AuthGuard reads (see that component's own
+  // note) — nav-link visibility is cosmetic, not the access boundary, but it
+  // should still reflect what the role can actually reach rather than the
+  // mock store's separately-editable copy.
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    fetch("/api/me/permissions")
+      .then((res) => (res.ok ? (res.json() as Promise<PermissionsResponse>) : null))
+      .then((data) => {
+        if (!cancelled) setPerms(data);
+      })
+      .catch(() => {
+        if (!cancelled) setPerms(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
   if (!user) return null;
 
-  const perms = routePermissions[user.role];
   const isVisible = (item: NavItem) => {
     const routeModule = moduleForPath(item.href);
-    return !routeModule || perms?.[routeModule] !== false;
+    return !routeModule || perms?.permissions[routeModule] !== false;
   };
 
   const navItems = navForRole(user.role).filter(isVisible);
@@ -36,7 +62,7 @@ export function Sidebar() {
           <h1 className="text-headline-sm font-bold text-on-primary">EduFlow</h1>
           <p className="text-label-sm text-primary-fixed-dim">
             {ROLE_LABEL[user.role]}
-            {user.role !== "platform_admin" && schoolProfile ? ` · ${schoolProfile.name}` : ""}
+            {perms?.schoolName ? ` · ${perms.schoolName}` : ""}
           </p>
         </div>
       </div>

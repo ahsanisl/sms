@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Department } from "@/lib/types";
+import type { Campus, Department, Subject, Teacher } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -15,12 +15,19 @@ interface DepartmentFormProps {
   initialValues?: Department;
   onSubmit: (values: DepartmentFormValues) => void;
   onCancel?: () => void;
+  /** Real-data callers pass their own lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
+  campuses?: Campus[];
+  subjects?: Subject[];
+  teachers?: Teacher[];
 }
 
-export function DepartmentForm({ initialValues, onSubmit, onCancel }: DepartmentFormProps) {
-  const { campuses } = useCampuses();
-  const { subjects } = useSubjects();
-  const { teachers } = useTeachers();
+export function DepartmentForm({ initialValues, onSubmit, onCancel, campuses: campusesProp, subjects: subjectsProp, teachers: teachersProp }: DepartmentFormProps) {
+  const { campuses: mockCampuses } = useCampuses();
+  const { subjects: mockSubjects } = useSubjects();
+  const { teachers: mockTeachers } = useTeachers();
+  const campuses = campusesProp ?? mockCampuses;
+  const subjects = subjectsProp ?? mockSubjects;
+  const teachers = teachersProp ?? mockTeachers;
   const activeCampuses = campuses.filter((c) => c.status === "active");
   const activeSubjects = subjects.filter((s) => s.status === "active");
 

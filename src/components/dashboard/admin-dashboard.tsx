@@ -17,105 +17,65 @@ import { StatCard } from "@/components/shared/stat-card";
 import { ChartCard } from "@/components/shared/chart-card";
 import { Icon } from "@/components/shared/icon";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/lib/auth/session-context";
-import { useCampusScope } from "@/lib/campus-scope";
-import { useStudents, useTeachers, useAttendanceStore, useFeesStore, useExamsStore } from "@/lib/store/hooks";
-import { CAMPUSES, CLASSES, classLabel, campusName } from "@/lib/mock/reference-data";
-import { SCHOOL_DAYS } from "@/lib/mock/attendance";
 import { formatCompactNumber, formatCompactPKR, formatDate, timeAgo } from "@/lib/format";
 
-export function AdminDashboard() {
-  const { user } = useSession();
-  const { scopedCampusId, isAllCampuses } = useCampusScope();
-  const { students } = useStudents();
-  const { teachers } = useTeachers();
-  const { attendance } = useAttendanceStore();
-  const { invoices, payments } = useFeesStore();
-  const { exams } = useExamsStore();
+interface CampusGlanceRow {
+  id: string;
+  name: string;
+  students: number;
+  teachers: number;
+  attendanceRate: number;
+  collected: number;
+  outstanding: number;
+}
 
-  const scopedStudents = scopedCampusId ? students.filter((s) => s.campusId === scopedCampusId) : students;
-  const scopedTeachers = scopedCampusId ? teachers.filter((t) => t.campusId === scopedCampusId) : teachers;
-  const scopedClasses = scopedCampusId ? CLASSES.filter((c) => c.campusId === scopedCampusId) : CLASSES;
-  const scopedClassIds = new Set(scopedClasses.map((c) => c.id));
+interface AdminDashboardProps {
+  userName: string;
+  campusLabel: string;
+  today: string;
+  totalStudents: number;
+  totalTeachers: number;
+  todayRate: number;
+  yesterdayRate: number;
+  collected: number;
+  outstanding: number;
+  showCampusGlance: boolean;
+  campusGlance: CampusGlanceRow[];
+  attendanceTrend: { date: string; rate: number }[];
+  feeByCampus: { campus: string; collected: number; outstanding: number }[];
+  classAttendance: { id: string; label: string; rate: number }[];
+  latestStudentActivity?: { name: string; classLabel: string; admissionDate: string };
+  latestPayments: { id: string; amount: number; date: string }[];
+  absentToday: number;
+  upcomingExams: { id: string; name: string; startDate: string }[];
+}
 
-  const showCampusGlance = user?.role === "school_owner" && isAllCampuses;
-
-  const today = SCHOOL_DAYS[SCHOOL_DAYS.length - 1];
-  const yesterday = SCHOOL_DAYS[SCHOOL_DAYS.length - 2];
-  const todayRecords = attendance.filter((a) => a.date === today && scopedClassIds.has(a.classId));
-  const yesterdayRecords = attendance.filter((a) => a.date === yesterday && scopedClassIds.has(a.classId));
-
-  const rate = (records: typeof attendance) =>
-    records.length ? Math.round((records.filter((r) => r.status === "present" || r.status === "late").length / records.length) * 100) : 0;
-
-  const todayRate = rate(todayRecords);
-  const yesterdayRate = rate(yesterdayRecords);
-
-  const scopedInvoices = invoices.filter((inv) => scopedStudents.some((s) => s.id === inv.studentId));
-  const currentMonthInvoices = scopedInvoices.filter((inv) => inv.month === "August 2026");
-  const collected = currentMonthInvoices.reduce((sum, inv) => sum + inv.paidAmount, 0);
-  const outstanding = currentMonthInvoices.reduce((sum, inv) => sum + (inv.totalAmount - inv.paidAmount), 0);
-
-  const attendanceTrend = SCHOOL_DAYS.slice(-7).map((date) => {
-    const records = attendance.filter((a) => a.date === date && scopedClassIds.has(a.classId));
-    return { date: formatDate(date).slice(0, 6), rate: rate(records) };
-  });
-
-  const feeByCampus = (scopedCampusId ? CAMPUSES.filter((c) => c.id === scopedCampusId) : CAMPUSES).map((campus) => {
-    const campusInvoices = currentMonthInvoices.filter((inv) => {
-      const student = students.find((s) => s.id === inv.studentId);
-      return student?.campusId === campus.id;
-    });
-    return {
-      campus: campus.name.replace(" Campus", ""),
-      collected: campusInvoices.reduce((s, i) => s + i.paidAmount, 0),
-      outstanding: campusInvoices.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0),
-    };
-  });
-
-  const campusGlance = showCampusGlance
-    ? CAMPUSES.map((campus) => {
-        const campusStudents = students.filter((s) => s.campusId === campus.id);
-        const campusClassIds = new Set(CLASSES.filter((c) => c.campusId === campus.id).map((c) => c.id));
-        const campusTodayRecords = attendance.filter((a) => a.date === today && campusClassIds.has(a.classId));
-        const campusInvoices = currentMonthInvoices.filter((inv) => campusStudents.some((s) => s.id === inv.studentId));
-        return {
-          campus,
-          students: campusStudents.length,
-          teachers: teachers.filter((t) => t.campusId === campus.id).length,
-          attendanceRate: rate(campusTodayRecords),
-          collected: campusInvoices.reduce((s, i) => s + i.paidAmount, 0),
-          outstanding: campusInvoices.reduce((s, i) => s + (i.totalAmount - i.paidAmount), 0),
-        };
-      })
-    : [];
-
-  const classAttendance = scopedClasses
-    .map((cls) => {
-      const records = todayRecords.filter((r) => r.classId === cls.id);
-      return { cls, rate: rate(records) };
-    })
-    .sort((a, b) => b.rate - a.rate)
-    .slice(0, 5);
-
-  const latestPayments = [...payments]
-    .filter((p) => scopedStudents.some((s) => s.id === p.studentId))
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 2);
-  const latestStudent = [...scopedStudents].sort((a, b) => (a.admissionDate < b.admissionDate ? 1 : -1))[0];
-  const absentToday = todayRecords.filter((r) => r.status === "absent").length;
-
-  const upcomingExams = exams
-    .filter((e) => e.status === "scheduled" && (!scopedCampusId || e.campusId === scopedCampusId))
-    .sort((a, b) => (a.startDate > b.startDate ? 1 : -1))
-    .slice(0, 3);
-
+export function AdminDashboard({
+  userName,
+  campusLabel,
+  today,
+  totalStudents,
+  totalTeachers,
+  todayRate,
+  yesterdayRate,
+  collected,
+  outstanding,
+  showCampusGlance,
+  campusGlance,
+  attendanceTrend,
+  feeByCampus,
+  classAttendance,
+  latestStudentActivity,
+  latestPayments,
+  absentToday,
+  upcomingExams,
+}: AdminDashboardProps) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h2 className="text-headline-lg font-semibold text-primary mb-1">
-            Good morning, {user?.name.split(" ")[0]}
+            Good morning, {userName.split(" ")[0]}
           </h2>
           <p className="text-body-md text-on-surface-variant">
             Here&apos;s what&apos;s happening across your school today.
@@ -124,7 +84,7 @@ export function AdminDashboard() {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline-variant card-shadow">
             <Icon name="business" className="h-4 w-4 text-on-surface-variant" />
-            <span className="text-label-md">{scopedCampusId ? campusName(scopedCampusId) : "All Campuses"}</span>
+            <span className="text-label-md">{campusLabel}</span>
           </div>
           <div className="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline-variant card-shadow">
             <Icon name="calendar_today" className="h-4 w-4 text-on-surface-variant" />
@@ -134,8 +94,8 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard label="Total Students" value={scopedStudents.length.toLocaleString()} icon="group" trend={{ direction: "up", label: "Across all classes" }} />
-        <StatCard label="Teachers" value={scopedTeachers.length.toLocaleString()} icon="school" trend={{ direction: "flat", label: "Active faculty" }} />
+        <StatCard label="Total Students" value={totalStudents.toLocaleString()} icon="group" trend={{ direction: "up", label: "Across all classes" }} />
+        <StatCard label="Teachers" value={totalTeachers.toLocaleString()} icon="school" trend={{ direction: "flat", label: "Active faculty" }} />
         <StatCard
           label="Today's Attendance"
           value={`${todayRate}%`}
@@ -163,9 +123,9 @@ export function AdminDashboard() {
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
                 {campusGlance.map((c) => (
-                  <tr key={c.campus.id} className="hover:bg-surface-bright transition-colors">
+                  <tr key={c.id} className="hover:bg-surface-bright transition-colors">
                     <td className="p-3 font-medium text-on-surface">
-                      <Link href="/settings/campuses" className="hover:text-secondary hover:underline">{c.campus.name}</Link>
+                      <Link href="/settings/campuses" className="hover:text-secondary hover:underline">{c.name}</Link>
                     </td>
                     <td className="p-3 text-right text-on-surface-variant">{c.students}</td>
                     <td className="p-3 text-right text-on-surface-variant">{c.teachers}</td>
@@ -185,7 +145,7 @@ export function AdminDashboard() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        <ChartCard title="Attendance Overview (last 7 school days)">
+        <ChartCard title="Attendance Overview (last 7 days)">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={attendanceTrend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <defs>
@@ -203,7 +163,7 @@ export function AdminDashboard() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="Fee Collection by Campus (August 2026)">
+        <ChartCard title={`Fee Collection by Campus (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })})`}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={feeByCampus} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
@@ -222,10 +182,10 @@ export function AdminDashboard() {
         <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
           <h3 className="text-title-lg font-semibold text-primary mb-6">Today&apos;s Attendance</h3>
           <div className="space-y-5">
-            {classAttendance.map(({ cls, rate: r }) => (
-              <div key={cls.id}>
+            {classAttendance.map(({ id, label, rate: r }) => (
+              <div key={id}>
                 <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface font-semibold">{classLabel(cls)}</span>
+                  <span className="text-on-surface font-semibold">{label}</span>
                   <span className={r >= 90 ? "text-emerald-600 font-bold" : r >= 80 ? "text-on-surface-variant font-bold" : "text-error font-bold"}>
                     {r}%
                   </span>
@@ -235,6 +195,7 @@ export function AdminDashboard() {
                 </div>
               </div>
             ))}
+            {classAttendance.length === 0 && <p className="text-body-md text-on-surface-variant">No attendance recorded yet today.</p>}
           </div>
           <Button variant="link" asChild className="w-full mt-6 justify-center">
             <Link href="/classes">View All Classes</Link>
@@ -244,14 +205,22 @@ export function AdminDashboard() {
         <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow col-span-1 lg:col-span-2">
           <h3 className="text-title-lg font-semibold text-primary mb-6">Recent Activity</h3>
           <div className="space-y-4">
-            {latestStudent && (
-              <ActivityItem icon="person_add" tone="secondary" text={<><span className="font-semibold">{latestStudent.name}</span> was admitted to <span className="font-semibold">{classLabel(latestStudent.classId)}</span></>} time={formatDate(latestStudent.admissionDate)} />
+            {latestStudentActivity && (
+              <ActivityItem
+                icon="person_add"
+                tone="secondary"
+                text={<><span className="font-semibold">{latestStudentActivity.name}</span> was admitted to <span className="font-semibold">{latestStudentActivity.classLabel}</span></>}
+                time={formatDate(latestStudentActivity.admissionDate)}
+              />
             )}
             {latestPayments.map((p) => (
               <ActivityItem key={p.id} icon="payments" tone="success" text={<><span className="font-semibold">{formatCompactPKR(p.amount)}</span> fee payment received</>} time={timeAgo(p.date)} />
             ))}
             {absentToday > 0 && (
               <ActivityItem icon="cancel" tone="error" text={<><span className="font-semibold">{absentToday} students</span> marked absent today</>} time={formatDate(today)} />
+            )}
+            {!latestStudentActivity && latestPayments.length === 0 && absentToday === 0 && (
+              <p className="text-body-md text-on-surface-variant">Nothing to show yet.</p>
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { ClassSection } from "@/lib/types";
+import type { Campus, ClassSection, Teacher } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -15,11 +15,16 @@ interface ClassFormProps {
   initialValues?: ClassSection;
   onSubmit: (values: ClassFormValues) => void;
   onCancel?: () => void;
+  /** Pass real (DB-backed) data from a Server Component page — falls back to the mock store's hooks for the screens not yet migrated off it. */
+  campuses?: Campus[];
+  teachers?: Teacher[];
 }
 
-export function ClassForm({ initialValues, onSubmit, onCancel }: ClassFormProps) {
-  const { campuses } = useCampuses();
-  const { teachers } = useTeachers();
+export function ClassForm({ initialValues, onSubmit, onCancel, campuses: campusesProp, teachers: teachersProp }: ClassFormProps) {
+  const mockCampuses = useCampuses();
+  const mockTeachers = useTeachers();
+  const campuses = campusesProp ?? mockCampuses.campuses;
+  const teachers = teachersProp ?? mockTeachers.teachers;
   const activeCampuses = campuses.filter((c) => c.status === "active");
 
   const [grade, setGrade] = useState(initialValues?.grade ?? GRADE_ORDER[0]);
@@ -50,13 +55,19 @@ export function ClassForm({ initialValues, onSubmit, onCancel }: ClassFormProps)
       return;
     }
     setTeacherError("");
+    // The subjectId() mock helper produces ids only meaningful for the mock
+    // store's namespaced subject records — real (DB-backed) subjects are
+    // plain UUIDs with no code-based recipe, so this auto-fill only applies
+    // in mock mode. A real class currently starts with no subjects assigned;
+    // a proper subject picker for the real-data path is a follow-up.
     const fallbackCodes = GRADE_SUBJECTS[grade] ?? ["eng", "urdu", "math"];
+    const fallbackSubjectIds = campusesProp ? [] : selectedCampus ? fallbackCodes.map((code) => subjectId(selectedCampus.schoolId, code)) : [];
     onSubmit({
       grade,
       section: section.toUpperCase(),
       campusId,
       classTeacherId,
-      subjectIds: initialValues?.subjectIds ?? (selectedCampus ? fallbackCodes.map((code) => subjectId(selectedCampus.schoolId, code)) : []),
+      subjectIds: initialValues?.subjectIds ?? fallbackSubjectIds,
       studentCapacity,
       status: initialValues?.status ?? "active",
     });

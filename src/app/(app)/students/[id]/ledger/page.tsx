@@ -1,145 +1,53 @@
-"use client";
-
-import { use } from "react";
-import { useRouter } from "next/navigation";
-import { Printer } from "lucide-react";
+import * as studentService from "@/services/student.service";
+import * as classService from "@/services/class.service";
+import * as campusService from "@/services/campus.service";
+import * as feeService from "@/services/fee.service";
+import { requireSession, NotFoundError } from "@/lib/tenancy";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Avatar } from "@/components/shared/avatar";
-import { Button } from "@/components/ui/button";
-import { useStudents, useFeesStore } from "@/lib/store/hooks";
-import { classLabel, campusName } from "@/lib/mock/reference-data";
-import { formatDate, formatPKR } from "@/lib/format";
+import Link from "next/link";
+import { LedgerClient } from "@/app/(app)/students/[id]/ledger/ledger-client";
 
-const METHOD_LABEL: Record<string, string> = {
-  cash: "Cash",
-  bank_transfer: "Bank Transfer",
-  card: "Card",
-  cheque: "Cheque",
-};
+export default async function StudentLedgerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const session = await requireSession();
 
-interface LedgerRow {
-  date: string;
-  description: string;
-  debit: number;
-  credit: number;
-}
-
-export default function StudentLedgerPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const router = useRouter();
-  const { students } = useStudents();
-  const { invoices, payments, reversals } = useFeesStore();
-
-  const student = students.find((s) => s.id === id);
-
-  if (!student) {
-    return (
-      <EmptyState icon="person_off" title="Student not found" description="Go back to Students." actionLabel="Back to Students" onAction={() => router.push("/students")} />
-    );
+  let student;
+  try {
+    student = await studentService.getStudent(session, id);
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return (
+        <div className="text-center">
+          <EmptyState icon="person_off" title="Student not found" description="Go back to Students." />
+          <Link href="/students" className="text-label-md text-secondary hover:underline">
+            Back to Students
+          </Link>
+        </div>
+      );
+    }
+    throw error;
   }
 
-  const studentInvoices = invoices.filter((i) => i.studentId === id);
-  const studentPayments = payments.filter((p) => p.studentId === id);
-  const studentReversals = reversals.filter((r) => r.studentId === id);
+  const [classes, campuses, invoices, payments, reversals] = await Promise.all([
+    classService.listClasses(session),
+    campusService.listCampuses(session),
+    feeService.listInvoicesForStudent(session, id),
+    feeService.listPaymentsForStudent(session, id),
+    feeService.listReversalsForStudent(session, id),
+  ]);
 
-  const rows: LedgerRow[] = [
-    ...studentInvoices.map((i) => ({
-      date: i.issueDate,
-      description: `${i.month} Invoice — ${i.invoiceNo}`,
-      debit: i.totalAmount,
-      credit: 0,
-    })),
-    ...studentPayments.map((p) => ({
-      date: p.date,
-      description: `Payment received — ${METHOD_LABEL[p.method] ?? p.method}${p.reference ? ` · Ref ${p.reference}` : ""}`,
-      debit: 0,
-      credit: p.amount,
-    })),
-    ...studentReversals.map((r) => ({
-      date: r.date,
-      description: `Payment reversed — ${r.reason}`,
-      debit: r.amount,
-      credit: 0,
-    })),
-  ].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-
-  const withBalance = rows.reduce<(LedgerRow & { balance: number })[]>((acc, r) => {
-    const previousBalance = acc.length ? acc[acc.length - 1].balance : 0;
-    acc.push({ ...r, balance: previousBalance + r.debit - r.credit });
-    return acc;
-  }, []);
-
-  const totalCharged = studentInvoices.reduce((s, i) => s + i.totalAmount, 0);
-  const totalPaid = studentPayments.reduce((s, p) => s + p.amount, 0) - studentReversals.reduce((s, r) => s + r.amount, 0);
-  const balance = totalCharged - totalPaid;
+  const cls = classes.find((c) => c.id === student.classId);
+  const campus = campuses.find((c) => c.id === student.campusId);
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 print:hidden">
-        <h2 className="text-headline-md font-semibold text-on-surface">Financial Statement</h2>
-        <Button variant="secondary" onClick={() => window.print()}>
-          <Printer size={18} /> Print
-        </Button>
-      </div>
-
-      <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg space-y-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-lg border-b border-outline-variant">
-          <div className="flex items-center gap-4">
-            <Avatar name={student.name} size="lg" />
-            <div>
-              <h3 className="text-title-lg font-semibold text-on-surface">{student.name}</h3>
-              <p className="text-body-md text-on-surface-variant">
-                {classLabel(student.classId)} · {campusName(student.campusId)} · Roll {student.rollNumber}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Charged</p>
-              <p className="text-title-lg font-semibold text-on-surface">{formatPKR(totalCharged)}</p>
-            </div>
-            <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Paid</p>
-              <p className="text-title-lg font-semibold text-emerald-600">{formatPKR(totalPaid)}</p>
-            </div>
-            <div>
-              <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Balance</p>
-              <p className={`text-title-lg font-semibold ${balance > 0 ? "text-error" : "text-emerald-600"}`}>{formatPKR(balance)}</p>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Transaction History</h3>
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-outline-variant">
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide">Date</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide">Description</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Charge</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Payment</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Balance</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/30">
-              {withBalance.map((r, i) => (
-                <tr key={i}>
-                  <td className="px-4 py-3 text-body-md text-on-surface-variant whitespace-nowrap">{formatDate(r.date)}</td>
-                  <td className="px-4 py-3 text-body-md text-on-surface">{r.description}</td>
-                  <td className="px-4 py-3 text-body-md text-error text-right">{r.debit ? formatPKR(r.debit) : "—"}</td>
-                  <td className="px-4 py-3 text-body-md text-emerald-600 text-right">{r.credit ? formatPKR(r.credit) : "—"}</td>
-                  <td className="px-4 py-3 text-body-md font-medium text-on-surface text-right">{formatPKR(r.balance)}</td>
-                </tr>
-              ))}
-              {withBalance.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-body-md text-on-surface-variant">No transactions recorded yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <LedgerClient
+      studentName={student.name}
+      classLabel={cls ? `${cls.grade}-${cls.section}` : "—"}
+      campusName={campus?.name ?? "—"}
+      rollNumber={student.rollNumber}
+      invoices={invoices.map((i) => ({ id: i.id, invoiceNo: i.invoiceNo, month: i.month, issueDate: i.issueDate, totalAmount: i.totalAmount }))}
+      payments={payments.map((p) => ({ id: p.id, date: p.date, amount: p.amount, method: p.method, reference: p.reference }))}
+      reversals={reversals.map((r) => ({ id: r.id, date: r.date, amount: r.amount, reason: r.reason }))}
+    />
   );
 }
