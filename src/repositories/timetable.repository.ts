@@ -39,6 +39,33 @@ export async function listSlotsForTeacher(teacherId: string) {
   return db.select().from(timetableSlots).where(eq(timetableSlots.teacherId, teacherId));
 }
 
+/** Does this teacher have a published slot teaching this exact subject to this exact class? Backs the Curriculum/Classwork/Homework ownership check — see services/scope.ts's assertTeacherTeachesClassSubject. */
+export async function findSlotForTeacherClassSubject(teacherId: string, classId: string, subjectId: string) {
+  const [row] = await db
+    .select()
+    .from(timetableSlots)
+    .where(and(eq(timetableSlots.teacherId, teacherId), eq(timetableSlots.classId, classId), eq(timetableSlots.subjectId, subjectId)))
+    .limit(1);
+  return row ?? null;
+}
+
+/**
+ * Whether *any* teacher has a published slot for this exact class+subject —
+ * used only for the ownership check's early-adopter fallback (see
+ * assertTeacherTeachesClassSubject). Deliberately scoped to the subject, not
+ * just the class: a school can have some subjects scheduled and others not
+ * yet, and a class with a Math slot but no English slot shouldn't block an
+ * English teacher from being trusted by the looser fallback.
+ */
+export async function slotExistsForClassSubject(classId: string, subjectId: string) {
+  const [row] = await db
+    .select()
+    .from(timetableSlots)
+    .where(and(eq(timetableSlots.classId, classId), eq(timetableSlots.subjectId, subjectId)))
+    .limit(1);
+  return !!row;
+}
+
 /** Another PUBLISHED slot where this teacher is already booked at the same day/period, across any class — excludes the slot currently being edited. */
 export async function findTeacherConflict(teacherId: string, day: string, period: number, excludeSlotId?: string) {
   const conditions = [eq(timetableSlots.teacherId, teacherId), eq(timetableSlots.day, day as never), eq(timetableSlots.period, period)];

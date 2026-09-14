@@ -3,6 +3,7 @@ import * as permissionsRepo from "@/repositories/permissions.repository";
 import { requirePermission } from "@/lib/authorization";
 import { type AuthSession } from "@/lib/tenancy";
 import type { PermissionModule, Role } from "@/lib/types";
+import { logAudit } from "@/services/audit.service";
 
 /**
  * The full role x module matrix backing Settings → Users & Roles. Platform-
@@ -28,4 +29,8 @@ export async function updateRolePermission(session: AuthSession, role: Role, mod
     throw new Error("You can't remove your own access to Users & Roles — have another admin change this instead.");
   }
   await permissionsRepo.setRolePermission(role, moduleKey, allowed);
+  // role_permissions is platform-wide (no schoolId column, see the note above),
+  // so this is attributed to the acting admin's own school's audit log —
+  // there's no more correct school to log it under.
+  await logAudit(session, "role_permission.updated", "RolePermission", undefined, { role, module: moduleKey, allowed });
 }

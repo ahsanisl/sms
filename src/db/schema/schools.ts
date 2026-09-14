@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { boolean, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { archivableStatusEnum } from "@/db/schema/enums";
 
 /**
@@ -20,6 +20,8 @@ export const schools = pgTable("schools", {
   status: archivableStatusEnum("status").notNull().default("active"),
   /** False until the Owner finishes /onboarding. */
   onboardingComplete: boolean("onboarding_complete").notNull().default(false),
+  /** Days of audit_logs history to keep before automatic pruning — null means keep forever (the default, matching pre-retention-feature behavior). See services/audit.service.ts. */
+  auditLogRetentionDays: integer("audit_log_retention_days"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

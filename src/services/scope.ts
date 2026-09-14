@@ -2,6 +2,8 @@ import "server-only";
 import * as campusRepo from "@/repositories/campuses.repository";
 import * as studentRepo from "@/repositories/students.repository";
 import * as userRepo from "@/repositories/users.repository";
+import * as timetableRepo from "@/repositories/timetable.repository";
+import * as teacherRepo from "@/repositories/teachers.repository";
 import { requireSchoolId, NotFoundError, PermissionError, type AuthSession } from "@/lib/tenancy";
 
 /**
@@ -23,6 +25,41 @@ export async function scopedCampusIds(session: AuthSession): Promise<string[]> {
 export async function assertCampusInScope(session: AuthSession, campusId: string): Promise<void> {
   const ids = await scopedCampusIds(session);
   if (!ids.includes(campusId)) throw new PermissionError("campus");
+}
+
+/**
+ * Shared by Curriculum (status updates), Classwork, and Homework
+ * (create/edit): may this *teacher* act on this exact (class, subject) pair?
+ * Admin roles are never checked here — they're already scoped via the
+ * normal campus check each of those services does first.
+ *
+ * Precise check: does the teacher have a published Timetable slot for this
+ * exact class+subject? Falls back to "does this teacher teach this subject
+ * anywhere in scope" (teacherSubjects) ONLY when *this class+subject pair
+ * specifically* has no timetable slot at all yet (any teacher) — a
+ * deliberate, narrow trust concession so a school still filling in its
+ * Timetable subject-by-subject isn't blocked from using
+ * Curriculum/Classwork/Homework for the subjects it hasn't scheduled yet.
+ * The fallback is scoped to the subject, not just the class, so a class
+ * with a Math slot already set but no English slot yet still lets an
+ * English teacher through — checked live: this class-wide (not
+ * subject-wide) version blocked a real teacher who only teaches a subject
+ * the class's timetable hadn't reached yet.
+ */
+export async function assertTeacherTeachesClassSubject(session: AuthSession, classId: string, subjectId: string): Promise<void> {
+  if (session.role !== "teacher") return;
+  if (!session.teacherId) throw new PermissionError("classes");
+
+  const slot = await timetableRepo.findSlotForTeacherClassSubject(session.teacherId, classId, subjectId);
+  if (slot) return;
+
+  const subjectAlreadyScheduled = await timetableRepo.slotExistsForClassSubject(classId, subjectId);
+  if (!subjectAlreadyScheduled) {
+    const teachesSubject = await teacherRepo.teacherTeachesSubject(session.teacherId, subjectId);
+    if (teachesSubject) return;
+  }
+
+  throw new PermissionError("classes");
 }
 
 /**

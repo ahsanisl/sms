@@ -21,6 +21,13 @@ export const PERMISSION_MODULE_LABEL: Record<PermissionModule, string> = {
   announcements: "Announcements",
   announcementsCreate: "Create Announcement",
   leave: "Leave Management",
+  curriculum: "Curriculum",
+  curriculumManage: "Manage Curriculum (add/edit/reorder topics)",
+  classwork: "Classwork",
+  classworkCreate: "Post Classwork",
+  homework: "Homework",
+  homeworkCreate: "Post & Grade Homework",
+  auditLog: "Audit Log",
   reports: "Reports Center",
   settings: "Settings",
   settingsUsers: "Users & Roles",
@@ -35,6 +42,7 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "settingsCampuses", prefixes: ["/settings/campuses"] },
   { module: "settingsSubjects", prefixes: ["/settings/subjects"] },
   { module: "settingsSchools", prefixes: ["/settings/schools"] },
+  { module: "auditLog", prefixes: ["/settings/audit-log"] },
   { module: "settings", prefixes: ["/settings"] },
   { module: "attendanceMark", prefixes: ["/attendance/mark"] },
   { module: "attendance", prefixes: ["/attendance"] },
@@ -49,6 +57,13 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "announcementsCreate", prefixes: ["/announcements/create"] },
   { module: "announcements", prefixes: ["/announcements"] },
   { module: "leave", prefixes: ["/leave"] },
+  // curriculumManage and classworkCreate gate in-page actions (add/edit/reorder a
+  // topic on /curriculum; the Add modal on /classwork), not their own route — so
+  // they have no MODULE_ROUTES entry, same as e.g. studentsManage's in-page actions.
+  { module: "curriculum", prefixes: ["/curriculum"] },
+  { module: "classwork", prefixes: ["/classwork"] },
+  { module: "homeworkCreate", prefixes: ["/homework/new"] },
+  { module: "homework", prefixes: ["/homework"] },
   { module: "studentsManage", prefixes: ["/students/new", "/students/promote", "/students/alumni"] },
   { module: "students", prefixes: ["/students"] },
   { module: "admissions", prefixes: ["/admissions"] },
@@ -101,7 +116,11 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
   platform_admin: allFalseExcept(["dashboard", "settingsSchools"]),
   school_owner: allTrueExcept(["settingsSchools"]),
   school_admin: allTrueExcept(["settingsSchools"]),
-  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects", "settingsSchools"]),
+  // Audit Log is owner/school_admin only, even for campus_admin — audit_logs
+  // has no campusId column, so there's no way to scope it to just one
+  // campus without a bigger schema change; showing every campus's entries
+  // to a campus-scoped role isn't the right default.
+  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects", "settingsSchools", "auditLog"]),
   teacher: allTrueExcept([
     "studentsManage",
     "admissions",
@@ -113,6 +132,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "examsCreate",
     "timetableBuilder",
     "announcementsCreate",
+    "curriculumManage", // the syllabus itself is admin-set — teachers only update progress, see curriculum.service.ts
+    "auditLog",
     "reports",
     "settings",
     "settingsUsers",
@@ -135,6 +156,13 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "timetableBuilder",
     "announcementsCreate",
     "leave",
+    "curriculum", // finance-only role — no academic access at all, matches its existing exam/attendance/timetable exclusions
+    "curriculumManage",
+    "classwork",
+    "classworkCreate",
+    "homework",
+    "homeworkCreate",
+    "auditLog",
     "settings",
     "settingsUsers",
     "settingsCampuses",
@@ -159,6 +187,20 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "timetableBuilder",
     "announcementsCreate",
     "leave",
+    // Same shape as "exams" above: the staff-facing /curriculum, /classwork,
+    // /homework routes and their read functions require these role
+    // permissions, which a parent never holds — matching how parent never
+    // gets "exams" either. Their own /portal/curriculum, /portal/classwork,
+    // /portal/homework pages call separate ownership-checked service
+    // functions that skip this permission entirely (mirrors
+    // exam.service.getResultCardData), so this exclusion doesn't block them.
+    "curriculum",
+    "curriculumManage",
+    "classwork",
+    "classworkCreate",
+    "homework",
+    "homeworkCreate",
+    "auditLog",
     "reports",
     "settings",
     "settingsUsers",

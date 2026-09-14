@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# uploaded attachment files (see src/lib/storage) — never committed, same as any other user-uploaded content
+/storage/uploads/
+
 # production
 /build
 

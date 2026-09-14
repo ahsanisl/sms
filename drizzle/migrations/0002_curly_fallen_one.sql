@@ -1,0 +1,1 @@
+ALTER TABLE "schools" ADD COLUMN "audit_log_retention_days" integer;

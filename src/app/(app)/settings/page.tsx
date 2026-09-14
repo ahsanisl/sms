@@ -11,7 +11,7 @@ import { activeSession } from "@/lib/mock/sessions";
 
 export default async function SettingsPage() {
   const session = await requireSession();
-  const [school, campuses, sessions, subjects, gradeBands, departments, canCampuses, canTimetable, canFees, canUsers] = await Promise.all([
+  const [school, campuses, sessions, subjects, gradeBands, departments, canCampuses, canTimetable, canFees, canUsers, canAuditLog] = await Promise.all([
     schoolService.getMySchool(session),
     campusService.listCampuses(session),
     sessionService.listSessions(session),
@@ -22,6 +22,7 @@ export default async function SettingsPage() {
     can(session.role, "timetableBuilder"),
     can(session.role, "feesStructure"),
     can(session.role, "settingsUsers"),
+    can(session.role, "auditLog"),
   ]);
 
   return (
@@ -36,7 +37,7 @@ export default async function SettingsPage() {
         reportCardFooter: school.reportCardFooter,
         showSignatureLines: school.showSignatureLines,
       }}
-      visibility={{ settingsCampuses: canCampuses, timetableBuilder: canTimetable, feesStructure: canFees, settingsUsers: canUsers }}
+      visibility={{ settingsCampuses: canCampuses, timetableBuilder: canTimetable, feesStructure: canFees, settingsUsers: canUsers, auditLog: canAuditLog }}
       activeCampuses={campuses.filter((c) => c.status === "active").map((c) => ({ id: c.id, name: c.name }))}
       currentSession={(() => {
         const s = activeSession(sessions);
