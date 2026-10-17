@@ -166,9 +166,13 @@ export async function recordPayment(session: AuthSession, input: unknown) {
 export async function reversePayment(session: AuthSession, input: unknown) {
   await requirePermission(session, "feesCollect");
   const data = ReversePaymentInputSchema.parse(input);
-  const reversal = await feeRepo.reversePayment(data.paymentId, data.amount, data.reason, data.date, session.userId);
+  // Scope-check the payment's student BEFORE writing — the repo's studentId
+  // match then pins the write to exactly this (already-authorized) payment.
+  const payment = await feeRepo.getPayment(data.paymentId);
+  if (!payment) throw new NotFoundError("Payment");
+  await assertStudentInScope(session, payment.studentId);
+  const reversal = await feeRepo.reversePayment(data.paymentId, payment.studentId, data.amount, data.reason, data.date, session.userId);
   if (!reversal) throw new NotFoundError("Payment");
-  await assertStudentInScope(session, reversal.studentId);
   await logAudit(session, "payment.reversed", "FeePaymentReversal", reversal.id, { amount: data.amount, reason: data.reason });
   return reversal;
 }

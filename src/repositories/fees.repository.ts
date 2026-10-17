@@ -88,9 +88,15 @@ export async function createInvoice(
 }
 
 // -- Payments (never destructive — see reversals) --------------------------------------------------------
+/** Matches on studentId as well as invoiceId — the caller scope-checks the student, so an invoice belonging to anyone else must be a miss here (null), never a write. */
 export async function recordPayment(invoiceId: string, studentId: string, amount: number, method: string, date: string, receivedBy: string, reference?: string) {
   return db.transaction(async (tx) => {
-    const [invoice] = await tx.select().from(feeInvoices).where(eq(feeInvoices.id, invoiceId)).limit(1);
+    const [invoice] = await tx
+      .select()
+      .from(feeInvoices)
+      .where(and(eq(feeInvoices.id, invoiceId), eq(feeInvoices.studentId, studentId)))
+      .limit(1)
+      .for("update");
     if (!invoice) return null;
     const paidAmount = Math.min(invoice.totalAmount, invoice.paidAmount + amount);
     const status = paidAmount >= invoice.totalAmount ? "paid" : paidAmount > 0 ? "partial" : invoice.status;
@@ -103,12 +109,31 @@ export async function recordPayment(invoiceId: string, studentId: string, amount
   });
 }
 
-/** Never deletes the original payment — inserts a reversal row and adjusts the invoice, keeping the full history intact (spec §23). */
-export async function reversePayment(paymentId: string, amount: number, reason: string, date: string, reversedBy: string) {
+export async function getPayment(paymentId: string) {
+  const [payment] = await db.select().from(feePayments).where(eq(feePayments.id, paymentId)).limit(1);
+  return payment ?? null;
+}
+
+/**
+ * Never deletes the original payment — inserts a reversal row and adjusts the invoice, keeping the full history intact (spec §23).
+ * Matches on studentId (the caller scope-checks it first) and caps the total reversed at the payment's own amount — the payment
+ * row is locked, so two concurrent reversals can't both pass that cap. Returns null on a miss.
+ */
+export async function reversePayment(paymentId: string, studentId: string, amount: number, reason: string, date: string, reversedBy: string) {
   return db.transaction(async (tx) => {
-    const [payment] = await tx.select().from(feePayments).where(eq(feePayments.id, paymentId)).limit(1);
+    const [payment] = await tx
+      .select()
+      .from(feePayments)
+      .where(and(eq(feePayments.id, paymentId), eq(feePayments.studentId, studentId)))
+      .limit(1)
+      .for("update");
     if (!payment) return null;
-    const [invoice] = await tx.select().from(feeInvoices).where(eq(feeInvoices.id, payment.invoiceId)).limit(1);
+    const prior = await tx.select({ amount: feePaymentReversals.amount }).from(feePaymentReversals).where(eq(feePaymentReversals.paymentId, paymentId));
+    const remaining = payment.amount - prior.reduce((sum, r) => sum + r.amount, 0);
+    if (amount > remaining) {
+      throw new Error(remaining > 0 ? `Only ${remaining} of this payment is left to reverse.` : "This payment has already been fully reversed.");
+    }
+    const [invoice] = await tx.select().from(feeInvoices).where(eq(feeInvoices.id, payment.invoiceId)).limit(1).for("update");
     if (!invoice) return null;
     const paidAmount = Math.max(0, invoice.paidAmount - amount);
     const status = paidAmount >= invoice.totalAmount ? "paid" : paidAmount > 0 ? "partial" : "unpaid";
@@ -140,9 +165,15 @@ export async function listReversalsForStudents(studentIds: string[]) {
 }
 
 // -- Concessions --------------------------------------------------------
+/** Matches on input.studentId as well as invoiceId — same reasoning as recordPayment. Returns null on a miss. */
 export async function applyConcession(invoiceId: string, input: Omit<NewFeeConcession, "invoiceId">) {
   return db.transaction(async (tx) => {
-    const [invoice] = await tx.select().from(feeInvoices).where(eq(feeInvoices.id, invoiceId)).limit(1);
+    const [invoice] = await tx
+      .select()
+      .from(feeInvoices)
+      .where(and(eq(feeInvoices.id, invoiceId), eq(feeInvoices.studentId, input.studentId)))
+      .limit(1)
+      .for("update");
     if (!invoice) return null;
     const items = await tx.select().from(feeInvoiceItems).where(eq(feeInvoiceItems.invoiceId, invoiceId));
     const subtotal = items.filter((i) => !i.isDiscount).reduce((s, i) => s + i.amount, 0);
