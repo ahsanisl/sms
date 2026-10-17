@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Bell, ChevronDown, LogOut, Settings, User, Check } from "lucide-react";
@@ -12,23 +13,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
 import { ROLE_LABEL } from "@/lib/nav-config";
-import { useCampuses } from "@/lib/store/hooks";
 import { canSwitchCampus } from "@/lib/campus-scope";
-import { campusName } from "@/lib/mock";
+import { setViewCampusAction } from "@/app/(app)/actions";
+import type { TopbarCampusContext } from "@/components/layout/app-shell";
 
-export function Topbar() {
-  const { user, logout, viewCampusId, setViewCampusId } = useSession();
-  const { campuses } = useCampuses();
+export function Topbar({ campusContext }: { campusContext: TopbarCampusContext | null }) {
+  const { user, logout } = useSession();
   const router = useRouter();
+  const [isSwitching, startSwitching] = useTransition();
 
   if (!user) return null;
-  const isAdmin = user.role === "school_admin" || user.role === "campus_admin" || user.role === "school_owner" || user.role === "accountant";
   const switchable = canSwitchCampus(user.role);
-  const activeCampuses = campuses.filter((c) => c.status === "active");
+  const campuses = campusContext?.campuses ?? [];
+  const viewCampusId = campusContext?.viewCampusId ?? null;
+  const sessionSuffix = campusContext?.sessionLabel ? ` · ${campusContext.sessionLabel}` : "";
+  const campusLabel = (campusId: string | null | undefined) => (campusId ? (campuses.find((c) => c.id === campusId)?.name ?? "Campus") : "All Campuses");
 
-  function handleLogout() {
+  function switchCampus(campusId: string | null) {
+    if (campusId === viewCampusId) return;
+    startSwitching(async () => {
+      const result = await setViewCampusAction(campusId);
+      if (!result.success) toast.error(result.error ?? "Couldn't switch campus.");
+    });
+  }
+
+  async function handleLogout() {
+    // Clear the switcher cookie so the next account on this browser starts on "All Campuses".
+    if (switchable && viewCampusId) await setViewCampusAction(null);
     logout();
     router.push("/login");
   }
@@ -46,23 +60,26 @@ export function Topbar() {
         </div>
       </div>
       <div className="flex items-center gap-4 ml-4">
-        {isAdmin && switchable && (
+        {campusContext && switchable && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors outline-none">
+            <DropdownMenuTrigger
+              disabled={isSwitching}
+              className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors outline-none disabled:opacity-60"
+            >
               <span className="text-label-md text-on-surface-variant">
-                {viewCampusId ? campusName(viewCampusId) : "All Campuses"} · 2026-27
+                {isSwitching ? "Switching…" : `${campusLabel(viewCampusId)}${sessionSuffix}`}
               </span>
               <ChevronDown className="h-3.5 w-3.5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>View Campus</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setViewCampusId(null)}>
+              <DropdownMenuItem onClick={() => switchCampus(null)}>
                 <Check className={`h-4 w-4 ${!viewCampusId ? "opacity-100" : "opacity-0"}`} />
                 All Campuses
               </DropdownMenuItem>
-              {activeCampuses.map((campus) => (
-                <DropdownMenuItem key={campus.id} onClick={() => setViewCampusId(campus.id)}>
+              {campuses.map((campus) => (
+                <DropdownMenuItem key={campus.id} onClick={() => switchCampus(campus.id)}>
                   <Check className={`h-4 w-4 ${viewCampusId === campus.id ? "opacity-100" : "opacity-0"}`} />
                   {campus.name}
                 </DropdownMenuItem>
@@ -70,10 +87,11 @@ export function Topbar() {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        {isAdmin && !switchable && (
+        {campusContext && !switchable && (
           <div className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-md border border-outline-variant">
             <span className="text-label-md text-on-surface-variant">
-              {user.campusId ? campusName(user.campusId) : "All Campuses"} · 2026-27
+              {campusLabel(user.campusId)}
+              {sessionSuffix}
             </span>
           </div>
         )}

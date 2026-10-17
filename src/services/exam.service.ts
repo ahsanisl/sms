@@ -6,7 +6,7 @@ import { requirePermission } from "@/lib/authorization";
 import { requireSchoolId, NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { EnterMarksBulkSchema, ExamInputSchema } from "@/lib/validation/exam";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
 /**
  * /exams/results/[id] is one of lib/permissions.ts's ALWAYS_ALLOWED_PREFIXES
@@ -41,9 +41,9 @@ export async function getResultCardData(session: AuthSession, studentId: string)
   return { student, exams: studentExams, marks };
 }
 
-export async function listExams(session: AuthSession) {
+export async function listExams(session: AuthSession, scope?: ListScope) {
   await requirePermission(session, "exams");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   return examRepo.listExams(campusIds);
 }
 

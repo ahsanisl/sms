@@ -4,6 +4,7 @@ import { requirePermission } from "@/lib/authorization";
 import { requireSchoolId, NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { CampusInputSchema } from "@/lib/validation/campus";
 import { logAudit } from "@/services/audit.service";
+import { getViewCampusId } from "@/services/scope";
 
 export async function listCampuses(session: AuthSession) {
   const schoolId = requireSchoolId(session);
@@ -13,6 +14,12 @@ export async function listCampuses(session: AuthSession) {
     return all.filter((c) => c.id === session.campusId);
   }
   return all;
+}
+
+/** listCampuses narrowed to the top bar switcher's campus when one is set — for overview pages' per-campus breakdowns (Dashboard, Reports), which should match the narrowed lists beside them. */
+export async function listCampusesInView(session: AuthSession) {
+  const [all, viewId] = await Promise.all([listCampuses(session), getViewCampusId(session)]);
+  return viewId ? all.filter((c) => c.id === viewId) : all;
 }
 
 export async function createCampus(session: AuthSession, input: unknown) {

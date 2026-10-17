@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import {
   SessionProvider as NextAuthSessionProvider,
   useSession as useNextAuthSession,
@@ -9,17 +9,12 @@ import {
 } from "next-auth/react";
 import type { AppUser } from "@/lib/types";
 
-const VIEW_CAMPUS_KEY = "eduflow-view-campus-v1";
-
 interface SessionContextValue {
   user: AppUser | null;
   isLoading: boolean;
   /** Real credential check against the database — returns an error message on failure instead of throwing, so the login form can show it inline. */
   login: (email: string, password: string) => Promise<string | null>;
   logout: () => void;
-  /** Campus the top bar switcher is currently scoped to; `null` means "All Campuses". Only meaningful for roles not already locked to one campus (school_owner, school_admin, accountant). */
-  viewCampusId: string | null;
-  setViewCampusId: (campusId: string | null) => void;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -27,21 +22,6 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 /** Translates next-auth's session shape into the AppUser shape every existing screen already reads — so nothing downstream of useSession() needs to change. */
 function SessionBridge({ children }: { children: ReactNode }) {
   const { data, status } = useNextAuthSession();
-  const [viewCampusId, setViewCampusIdState] = useState<string | null>(null);
-
-  useEffect(() => {
-    // One-time hydration of persisted campus-switcher state on mount — reading
-    // localStorage can only happen client-side, so this can't be a lazy
-    // useState initializer.
-    try {
-      const stored = window.localStorage.getItem(VIEW_CAMPUS_KEY);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (stored) setViewCampusIdState(stored);
-    } catch {
-      // ignore malformed storage
-    }
-  }, []);
-
   const user: AppUser | null = data?.user
     ? {
         id: data.user.id,
@@ -61,27 +41,11 @@ function SessionBridge({ children }: { children: ReactNode }) {
   }
 
   function logout() {
-    setViewCampusIdState(null);
-    try {
-      window.localStorage.removeItem(VIEW_CAMPUS_KEY);
-    } catch {
-      // ignore
-    }
     void nextAuthSignOut({ redirectTo: "/login" });
   }
 
-  function setViewCampusId(campusId: string | null) {
-    setViewCampusIdState(campusId);
-    try {
-      if (campusId) window.localStorage.setItem(VIEW_CAMPUS_KEY, campusId);
-      else window.localStorage.removeItem(VIEW_CAMPUS_KEY);
-    } catch {
-      // ignore quota errors
-    }
-  }
-
   return (
-    <SessionContext.Provider value={{ user, isLoading: status === "loading", login, logout, viewCampusId, setViewCampusId }}>
+    <SessionContext.Provider value={{ user, isLoading: status === "loading", login, logout }}>
       {children}
     </SessionContext.Provider>
   );

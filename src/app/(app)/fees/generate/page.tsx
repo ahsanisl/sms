@@ -3,10 +3,12 @@ import * as classService from "@/services/class.service";
 import * as studentService from "@/services/student.service";
 import * as feeService from "@/services/fee.service";
 import { requireSession } from "@/lib/tenancy";
+import { getViewCampusId } from "@/services/scope";
 import { GenerateInvoicesClient } from "@/app/(app)/fees/generate/generate-client";
 
 export default async function GenerateInvoicesPage() {
   const session = await requireSession();
+  const viewCampusId = await getViewCampusId(session);
   const [campuses, classes, students, structureItems] = await Promise.all([
     campusService.listCampuses(session),
     classService.listClasses(session),
@@ -31,7 +33,7 @@ export default async function GenerateInvoicesPage() {
       campuses={campuses.filter((c) => c.status === "active")}
       structureItems={structureItems}
       existingInvoiceMonthsByStudent={existingInvoiceMonthsByStudent}
-      defaultCampusId={session.role === "campus_admin" ? (session.campusId ?? undefined) : undefined}
+      defaultCampusId={session.role === "campus_admin" ? (session.campusId ?? undefined) : (viewCampusId ?? undefined)}
       isAllCampuses={campuses.length > 1 && session.role !== "campus_admin"}
     />
   );

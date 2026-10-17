@@ -10,7 +10,7 @@ function isoDate(d: Date) {
 export default async function AttendancePage() {
   const session = await requireSession();
 
-  const allClasses = await classService.listClasses(session);
+  const allClasses = await classService.listClasses(session, { inView: true });
   const scopedClasses =
     session.role === "teacher"
       ? allClasses.filter((c) => c.classTeacherId === session.teacherId && c.status === "active")

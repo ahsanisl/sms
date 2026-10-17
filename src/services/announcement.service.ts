@@ -4,11 +4,11 @@ import { requirePermission } from "@/lib/authorization";
 import { requireSchoolId, type AuthSession } from "@/lib/tenancy";
 import { AnnouncementInputSchema } from "@/lib/validation/announcement";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, type ListScope } from "@/services/scope";
 
-export async function listAnnouncements(session: AuthSession) {
+export async function listAnnouncements(session: AuthSession, scope?: ListScope) {
   const schoolId = requireSchoolId(session);
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   return announcementRepo.listAnnouncements(schoolId, campusIds);
 }
 

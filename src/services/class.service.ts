@@ -4,10 +4,10 @@ import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { ClassInputSchema } from "@/lib/validation/class";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
-export async function listClasses(session: AuthSession) {
-  const campusIds = await scopedCampusIds(session);
+export async function listClasses(session: AuthSession, scope?: ListScope) {
+  const campusIds = await listScopeCampusIds(session, scope);
   return classRepo.listClasses(campusIds);
 }
 

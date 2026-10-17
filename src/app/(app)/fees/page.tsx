@@ -10,7 +10,7 @@ export default async function FeesPage() {
   const session = await requireSession();
   const [classes, students, canManageStructure] = await Promise.all([
     classService.listClasses(session),
-    studentService.listStudents(session),
+    studentService.listStudents(session, { inView: true }),
     can(session.role, "feesStructure"),
   ]);
 

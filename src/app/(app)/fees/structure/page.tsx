@@ -2,15 +2,17 @@ import * as campusService from "@/services/campus.service";
 import * as classService from "@/services/class.service";
 import * as feeService from "@/services/fee.service";
 import { requireSession } from "@/lib/tenancy";
+import { getViewCampusId } from "@/services/scope";
 import { FeeStructureClient } from "@/app/(app)/fees/structure/structure-client";
 
 export default async function FeeStructurePage() {
   const session = await requireSession();
+  const viewCampusId = await getViewCampusId(session);
   const [campuses, classes, feeCategories, structureItems] = await Promise.all([
     campusService.listCampuses(session),
     classService.listClasses(session),
     feeService.listCategories(session),
-    feeService.listStructureItems(session),
+    feeService.listStructureItems(session, { inView: true }),
   ]);
 
   return (
@@ -19,7 +21,7 @@ export default async function FeeStructurePage() {
       classes={classes}
       feeCategories={feeCategories}
       structureItems={structureItems}
-      defaultCampusId={session.role === "campus_admin" ? (session.campusId ?? undefined) : undefined}
+      defaultCampusId={session.role === "campus_admin" ? (session.campusId ?? undefined) : (viewCampusId ?? undefined)}
     />
   );
 }

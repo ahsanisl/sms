@@ -8,7 +8,7 @@ const COLORS = { present: "#4648d4", absent: "#ba1a1a", leave: "#75777d", late: 
 
 export default async function AttendanceReportsPage() {
   const session = await requireSession();
-  const [campuses, classes] = await Promise.all([campusService.listCampuses(session), classService.listClasses(session)]);
+  const [campuses, classes] = await Promise.all([campusService.listCampusesInView(session), classService.listClasses(session, { inView: true })]);
   const activeClasses = classes.filter((c) => c.status === "active");
   const campusById = new Map(campuses.map((c) => [c.id, c]));
 

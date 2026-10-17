@@ -12,20 +12,17 @@ import { ReportsCenterClient } from "@/app/(app)/reports/reports-client";
 export default async function ReportsCenterPage() {
   const session = await requireSession();
 
-  // Every one of these services already scopes to the caller's own campus(es)
-  // server-side via scopedCampusIds — a Campus Admin gets just their campus,
-  // everyone else gets every campus in their school. Unlike the mock version,
-  // there's no separate "scope to the topbar switcher" step needed: the real
-  // switcher isn't wired to any already-migrated page in this app (see the
-  // Dashboards round's note on why), so these results are already correctly
-  // scoped without it.
+  // Every one of these services scopes to the caller's own campus(es)
+  // server-side via scopedCampusIds; the inView lists additionally narrow to
+  // the top bar switcher's campus, so the report matches what the rest of
+  // the app is showing.
   const [campuses, classes, rawTeachers, students, subjects, exams] = await Promise.all([
-    campusService.listCampuses(session),
-    classService.listClasses(session),
-    teacherService.listTeachers(session),
-    studentService.listStudents(session),
+    campusService.listCampusesInView(session),
+    classService.listClasses(session, { inView: true }),
+    teacherService.listTeachers(session, { inView: true }),
+    studentService.listStudents(session, { inView: true }),
     subjectService.listSubjects(session),
-    examService.listExams(session),
+    examService.listExams(session, { inView: true }),
   ]);
 
   const teachers = rawTeachers.map((t) => ({

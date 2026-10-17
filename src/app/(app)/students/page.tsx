@@ -10,7 +10,7 @@ import { StudentsClient } from "@/app/(app)/students/students-client";
 export default async function StudentsPage() {
   const session = await requireSession();
   const [students, classes, campuses, canManage] = await Promise.all([
-    studentService.listStudents(session),
+    studentService.listStudents(session, { inView: true }),
     classService.listClasses(session),
     campusService.listCampuses(session),
     can(session.role, "studentsManage"),

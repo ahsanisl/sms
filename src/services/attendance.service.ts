@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, PermissionError, type AuthSession } from "@/lib/tenancy";
 import { AttendanceCorrectionInputSchema, MarkAttendanceBulkSchema } from "@/lib/validation/attendance";
 import { logAudit } from "@/services/audit.service";
-import { assertStudentAccessible, scopedCampusIds } from "@/services/scope";
+import { assertStudentAccessible, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
 async function assertClassInScope(session: AuthSession, classId: string) {
   const campusIds = await scopedCampusIds(session);
@@ -61,9 +61,9 @@ export async function requestCorrection(session: AuthSession, input: unknown) {
   return correction;
 }
 
-export async function listCorrections(session: AuthSession) {
+export async function listCorrections(session: AuthSession, scope?: ListScope) {
   await requirePermission(session, "attendance");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   const classes = await classRepo.listClasses(campusIds);
   return attendanceRepo.listCorrections(classes.map((c) => c.id));
 }

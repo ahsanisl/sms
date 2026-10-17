@@ -1,4 +1,6 @@
 import "server-only";
+import { cookies } from "next/headers";
+import { canSwitchCampus, VIEW_CAMPUS_COOKIE } from "@/lib/campus-scope";
 import * as campusRepo from "@/repositories/campuses.repository";
 import * as studentRepo from "@/repositories/students.repository";
 import * as userRepo from "@/repositories/users.repository";
@@ -20,6 +22,39 @@ export async function scopedCampusIds(session: AuthSession): Promise<string[]> {
     return allIds.includes(session.campusId) ? [session.campusId] : [];
   }
   return allIds;
+}
+
+/**
+ * The campus the top bar switcher is set to, or null for "All Campuses" —
+ * only ever honored for roles that can switch (canSwitchCampus), and only
+ * if it's still within the session's own scope, so a stale or tampered
+ * cookie can narrow a view but never widen it.
+ */
+export async function getViewCampusId(session: AuthSession): Promise<string | null> {
+  if (!canSwitchCampus(session.role)) return null;
+  const value = (await cookies()).get(VIEW_CAMPUS_COOKIE)?.value;
+  if (!value) return null;
+  const ids = await scopedCampusIds(session);
+  return ids.includes(value) ? value : null;
+}
+
+/**
+ * Opt-in narrowing for overview lists (Students, Fees, Dashboard, ...) —
+ * deliberately NOT applied inside scopedCampusIds itself, which stays the
+ * authorization boundary: detail pages, cross-campus actions (e.g. a
+ * transfer to another campus), and form dropdowns keep working regardless
+ * of which campus the switcher is on.
+ */
+export interface ListScope {
+  inView?: boolean;
+}
+
+export async function listScopeCampusIds(session: AuthSession, scope?: ListScope): Promise<string[]> {
+  if (scope?.inView) {
+    const viewId = await getViewCampusId(session);
+    if (viewId) return [viewId];
+  }
+  return scopedCampusIds(session);
 }
 
 export async function assertCampusInScope(session: AuthSession, campusId: string): Promise<void> {

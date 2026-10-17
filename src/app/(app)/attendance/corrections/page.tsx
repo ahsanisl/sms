@@ -8,7 +8,7 @@ import { CorrectionsClient } from "@/app/(app)/attendance/corrections/correction
 export default async function AttendanceCorrectionsPage() {
   const session = await requireSession();
   const [corrections, students, classes, users] = await Promise.all([
-    attendanceService.listCorrections(session),
+    attendanceService.listCorrections(session, { inView: true }),
     studentService.listStudents(session),
     classService.listClasses(session),
     userService.listUsersBySchool(session),

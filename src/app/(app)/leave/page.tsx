@@ -25,9 +25,9 @@ export default async function LeavePage() {
   }
 
   const [requests, teachers, campuses, users] = await Promise.all([
-    leaveService.listLeaveRequests(session),
+    leaveService.listLeaveRequests(session, { inView: true }),
     teacherService.listTeachers(session),
-    campusService.listCampuses(session),
+    campusService.listCampusesInView(session),
     userService.listUsersBySchool(session),
   ]);
   const teacherNameById = new Map(teachers.map((t) => [t.id, t.name]));

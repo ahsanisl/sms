@@ -6,11 +6,11 @@ import { NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { InquiryInputSchema, InquiryStageSchema } from "@/lib/validation/admission";
 import { StudentInputSchema } from "@/lib/validation/student";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
-export async function listInquiries(session: AuthSession) {
+export async function listInquiries(session: AuthSession, scope?: ListScope) {
   await requirePermission(session, "admissions");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   return admissionRepo.listInquiries(campusIds);
 }
 

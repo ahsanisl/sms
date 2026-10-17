@@ -6,7 +6,7 @@ import { CollectFeeClient } from "@/app/(app)/fees/collect/collect-client";
 
 export default async function CollectFeePage() {
   const session = await requireSession();
-  const [classes, students] = await Promise.all([classService.listClasses(session), studentService.listStudents(session)]);
+  const [classes, students] = await Promise.all([classService.listClasses(session), studentService.listStudents(session, { inView: true })]);
   const activeStudents = students.filter((s) => s.status === "active").map((s) => ({ ...s, dob: s.dob ?? "", admissionDate: s.admissionDate ?? "" }));
   const invoices = await feeService.listInvoicesForStudents(session, activeStudents.map((s) => s.id));
 

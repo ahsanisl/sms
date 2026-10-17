@@ -13,7 +13,7 @@ import {
   ReversePaymentInputSchema,
 } from "@/lib/validation/fees";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
 /**
  * A parent's scope is their own children, not their campus (a parent has no
@@ -69,9 +69,9 @@ export async function archiveCategory(session: AuthSession, categoryId: string) 
   await logAudit(session, "fee_category.archived", "FeeCategory", categoryId);
 }
 
-export async function listStructureItems(session: AuthSession) {
+export async function listStructureItems(session: AuthSession, scope?: ListScope) {
   await requirePermission(session, "feesStructure");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   return feeRepo.listStructureItems(campusIds);
 }
 

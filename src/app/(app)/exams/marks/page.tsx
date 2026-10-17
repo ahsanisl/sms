@@ -10,7 +10,7 @@ export default async function EnterMarksPage({ searchParams }: { searchParams: P
   const session = await requireSession();
 
   const [exams, classes, subjects, students] = await Promise.all([
-    examService.listExams(session),
+    examService.listExams(session, { inView: true }),
     classService.listClasses(session),
     subjectService.listSubjects(session),
     studentService.listStudents(session),

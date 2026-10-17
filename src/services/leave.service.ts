@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, PermissionError, type AuthSession } from "@/lib/tenancy";
 import { LeaveRequestInputSchema, ReviewLeaveRequestSchema } from "@/lib/validation/leave";
 import { logAudit } from "@/services/audit.service";
-import { scopedCampusIds } from "@/services/scope";
+import { listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
 /** A teacher's own leave history — "My Leave" view. */
 export async function listMyLeaveRequests(session: AuthSession) {
@@ -30,10 +30,10 @@ export async function requestLeave(session: AuthSession, input: unknown) {
  * never renders this view for a teacher session, and the server must not
  * rely on that alone.
  */
-export async function listLeaveRequests(session: AuthSession) {
+export async function listLeaveRequests(session: AuthSession, scope?: ListScope) {
   await requirePermission(session, "leave");
   if (session.role === "teacher") throw new PermissionError("leave");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   const teachers = await teacherRepo.listTeachers(campusIds);
   return leaveRepo.listByTeachers(teachers.map((t) => t.id));
 }

@@ -4,7 +4,7 @@ import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { TeacherInputSchema } from "@/lib/validation/teacher";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 
 // listTeachers/getTeacher deliberately have no requirePermission("teachers")
 // gate — teacher names (and, transitively, their full directory row) are
@@ -13,8 +13,8 @@ import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
 // create/update/delete are actually gated below. Without this, a parent
 // (who lacks the "teachers" module) couldn't view a published timetable at
 // all, since it needs teacher names to render each period.
-export async function listTeachers(session: AuthSession) {
-  const campusIds = await scopedCampusIds(session);
+export async function listTeachers(session: AuthSession, scope?: ListScope) {
+  const campusIds = await listScopeCampusIds(session, scope);
   return teacherRepo.listTeachers(campusIds);
 }
 

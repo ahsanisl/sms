@@ -5,7 +5,7 @@ import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, type AuthSession } from "@/lib/tenancy";
 import { PromoteStudentsSchema, StudentInputSchema, TransferStudentSchema, WithdrawStudentSchema } from "@/lib/validation/student";
 import { logAudit } from "@/services/audit.service";
-import { assertCampusInScope, assertStudentAccessible, scopedCampusIds } from "@/services/scope";
+import { assertCampusInScope, assertStudentAccessible, listScopeCampusIds, scopedCampusIds, type ListScope } from "@/services/scope";
 import * as classRepo from "@/repositories/classes.repository";
 
 /** The Parent portal's own read: a parent's children, resolved via parentChildren — never campus-scoped, since a parent has no campusId of their own. */
@@ -16,10 +16,10 @@ export async function listMyChildren(session: AuthSession) {
 }
 
 /** A parent must only ever see their own children in "the student list" — never the school's full roster (a parent has no campus scoping, so the normal campus-scoped list would otherwise return every student in the school). */
-export async function listStudents(session: AuthSession) {
+export async function listStudents(session: AuthSession, scope?: ListScope) {
   if (session.role === "parent") return listMyChildren(session);
   await requirePermission(session, "students");
-  const campusIds = await scopedCampusIds(session);
+  const campusIds = await listScopeCampusIds(session, scope);
   return studentRepo.listStudents(campusIds);
 }
 

@@ -8,9 +8,9 @@ import { AlumniClient } from "@/app/(app)/students/alumni/alumni-client";
 export default async function AlumniDirectoryPage() {
   const session = await requireSession();
   const [students, classes, campuses, canManage] = await Promise.all([
-    studentService.listStudents(session),
+    studentService.listStudents(session, { inView: true }),
     classService.listClasses(session),
-    campusService.listCampuses(session),
+    campusService.listCampusesInView(session),
     can(session.role, "studentsManage"),
   ]);
 

@@ -5,7 +5,7 @@ import { AnnouncementsClient } from "@/app/(app)/announcements/announcements-cli
 
 export default async function AnnouncementsPage() {
   const session = await requireSession();
-  const [announcements, canManage] = await Promise.all([announcementService.listAnnouncements(session), can(session.role, "announcementsCreate")]);
+  const [announcements, canManage] = await Promise.all([announcementService.listAnnouncements(session, { inView: true }), can(session.role, "announcementsCreate")]);
 
   const rows = announcements
     .map((a) => ({

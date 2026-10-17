@@ -9,7 +9,7 @@ import type { ExamStatus } from "@/lib/types";
 export default async function ExamsPage() {
   const session = await requireSession();
   const [exams, classes, students, canPublish] = await Promise.all([
-    examService.listExams(session),
+    examService.listExams(session, { inView: true }),
     classService.listClasses(session),
     studentService.listStudents(session),
     can(session.role, "examsCreate"),

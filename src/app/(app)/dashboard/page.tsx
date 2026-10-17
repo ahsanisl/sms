@@ -11,6 +11,7 @@ import * as timetableService from "@/services/timetable.service";
 import * as announcementService from "@/services/announcement.service";
 import * as schoolService from "@/services/school.service";
 import { requireSession, type AuthSession } from "@/lib/tenancy";
+import { getViewCampusId } from "@/services/scope";
 import { ParentDashboardClient } from "@/app/(app)/dashboard/parent-dashboard-client";
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 import { TeacherDashboard } from "@/components/dashboard/teacher-dashboard";
@@ -188,7 +189,11 @@ async function renderTeacherDashboard(session: AuthSession) {
 }
 
 async function renderAccountantDashboard(session: AuthSession) {
-  const [campuses, students] = await Promise.all([campusService.listCampuses(session), studentService.listStudents(session)]);
+  const [campuses, students, viewCampusId] = await Promise.all([
+    campusService.listCampusesInView(session),
+    studentService.listStudents(session, { inView: true }),
+    getViewCampusId(session),
+  ]);
   const studentIds = students.map((s) => s.id);
   const [invoices, payments] = await Promise.all([
     feeService.listInvoicesForStudents(session, studentIds),
@@ -219,7 +224,7 @@ async function renderAccountantDashboard(session: AuthSession) {
   return (
     <AccountantDashboard
       userName={session.name}
-      isAllCampuses={session.role !== "campus_admin"}
+      isAllCampuses={!viewCampusId}
       collected={collected}
       outstanding={outstanding}
       overdueCount={overdueCount}
@@ -231,11 +236,12 @@ async function renderAccountantDashboard(session: AuthSession) {
 }
 
 async function renderAdminDashboard(session: AuthSession) {
-  const [campuses, students, teachers, classes] = await Promise.all([
-    campusService.listCampuses(session),
-    studentService.listStudents(session),
-    teacherService.listTeachers(session),
-    classService.listClasses(session),
+  const [campuses, students, teachers, classes, viewCampusId] = await Promise.all([
+    campusService.listCampusesInView(session),
+    studentService.listStudents(session, { inView: true }),
+    teacherService.listTeachers(session, { inView: true }),
+    classService.listClasses(session, { inView: true }),
+    getViewCampusId(session),
   ]);
   const activeClasses = classes.filter((c) => c.status === "active");
   const classIds = activeClasses.map((c) => c.id);
@@ -306,7 +312,7 @@ async function renderAdminDashboard(session: AuthSession) {
     : undefined;
   const absentToday = todayRecords.filter((r) => r.status === "absent").length;
 
-  const exams = await examService.listExams(session);
+  const exams = await examService.listExams(session, { inView: true });
   const upcomingExams = exams
     .filter((e) => e.status === "scheduled")
     .sort((a, b) => (a.startDate > b.startDate ? 1 : -1))
@@ -316,7 +322,13 @@ async function renderAdminDashboard(session: AuthSession) {
   return (
     <AdminDashboard
       userName={session.name}
-      campusLabel={session.role === "campus_admin" ? (campuses.find((c) => c.id === session.campusId)?.name ?? "This Campus") : "All Campuses"}
+      campusLabel={
+        session.role === "campus_admin"
+          ? (campuses.find((c) => c.id === session.campusId)?.name ?? "This Campus")
+          : viewCampusId
+            ? (campuses.find((c) => c.id === viewCampusId)?.name ?? "This Campus")
+            : "All Campuses"
+      }
       today={today}
       totalStudents={students.length}
       totalTeachers={teachers.length}

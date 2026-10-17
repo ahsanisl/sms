@@ -13,7 +13,7 @@ export default async function MarkAttendancePage({ searchParams }: { searchParam
   const { classId: requestedClassId, date: requestedDate } = await searchParams;
   const session = await requireSession();
 
-  const allClasses = await classService.listClasses(session);
+  const allClasses = await classService.listClasses(session, { inView: true });
   // A teacher may only mark their own class — tighter than the campus-wide
   // scoping other roles get, matching the server-side check markAttendanceBulk
   // already enforces (see attendance.service.ts's assertClassInScope).

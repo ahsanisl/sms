@@ -5,7 +5,7 @@ import { AdmissionsClient } from "@/app/(app)/admissions/admissions-client";
 
 export default async function AdmissionsPage() {
   const session = await requireSession();
-  const [inquiries, campuses] = await Promise.all([admissionService.listInquiries(session), campusService.listCampuses(session)]);
+  const [inquiries, campuses] = await Promise.all([admissionService.listInquiries(session, { inView: true }), campusService.listCampusesInView(session)]);
   const campusById = new Map(campuses.map((c) => [c.id, c]));
 
   const rows = inquiries.map((i) => ({

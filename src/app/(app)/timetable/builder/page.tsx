@@ -14,7 +14,7 @@ export default async function TimetableBuilderPage({ searchParams }: { searchPar
   const session = await requireSession();
 
   const [classes, teachers, rooms, config] = await Promise.all([
-    classService.listClasses(session),
+    classService.listClasses(session, { inView: true }),
     teacherService.listTeachers(session),
     roomService.listRooms(session),
     timetableService.getConfig(session),

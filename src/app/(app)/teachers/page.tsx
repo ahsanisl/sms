@@ -8,7 +8,7 @@ import { TeachersClient } from "@/app/(app)/teachers/teachers-client";
 export default async function TeachersPage() {
   const session = await requireSession();
   const [teachers, classes, campuses, subjects] = await Promise.all([
-    teacherService.listTeachers(session),
+    teacherService.listTeachers(session, { inView: true }),
     classService.listClasses(session),
     campusService.listCampuses(session),
     subjectService.listSubjects(session),

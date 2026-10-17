@@ -8,9 +8,9 @@ import { FeeReportsClient } from "@/app/(app)/fees/reports/reports-client";
 export default async function FeeReportsPage() {
   const session = await requireSession();
   const [campuses, classes, students] = await Promise.all([
-    campusService.listCampuses(session),
+    campusService.listCampusesInView(session),
     classService.listClasses(session),
-    studentService.listStudents(session),
+    studentService.listStudents(session, { inView: true }),
   ]);
 
   const studentById = new Map(students.map((s) => [s.id, s]));
