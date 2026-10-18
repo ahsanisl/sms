@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
+import { Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { Icon } from "@/components/shared/icon";
@@ -84,6 +85,7 @@ export function Sidebar() {
             >
               <Icon name={item.icon} className="h-5 w-5" />
               {item.label}
+              <NavPendingSpinner />
             </Link>
           );
         })}
@@ -105,6 +107,7 @@ export function Sidebar() {
             >
               <Icon name={item.icon} className="h-5 w-5" />
               {item.label}
+              <NavPendingSpinner />
             </Link>
           );
         })}
@@ -118,4 +121,11 @@ export function Sidebar() {
       </div>
     </aside>
   );
+}
+
+/** Shows on the clicked link while its page is still loading — instant feedback even before the route's loading.tsx fallback has been prefetched (slow networks). Must render inside the <Link>. */
+function NavPendingSpinner() {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+  return <Loader2 aria-hidden className="loader-delayed ml-auto h-4 w-4 motion-safe:animate-spin" />;
 }

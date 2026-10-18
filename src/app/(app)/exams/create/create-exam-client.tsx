@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { FormField } from "@/components/shared/form-field";
@@ -13,7 +13,7 @@ import { createExamAction } from "@/app/(app)/exams/create/actions";
 import type { Campus, ClassSection, Subject } from "@/lib/types";
 
 export function CreateExamClient({ campuses, classes, subjects, defaultCampusId }: { campuses: Campus[]; classes: ClassSection[]; subjects: Subject[]; defaultCampusId?: string }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   const [name, setName] = useState("");
   const [term, setTerm] = useState("Term 2, 2026-27");

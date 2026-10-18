@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Check, X, GraduationCap, Phone, Mail } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -12,7 +12,7 @@ import { FormField } from "@/components/shared/form-field";
 import { Textarea } from "@/components/ui/textarea";
 import { StudentForm, type StudentFormValues } from "@/components/students/student-form";
 import { advanceInquiryStageAction, rejectInquiryAction, admitInquiryAction } from "@/app/(app)/admissions/[id]/actions";
-import { INQUIRY_STAGE_LABEL, INQUIRY_STAGE_ORDER, INQUIRY_STAGE_TONE } from "@/lib/mock/admissions";
+import { INQUIRY_STAGE_LABEL, INQUIRY_STAGE_ORDER, INQUIRY_STAGE_TONE } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Campus, ClassSection, InquiryStage, Student } from "@/lib/types";
@@ -50,7 +50,7 @@ export function InquiryDetailClient({
   campuses: Campus[];
   classes: ClassSection[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [rejecting, setRejecting] = useState(false);
   const [rejectNote, setRejectNote] = useState("");
   const [admitOpen, setAdmitOpen] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { useSession } from "@/lib/auth/session-context";
 
 export default function RootPage() {
   const { user, isLoading } = useSession();
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   useEffect(() => {
     if (isLoading) return;

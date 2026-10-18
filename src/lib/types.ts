@@ -16,7 +16,7 @@ export interface AppUser {
 /**
  * A tenant. Everything else in the data model (Campus, and transitively
  * everything a Campus owns) is scoped to exactly one School — see
- * lib/store/school-scope.ts. Also doubles as the school's printed identity
+ * services/scope.ts. Also doubles as the school's printed identity
  * (used both on the Settings → School Profile form and as the letterhead on
  * printed documents, currently the exam Result Card) — one school, one
  * profile, no separate entity needed for that.
@@ -61,8 +61,8 @@ export type PermissionModule =
   | "announcements"
   | "announcementsCreate"
   | "leave"
-  | "curriculum"
-  | "curriculumManage"
+  | "syllabus"
+  | "syllabusManage"
   | "classwork"
   | "classworkCreate"
   | "homework"
@@ -80,7 +80,7 @@ export type ArchivableStatus = "active" | "archived";
 export interface Campus {
   id: string;
   name: string;
-  /** The tenant this campus belongs to — see lib/store/school-scope.ts. */
+  /** The tenant this campus belongs to — see services/scope.ts. */
   schoolId: string;
   city: string;
   address: string;
@@ -93,7 +93,7 @@ export interface Subject {
   id: string;
   name: string;
   code: string;
-  /** Per-school catalog — see lib/store/school-scope.ts. */
+  /** Per-school catalog — see services/scope.ts. */
   schoolId: string;
   status: ArchivableStatus;
 }
@@ -122,7 +122,7 @@ export interface ClassSection {
 export interface AcademicSession {
   id: string;
   label: string; // e.g. "2026-2027"
-  /** Per-school calendar — see lib/store/school-scope.ts. Each school has its own independently-active session. */
+  /** Per-school calendar — see services/scope.ts. Each school has its own independently-active session. */
   schoolId: string;
   startDate: string;
   endDate: string;
@@ -239,7 +239,7 @@ export type FeeFrequency = "monthly" | "quarterly" | "annual" | "one_time";
 export interface FeeCategory {
   id: string;
   name: string;
-  /** Per-school list — see lib/store/school-scope.ts. */
+  /** Per-school list — see services/scope.ts. */
   schoolId: string;
   status: ArchivableStatus;
 }
@@ -347,7 +347,7 @@ export interface GradeBand {
   id: string;
   grade: string;
   minPercentage: number;
-  /** Per-school scale — see lib/store/school-scope.ts. */
+  /** Per-school scale — see services/scope.ts. */
   schoolId: string;
 }
 
@@ -380,7 +380,7 @@ export interface Period {
   endTime: string;
 }
 
-/** Per-school working-days/periods schedule — see lib/store/school-scope.ts. */
+/** Per-school working-days/periods schedule — see services/scope.ts. */
 export interface TimetableConfig {
   schoolId: string;
   workingDays: TimetableDay[];

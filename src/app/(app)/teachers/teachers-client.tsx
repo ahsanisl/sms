@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
@@ -21,7 +21,7 @@ interface TeacherRow extends Teacher {
 }
 
 export function TeachersClient({ teachers, campuses, subjects }: { teachers: TeacherRow[]; campuses: Campus[]; subjects: Subject[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
 
   async function handleAdd(values: TeacherFormValues) {

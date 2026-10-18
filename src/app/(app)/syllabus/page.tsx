@@ -1,13 +1,13 @@
-import * as curriculumService from "@/services/curriculum.service";
+import * as syllabusService from "@/services/syllabus.service";
 import * as classService from "@/services/class.service";
 import * as subjectService from "@/services/subject.service";
 import * as sessionService from "@/services/academic-session.service";
 import { requireSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
-import { CurriculumClient } from "@/app/(app)/curriculum/curriculum-client";
-import { activeSession } from "@/lib/mock/sessions";
+import { SyllabusClient } from "@/app/(app)/syllabus/syllabus-client";
+import { activeSession } from "@/lib/academic-session";
 
-export default async function CurriculumPage({ searchParams }: { searchParams: Promise<{ classId?: string; subjectId?: string }> }) {
+export default async function SyllabusPage({ searchParams }: { searchParams: Promise<{ classId?: string; subjectId?: string }> }) {
   const { classId: requestedClassId, subjectId: requestedSubjectId } = await searchParams;
   const session = await requireSession();
 
@@ -15,7 +15,7 @@ export default async function CurriculumPage({ searchParams }: { searchParams: P
     classService.listClasses(session),
     subjectService.listSubjects(session),
     sessionService.listSessions(session),
-    can(session.role, "curriculumManage"),
+    can(session.role, "syllabusManage"),
   ]);
 
   const activeClasses = classes.filter((c) => c.status === "active");
@@ -28,10 +28,10 @@ export default async function CurriculumPage({ searchParams }: { searchParams: P
   const subjectId = requestedSubjectId && subjectOptions.some((s) => s.id === requestedSubjectId) ? requestedSubjectId : (subjectOptions[0]?.id ?? "");
 
   const currentSession = activeSession(sessions);
-  const topics = classId && subjectId && currentSession ? await curriculumService.listTopics(session, classId, subjectId, currentSession.id) : [];
+  const topics = classId && subjectId && currentSession ? await syllabusService.listTopics(session, classId, subjectId, currentSession.id) : [];
 
   return (
-    <CurriculumClient
+    <SyllabusClient
       key={`${classId}-${subjectId}`}
       classOptions={activeClasses.map((c) => ({ id: c.id, label: `${c.grade}-${c.section}` }))}
       classId={classId}

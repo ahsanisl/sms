@@ -63,7 +63,7 @@ export async function assertCampusInScope(session: AuthSession, campusId: string
 }
 
 /**
- * Shared by Curriculum (status updates), Classwork, and Homework
+ * Shared by Syllabus (status updates), Classwork, and Homework
  * (create/edit): may this *teacher* act on this exact (class, subject) pair?
  * Admin roles are never checked here — they're already scoped via the
  * normal campus check each of those services does first.
@@ -74,7 +74,7 @@ export async function assertCampusInScope(session: AuthSession, campusId: string
  * specifically* has no timetable slot at all yet (any teacher) — a
  * deliberate, narrow trust concession so a school still filling in its
  * Timetable subject-by-subject isn't blocked from using
- * Curriculum/Classwork/Homework for the subjects it hasn't scheduled yet.
+ * Syllabus/Classwork/Homework for the subjects it hasn't scheduled yet.
  * The fallback is scoped to the subject, not just the class, so a class
  * with a Math slot already set but no English slot yet still lets an
  * English teacher through — checked live: this class-wide (not

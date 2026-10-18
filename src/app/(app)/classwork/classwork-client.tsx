@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -48,7 +48,7 @@ export function ClassworkClient({
   canManage: boolean;
   isTeacher: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<ClassworkRow | null>(null);
   const [deleting, setDeleting] = useState<ClassworkRow | null>(null);

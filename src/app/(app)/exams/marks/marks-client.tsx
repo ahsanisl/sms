@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { Select } from "@/components/ui/select";
@@ -53,7 +53,7 @@ export function MarksClient({
   roster: RosterStudent[];
   initialMarks: Record<string, number>;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [grid, setGrid] = useState<Record<string, number>>(initialMarks);
   const [saving, setSaving] = useState(false);
 

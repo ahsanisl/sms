@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "@/lib/auth/session-context";
-import { AppDataProvider } from "@/lib/store/app-data-context";
+import { GlobalLoaderProvider } from "@/components/layout/global-loader";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full font-sans">
         <SessionProvider>
-          <AppDataProvider>{children}</AppDataProvider>
+          <GlobalLoaderProvider>{children}</GlobalLoaderProvider>
         </SessionProvider>
         <Toaster />
       </body>

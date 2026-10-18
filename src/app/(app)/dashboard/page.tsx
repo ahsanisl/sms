@@ -47,9 +47,9 @@ export default async function DashboardPage() {
 
   // The login page always lands here regardless of role, so this is the one
   // place that can reliably catch "school_owner whose school hasn't finished
-  // /onboarding yet" for a REAL (Postgres-only) school — AuthGuard's client-
-  // side equivalent check only knows about the mock store's schools, so it
-  // silently no-ops for one created through the real Platform Admin console.
+  // /onboarding yet" for a REAL (Postgres-only) school — a server-side
+  // backstop for AuthGuard's client-side redirect (which reads the same
+  // flag from /api/me/permissions).
   if (session.role === "school_owner") {
     const school = await schoolService.getMySchool(session);
     if (!school.onboardingComplete) redirect("/onboarding");

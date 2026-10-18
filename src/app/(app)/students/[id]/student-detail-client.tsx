@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Printer, Pencil, Users, GraduationCap as GradIcon, ClipboardList, User as UserIcon, UserMinus, ArrowRightLeft, RotateCcw, History } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/shared/avatar";
@@ -22,7 +22,7 @@ import {
   reactivateStudentAction,
   requestAttendanceCorrectionAction,
 } from "@/app/(app)/students/[id]/actions";
-import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/mock/students";
+import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/constants";
 import { gradeFor } from "@/lib/grade";
 import { formatDate, formatPKR } from "@/lib/format";
 import type { AttendanceStatus, Campus, ClassSection, InvoiceStatus, Student, StudentLifecycleEventType, StudentStatus } from "@/lib/types";
@@ -103,7 +103,7 @@ export function StudentDetailClient({
   canManage: boolean;
   canRequestCorrection: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [transferOpen, setTransferOpen] = useState(false);

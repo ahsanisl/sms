@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 import { updateSchoolProfileAction } from "@/app/(app)/settings/actions";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -52,7 +52,7 @@ interface SettingsClientProps {
 }
 
 export function SettingsClient({ school, visibility, activeCampuses, currentSession, activeSubjects, gradeBands, activeDepartmentCount }: SettingsClientProps) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [section, setSection] = useState<SectionLabel>("School Profile");
   const [schoolName, setSchoolName] = useState(school.name);
   const [tagline, setTagline] = useState(school.tagline);

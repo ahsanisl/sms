@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -22,7 +22,7 @@ const TYPE_LABEL: Record<Room["type"], string> = {
 };
 
 export function RoomManagementClient({ rooms, campuses }: { rooms: Room[]; campuses: Campus[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const campusById = new Map(campuses.map((c) => [c.id, c]));
 
   const [addOpen, setAddOpen] = useState(false);

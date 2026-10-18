@@ -7,7 +7,7 @@ import * as studentService from "@/services/student.service";
 import { requireSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
 import { TimetableViewClient } from "@/app/(app)/timetable/timetable-view-client";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 import type { TimetableDay } from "@/lib/types";
 
 export default async function TimetablePage({ searchParams }: { searchParams: Promise<{ classId?: string }> }) {

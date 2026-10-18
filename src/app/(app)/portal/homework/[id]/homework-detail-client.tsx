@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -51,7 +51,7 @@ export function ParentHomeworkDetailClient({
   attachments: { id: string; fileName: string }[];
   submission: SubmissionDetail | null;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [submissionText, setSubmissionText] = useState(submission?.submissionText ?? "");
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);

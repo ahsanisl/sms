@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "20mb",
     },
   },
+  // "Curriculum" was renamed to "Syllabus" — keep old bookmarks and links
+  // working. `:path*` also matches the bare path, and query strings
+  // (?classId=...) carry over automatically.
+  redirects() {
+    return [
+      { source: "/curriculum/:path*", destination: "/syllabus/:path*", permanent: true },
+      { source: "/portal/curriculum/:path*", destination: "/portal/syllabus/:path*", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

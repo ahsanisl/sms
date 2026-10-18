@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Check } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/shared/modal";
 import { ClassForm, type ClassFormValues } from "@/components/classes/class-form";
 import { createClassAction } from "@/app/(app)/classes/actions";
-import { GRADE_ORDER, wingForGrade } from "@/lib/mock/reference-data";
+import { GRADE_ORDER, wingForGrade } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Campus, Teacher } from "@/lib/types";
 
@@ -43,7 +43,7 @@ export function ClassesClient({
   campuses: Campus[];
   teachers: Teacher[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [wing, setWing] = useState<(typeof WINGS)[number]>("All Classes");
   const [addOpen, setAddOpen] = useState(false);
 

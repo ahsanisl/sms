@@ -6,8 +6,7 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useTeachers } from "@/lib/store/hooks";
-import { GRADE_ORDER, GRADE_SUBJECTS, subjectId } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 
 export type ClassFormValues = Omit<ClassSection, "id">;
 
@@ -15,16 +14,11 @@ interface ClassFormProps {
   initialValues?: ClassSection;
   onSubmit: (values: ClassFormValues) => void;
   onCancel?: () => void;
-  /** Pass real (DB-backed) data from a Server Component page — falls back to the mock store's hooks for the screens not yet migrated off it. */
-  campuses?: Campus[];
-  teachers?: Teacher[];
+  campuses: Campus[];
+  teachers: Teacher[];
 }
 
-export function ClassForm({ initialValues, onSubmit, onCancel, campuses: campusesProp, teachers: teachersProp }: ClassFormProps) {
-  const mockCampuses = useCampuses();
-  const mockTeachers = useTeachers();
-  const campuses = campusesProp ?? mockCampuses.campuses;
-  const teachers = teachersProp ?? mockTeachers.teachers;
+export function ClassForm({ initialValues, onSubmit, onCancel, campuses, teachers }: ClassFormProps) {
   const activeCampuses = campuses.filter((c) => c.status === "active");
 
   const [grade, setGrade] = useState(initialValues?.grade ?? GRADE_ORDER[0]);
@@ -42,7 +36,6 @@ export function ClassForm({ initialValues, onSubmit, onCancel, campuses: campuse
   const [teacherError, setTeacherError] = useState("");
 
   const campusTeachers = teachers.filter((t) => t.campusId === campusId);
-  const selectedCampus = campuses.find((c) => c.id === campusId);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,19 +48,13 @@ export function ClassForm({ initialValues, onSubmit, onCancel, campuses: campuse
       return;
     }
     setTeacherError("");
-    // The subjectId() mock helper produces ids only meaningful for the mock
-    // store's namespaced subject records — real (DB-backed) subjects are
-    // plain UUIDs with no code-based recipe, so this auto-fill only applies
-    // in mock mode. A real class currently starts with no subjects assigned;
-    // a proper subject picker for the real-data path is a follow-up.
-    const fallbackCodes = GRADE_SUBJECTS[grade] ?? ["eng", "urdu", "math"];
-    const fallbackSubjectIds = campusesProp ? [] : selectedCampus ? fallbackCodes.map((code) => subjectId(selectedCampus.schoolId, code)) : [];
+    // A new class starts with no subjects assigned; a subject picker here is a follow-up.
     onSubmit({
       grade,
       section: section.toUpperCase(),
       campusId,
       classTeacherId,
-      subjectIds: initialValues?.subjectIds ?? fallbackSubjectIds,
+      subjectIds: initialValues?.subjectIds ?? [],
       studentCapacity,
       status: initialValues?.status ?? "active",
     });

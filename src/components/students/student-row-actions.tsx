@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Eye, Pencil, MoreVertical, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -16,8 +16,8 @@ import { StudentForm, type StudentFormValues } from "@/components/students/stude
 import { updateStudentAction, deleteStudentAction } from "@/app/(app)/students/actions";
 import type { Campus, ClassSection, Student } from "@/lib/types";
 
-export function StudentRowActions({ student, campuses, classes }: { student: Student; campuses?: Campus[]; classes?: ClassSection[] }) {
-  const router = useRouter();
+export function StudentRowActions({ student, campuses, classes }: { student: Student; campuses: Campus[]; classes: ClassSection[] }) {
+  const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [busy, setBusy] = useState(false);

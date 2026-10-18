@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { ArrowRight, GraduationCap } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -39,7 +39,7 @@ export function PromoteClient({
   suggestedTargetClassId: string | "alumni";
   roster: RosterStudent[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [outcome, setOutcome] = useState<"class" | "alumni">(suggestedTargetClassId === "alumni" ? "alumni" : "class");
   const [targetClassId, setTargetClassId] = useState(suggestedTargetClassId === "alumni" ? "" : suggestedTargetClassId);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());

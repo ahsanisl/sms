@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Mail, Phone, GraduationCap, Pencil, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/shared/avatar";
@@ -48,7 +48,7 @@ export function TeacherDetailClient({
   campuses: Campus[];
   subjects: Subject[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   async function handleEditSubmit(values: TeacherFormValues) {

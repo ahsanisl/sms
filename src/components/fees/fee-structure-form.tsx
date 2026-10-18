@@ -6,8 +6,6 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useClasses, useFeeCategories } from "@/lib/store/hooks";
-import { classLabel as mockClassLabel } from "@/lib/mock/reference-data";
 
 export type FeeStructureFormValues = Omit<FeeStructureItem, "id">;
 
@@ -16,23 +14,15 @@ interface Props {
   defaultCampusId?: string;
   onSubmit: (values: FeeStructureFormValues) => void;
   onCancel?: () => void;
-  /** Real-data callers pass their own campus/class/category lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
-  classes?: ClassSection[];
-  feeCategories?: FeeCategory[];
+  campuses: Campus[];
+  classes: ClassSection[];
+  feeCategories: FeeCategory[];
 }
 
-export function FeeStructureForm({ defaultCampusId, onSubmit, onCancel, campuses: campusesProp, classes: classesProp, feeCategories: feeCategoriesProp }: Props) {
-  const { campuses: mockCampuses } = useCampuses();
-  const { classes: mockClasses } = useClasses();
-  const { feeCategories: mockFeeCategories } = useFeeCategories();
-  const campuses = campusesProp ?? mockCampuses;
-  const classes = classesProp ?? mockClasses;
-  const feeCategories = feeCategoriesProp ?? mockFeeCategories;
+export function FeeStructureForm({ defaultCampusId, onSubmit, onCancel, campuses, classes, feeCategories }: Props) {
   const activeCampuses = campuses.filter((c) => c.status === "active");
   const activeCategories = feeCategories.filter((c) => c.status === "active");
-  // Real-data callers pass classes with grade/section already resolved; the mock fallback still needs the mock lookup helper.
-  const classLabel = (c: ClassSection) => (classesProp ? `${c.grade}-${c.section}` : mockClassLabel(c));
+  const classLabel = (c: ClassSection) => `${c.grade}-${c.section}`;
 
   const [campusId, setCampusId] = useState(defaultCampusId ?? activeCampuses[0]?.id ?? "");
   const [classId, setClassId] = useState(classes.find((c) => c.status === "active" && c.campusId === campusId)?.id ?? "");

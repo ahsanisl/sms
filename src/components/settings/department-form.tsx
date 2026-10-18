@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useSubjects, useTeachers } from "@/lib/store/hooks";
 
 export type DepartmentFormValues = Omit<Department, "id" | "status">;
 
@@ -15,19 +14,12 @@ interface DepartmentFormProps {
   initialValues?: Department;
   onSubmit: (values: DepartmentFormValues) => void;
   onCancel?: () => void;
-  /** Real-data callers pass their own lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
-  subjects?: Subject[];
-  teachers?: Teacher[];
+  campuses: Campus[];
+  subjects: Subject[];
+  teachers: Teacher[];
 }
 
-export function DepartmentForm({ initialValues, onSubmit, onCancel, campuses: campusesProp, subjects: subjectsProp, teachers: teachersProp }: DepartmentFormProps) {
-  const { campuses: mockCampuses } = useCampuses();
-  const { subjects: mockSubjects } = useSubjects();
-  const { teachers: mockTeachers } = useTeachers();
-  const campuses = campusesProp ?? mockCampuses;
-  const subjects = subjectsProp ?? mockSubjects;
-  const teachers = teachersProp ?? mockTeachers;
+export function DepartmentForm({ initialValues, onSubmit, onCancel, campuses, subjects, teachers }: DepartmentFormProps) {
   const activeCampuses = campuses.filter((c) => c.status === "active");
   const activeSubjects = subjects.filter((s) => s.status === "active");
 

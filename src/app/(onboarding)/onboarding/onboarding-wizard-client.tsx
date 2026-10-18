@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Check, ChevronRight, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,7 @@ export function OnboardingWizardClient({
   timetableBreakAfterPeriod,
   feeCategories,
 }: OnboardingWizardClientProps) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [finishing, setFinishing] = useState(false);
 
   const activeCampuses = campuses.filter((c) => c.status === "active");

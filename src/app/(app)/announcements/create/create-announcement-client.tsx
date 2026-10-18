@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Megaphone, AlertTriangle } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -30,7 +30,7 @@ export function CreateAnnouncementClient({
   fixedCampusId?: string;
   fixedCampusName?: string;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");

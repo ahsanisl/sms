@@ -75,6 +75,6 @@ export const leaveTypeEnum = pgEnum("leave_type", ["sick", "casual", "annual", "
 
 export const leaveStatusEnum = pgEnum("leave_status", ["pending", "approved", "rejected"]);
 
-export const curriculumTopicStatusEnum = pgEnum("curriculum_topic_status", ["not_started", "in_progress", "completed"]);
+export const syllabusTopicStatusEnum = pgEnum("syllabus_topic_status", ["not_started", "in_progress", "completed"]);
 
 export const homeworkSubmissionStatusEnum = pgEnum("homework_submission_status", ["not_submitted", "submitted", "graded"]);

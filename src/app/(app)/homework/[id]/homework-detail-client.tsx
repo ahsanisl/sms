@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Download, Pencil, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -67,7 +67,7 @@ export function HomeworkDetailClient({
   submissions: SubmissionRow[];
   submissionAttachments: Record<string, { id: string; fileName: string }[]>;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [grading, setGrading] = useState<SubmissionRow | null>(null);

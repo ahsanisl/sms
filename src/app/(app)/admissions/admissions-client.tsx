@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
-import { INQUIRY_STAGE_LABEL, INQUIRY_STAGE_TONE } from "@/lib/mock/admissions";
+import { INQUIRY_STAGE_LABEL, INQUIRY_STAGE_TONE } from "@/lib/constants";
 import { formatDate } from "@/lib/format";
 import type { Campus, InquiryStage } from "@/lib/types";
 
@@ -34,7 +34,7 @@ export function AdmissionsClient({
   campuses: Campus[];
   isAllCampuses: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   const inProgress = inquiries.filter((i) => i.stage !== "admitted" && i.stage !== "rejected").length;
   const admitted = inquiries.filter((i) => i.stage === "admitted").length;

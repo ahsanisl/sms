@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Pencil, Archive } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -20,7 +20,7 @@ interface SchoolStats {
 }
 
 export function SchoolsClient({ schools }: { schools: { school: School; stats: SchoolStats }[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<School | null>(null);
   const [archiving, setArchiving] = useState<School | null>(null);

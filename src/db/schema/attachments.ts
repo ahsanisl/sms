@@ -4,7 +4,7 @@ import { users } from "@/db/schema/users";
 
 /**
  * One polymorphic table for every real file attachment in the app —
- * Homework, Homework Submissions, Classwork, Curriculum Topics, and
+ * Homework, Homework Submissions, Classwork, Syllabus Topics, and
  * anything future. `module`/`entityId` deliberately isn't a real FK (it
  * spans several unrelated tables) — same accepted pattern as
  * role_permissions.module being plain text instead of a pg enum, for the

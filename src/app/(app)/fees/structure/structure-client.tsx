@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/shared/modal";
 import { FeeStructureForm, type FeeStructureFormValues } from "@/components/fees/fee-structure-form";
 import { createStructureItemAction } from "@/app/(app)/fees/structure/actions";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 import { formatPKR } from "@/lib/format";
 import type { Campus, ClassSection, FeeCategory, FeeStructureItem } from "@/lib/types";
 
@@ -26,7 +26,7 @@ export function FeeStructureClient({
   structureItems: FeeStructureItem[];
   defaultCampusId?: string;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const classById = new Map(classes.map((c) => [c.id, c]));
 

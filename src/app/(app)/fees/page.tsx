@@ -4,7 +4,7 @@ import * as feeService from "@/services/fee.service";
 import { requireSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
 import { FeesDashboardClient } from "@/app/(app)/fees/fees-dashboard-client";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 
 export default async function FeesPage() {
   const session = await requireSession();

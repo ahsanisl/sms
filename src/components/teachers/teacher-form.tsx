@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useSubjects } from "@/lib/store/hooks";
 
 export type TeacherFormValues = Omit<Teacher, "id" | "classIds">;
 
@@ -36,16 +35,11 @@ interface TeacherFormProps {
   onSubmit: (values: TeacherFormValues) => void;
   onCancel?: () => void;
   submitLabel?: string;
-  /** Real-data callers pass their own campus/subject lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
-  subjects?: Subject[];
+  campuses: Campus[];
+  subjects: Subject[];
 }
 
-export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Teacher", campuses: campusesProp, subjects: subjectsProp }: TeacherFormProps) {
-  const { campuses: mockCampuses } = useCampuses();
-  const { subjects: mockSubjects } = useSubjects();
-  const campuses = campusesProp ?? mockCampuses;
-  const subjects = subjectsProp ?? mockSubjects;
+export function TeacherForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Teacher", campuses, subjects }: TeacherFormProps) {
 
   const [values, setValues] = useState<TeacherFormValues>(initialValues ?? emptyValues(campuses));
   const [errors, setErrors] = useState<Record<string, string>>({});

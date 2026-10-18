@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Check, X } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -39,7 +39,7 @@ export interface LeaveRequestRow {
 }
 
 export function LeaveClient({ view, requests, isAllCampuses }: { view: "teacher" | "admin"; requests: LeaveRequestRow[]; isAllCampuses: boolean }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [requestOpen, setRequestOpen] = useState(false);
   const [rejecting, setRejecting] = useState<LeaveRequestRow | null>(null);
   const [rejectNote, setRejectNote] = useState("");

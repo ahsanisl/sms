@@ -39,7 +39,7 @@ export async function listSlotsForTeacher(teacherId: string) {
   return db.select().from(timetableSlots).where(eq(timetableSlots.teacherId, teacherId));
 }
 
-/** Does this teacher have a published slot teaching this exact subject to this exact class? Backs the Curriculum/Classwork/Homework ownership check — see services/scope.ts's assertTeacherTeachesClassSubject. */
+/** Does this teacher have a published slot teaching this exact subject to this exact class? Backs the Syllabus/Classwork/Homework ownership check — see services/scope.ts's assertTeacherTeachesClassSubject. */
 export async function findSlotForTeacherClassSubject(teacherId: string, classId: string, subjectId: string) {
   const [row] = await db
     .select()

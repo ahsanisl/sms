@@ -6,7 +6,7 @@ import * as timetableService from "@/services/timetable.service";
 import { requireSession } from "@/lib/tenancy";
 import { EmptyState } from "@/components/shared/empty-state";
 import { BuilderClient } from "@/app/(app)/timetable/builder/builder-client";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 import type { TimetableDay } from "@/lib/types";
 
 export default async function TimetableBuilderPage({ searchParams }: { searchParams: Promise<{ classId?: string }> }) {

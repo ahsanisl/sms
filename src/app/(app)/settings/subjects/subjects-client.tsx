@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -19,7 +19,7 @@ interface SubjectWithClassCount extends Subject {
 }
 
 export function SubjectsClient({ subjects }: { subjects: SubjectWithClassCount[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Subject | null>(null);
   const [archiving, setArchiving] = useState<Subject | null>(null);

@@ -2,7 +2,7 @@ import { date, index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core
 import { classes } from "@/db/schema/classes";
 import { subjects } from "@/db/schema/subjects";
 import { teachers } from "@/db/schema/teachers";
-import { curriculumTopics } from "@/db/schema/curriculum";
+import { syllabusTopics } from "@/db/schema/syllabus";
 
 /** A same-day log of what a class covered/did in a subject period — teacher-authored, never "submitted" by students (unlike Homework). */
 export const classwork = pgTable(
@@ -18,8 +18,8 @@ export const classwork = pgTable(
     teacherId: uuid("teacher_id")
       .notNull()
       .references(() => teachers.id, { onDelete: "restrict" }),
-    /** Optional cross-link — "this classwork covered Topic X" — never required, since Curriculum topics may not exist yet for every class/subject. */
-    curriculumTopicId: uuid("curriculum_topic_id").references(() => curriculumTopics.id, { onDelete: "set null" }),
+    /** Optional cross-link — "this classwork covered Topic X" — never required, since Syllabus topics may not exist yet for every class/subject. */
+    syllabusTopicId: uuid("syllabus_topic_id").references(() => syllabusTopics.id, { onDelete: "set null" }),
     date: date("date").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull().default(""),

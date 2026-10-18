@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Pencil, CheckCircle2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -14,7 +14,7 @@ import type { AcademicSession } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 
 export function AcademicSessionsClient({ sessions }: { sessions: AcademicSession[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<AcademicSession | null>(null);
 

@@ -6,8 +6,6 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useClasses } from "@/lib/store/hooks";
-import { classLabel as mockClassLabel } from "@/lib/mock/reference-data";
 
 export type StudentFormValues = Omit<Student, "id">;
 
@@ -41,17 +39,12 @@ interface StudentFormProps {
   onSubmit: (values: StudentFormValues) => void;
   onCancel?: () => void;
   submitLabel?: string;
-  /** Real-data callers pass their own campus/class lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
-  classes?: ClassSection[];
+  campuses: Campus[];
+  classes: ClassSection[];
 }
 
-export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Student", campuses: campusesProp, classes: classesProp }: StudentFormProps) {
-  const { campuses: mockCampuses } = useCampuses();
-  const { classes: mockClasses } = useClasses();
-  const campuses = campusesProp ?? mockCampuses;
-  const classes = classesProp ?? mockClasses;
-  const classLabel = (c: ClassSection) => (classesProp ? `${c.grade}-${c.section}` : mockClassLabel(c));
+export function StudentForm({ initialValues, onSubmit, onCancel, submitLabel = "Save Student", campuses, classes }: StudentFormProps) {
+  const classLabel = (c: ClassSection) => `${c.grade}-${c.section}`;
 
   const [values, setValues] = useState<StudentFormValues>(initialValues ?? emptyValues(classes));
   const [errors, setErrors] = useState<Record<string, string>>({});

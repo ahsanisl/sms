@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Download, Upload, Plus } from "lucide-react";
@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Avatar } from "@/components/shared/avatar";
 import { Button } from "@/components/ui/button";
 import { StudentRowActions } from "@/components/students/student-row-actions";
-import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/mock/students";
+import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/constants";
 import { downloadCsv } from "@/lib/csv-export";
 import type { Campus, ClassSection, Student } from "@/lib/types";
 
@@ -32,7 +32,7 @@ export function StudentsClient({
   campuses: Campus[];
   canManage: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   const columns: Column<StudentRow>[] = [
     {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { StudentForm, type StudentFormValues } from "@/components/students/student-form";
@@ -8,7 +8,7 @@ import { createStudentAction } from "@/app/(app)/students/new/actions";
 import type { Campus, ClassSection } from "@/lib/types";
 
 export function NewStudentClient({ campuses, classes }: { campuses: Campus[]; classes: ClassSection[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   async function handleSubmit(values: StudentFormValues) {
     const result = await createStudentAction(values);

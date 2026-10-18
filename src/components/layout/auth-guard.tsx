@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
+import { PageLoader } from "@/components/shared/page-loader";
 import { useSession } from "@/lib/auth/session-context";
 import { isAlwaysAllowed, isParentOnlyRoute, moduleForPath } from "@/lib/permissions";
 import type { PermissionModule } from "@/lib/types";
@@ -14,7 +16,7 @@ interface PermissionsResponse {
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useSession();
-  const router = useRouter();
+  const router = useLoadingRouter();
   const pathname = usePathname();
   const lastDeniedPath = useRef<string | null>(null);
   const [perms, setPerms] = useState<PermissionsResponse | null>(null);
@@ -86,9 +88,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading || !user || !perms) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background text-on-surface-variant text-body-md">
-        Loading EduFlow…
-      </div>
+      <PageLoader fullScreen label="Loading EduFlow…" />
     );
   }
 

@@ -1,5 +1,5 @@
 import { date, index, integer, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { curriculumTopicStatusEnum } from "@/db/schema/enums";
+import { syllabusTopicStatusEnum } from "@/db/schema/enums";
 import { classes } from "@/db/schema/classes";
 import { subjects } from "@/db/schema/subjects";
 import { academicSessions } from "@/db/schema/academic-sessions";
@@ -10,8 +10,8 @@ import { academicSessions } from "@/db/schema/academic-sessions";
  * transitively through classId, same as timetable_slots and
  * attendance_records already are.
  */
-export const curriculumTopics = pgTable(
-  "curriculum_topics",
+export const syllabusTopics = pgTable(
+  "syllabus_topics",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     classId: uuid("class_id")
@@ -28,15 +28,15 @@ export const curriculumTopics = pgTable(
     orderIndex: integer("order_index").notNull().default(0),
     plannedStartDate: date("planned_start_date"),
     plannedEndDate: date("planned_end_date"),
-    status: curriculumTopicStatusEnum("status").notNull().default("not_started"),
+    status: syllabusTopicStatusEnum("status").notNull().default("not_started"),
     completedDate: date("completed_date"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    index("curriculum_topics_class_subject_session_idx").on(table.classId, table.subjectId, table.academicSessionId),
+    index("syllabus_topics_class_subject_session_idx").on(table.classId, table.subjectId, table.academicSessionId),
   ],
 );
 
-export type CurriculumTopic = typeof curriculumTopics.$inferSelect;
-export type NewCurriculumTopic = typeof curriculumTopics.$inferInsert;
+export type SyllabusTopic = typeof syllabusTopics.$inferSelect;
+export type NewSyllabusTopic = typeof syllabusTopics.$inferInsert;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { FormField } from "@/components/shared/form-field";
@@ -10,12 +10,12 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { createInquiryAction } from "@/app/(app)/admissions/new/actions";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
-import { INQUIRY_SOURCES } from "@/lib/mock/admissions";
+import { GRADE_ORDER } from "@/lib/constants";
+import { INQUIRY_SOURCES } from "@/lib/constants";
 import type { Campus } from "@/lib/types";
 
 export function NewInquiryClient({ campuses, defaultCampusId }: { campuses: Campus[]; defaultCampusId?: string }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
 
   const [childName, setChildName] = useState("");
   const [gradeAppliedFor, setGradeAppliedFor] = useState(GRADE_ORDER[0]);

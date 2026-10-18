@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const CurriculumTopicInputSchema = z.object({
+export const SyllabusTopicInputSchema = z.object({
   classId: z.string().uuid(),
   subjectId: z.string().uuid(),
   academicSessionId: z.string().uuid(),
@@ -10,4 +10,4 @@ export const CurriculumTopicInputSchema = z.object({
   plannedEndDate: z.string().optional(),
 });
 
-export const CurriculumTopicStatusSchema = z.enum(["not_started", "in_progress", "completed"]);
+export const SyllabusTopicStatusSchema = z.enum(["not_started", "in_progress", "completed"]);

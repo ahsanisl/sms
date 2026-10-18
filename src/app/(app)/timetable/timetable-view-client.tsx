@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { Pencil, User, DoorOpen } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -44,7 +44,7 @@ export function TimetableViewClient({
   slots: Slot[];
   canBuild: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const cls = classes.find((c) => c.id === classId);
   const teacherById = new Map(teachers.map((t) => [t.id, t]));
   const roomById = new Map(rooms.map((r) => [r.id, r]));

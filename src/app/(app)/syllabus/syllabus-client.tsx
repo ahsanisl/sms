@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, ChevronUp, ChevronDown, Pencil, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -11,8 +11,8 @@ import { Modal } from "@/components/shared/modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
-import { TopicForm, type TopicFormValues } from "@/components/curriculum/topic-form";
-import { createTopicAction, updateTopicAction, updateTopicStatusAction, deleteTopicAction, reorderTopicsAction } from "@/app/(app)/curriculum/actions";
+import { TopicForm, type TopicFormValues } from "@/components/syllabus/topic-form";
+import { createTopicAction, updateTopicAction, updateTopicStatusAction, deleteTopicAction, reorderTopicsAction } from "@/app/(app)/syllabus/actions";
 import { formatDate } from "@/lib/format";
 
 type TopicStatus = "not_started" | "in_progress" | "completed";
@@ -30,7 +30,7 @@ interface TopicRow {
   completedDate: string;
 }
 
-interface CurriculumClientProps {
+interface SyllabusClientProps {
   classOptions: { id: string; label: string }[];
   classId: string;
   subjectOptions: { id: string; name: string }[];
@@ -42,7 +42,7 @@ interface CurriculumClientProps {
   isTeacher: boolean;
 }
 
-export function CurriculumClient({
+export function SyllabusClient({
   classOptions,
   classId,
   subjectOptions,
@@ -52,14 +52,14 @@ export function CurriculumClient({
   topics,
   canManage,
   isTeacher,
-}: CurriculumClientProps) {
-  const router = useRouter();
+}: SyllabusClientProps) {
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<TopicRow | null>(null);
   const [deleting, setDeleting] = useState<TopicRow | null>(null);
 
   function navigate(nextClassId: string, nextSubjectId: string) {
-    router.push(`/curriculum?classId=${nextClassId}&subjectId=${nextSubjectId}`);
+    router.push(`/syllabus?classId=${nextClassId}&subjectId=${nextSubjectId}`);
   }
 
   async function handleAdd(values: TopicFormValues) {
@@ -126,7 +126,7 @@ export function CurriculumClient({
   return (
     <div>
       <PageHeader
-        title="Curriculum"
+        title="Syllabus"
         description="The syllabus plan for each class and subject — track what's taught and how far along coverage is."
         actions={
           canManage && (
@@ -159,7 +159,7 @@ export function CurriculumClient({
       </div>
 
       {!academicSessionId && (
-        <EmptyState icon="event_busy" title="No active academic session" description="Set an active session in Settings → Academic Sessions before planning a curriculum." />
+        <EmptyState icon="event_busy" title="No active academic session" description="Set an active session in Settings → Academic Sessions before planning a syllabus." />
       )}
 
       {academicSessionId && topics.length > 0 && (

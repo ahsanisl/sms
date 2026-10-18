@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveTimetableSettingsAction } from "@/app/(app)/settings/timetable/actions";
-import { BREAK_AFTER_PERIOD, DAYS, PERIODS } from "@/lib/mock/timetable";
+import { DEFAULT_BREAK_AFTER_PERIOD, DEFAULT_PERIODS, DEFAULT_WORKING_DAYS } from "@/lib/constants";
 import type { Period, TimetableDay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +29,7 @@ export function TimetableSettingsClient({
   periods: Period[];
   breakAfterPeriod: number;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [days, setDays] = useState<TimetableDay[]>(savedDays);
   const [periods, setLocalPeriods] = useState<Period[]>(savedPeriods);
   const [breakAfter, setBreakAfter] = useState<number>(savedBreak);
@@ -53,9 +53,9 @@ export function TimetableSettingsClient({
   }
 
   function loadStandardSchedule() {
-    setDays([...DAYS]);
-    setLocalPeriods(PERIODS.map((p) => ({ ...p })));
-    setBreakAfter(BREAK_AFTER_PERIOD);
+    setDays([...DEFAULT_WORKING_DAYS]);
+    setLocalPeriods(DEFAULT_PERIODS.map((p) => ({ ...p })));
+    setBreakAfter(DEFAULT_BREAK_AFTER_PERIOD);
   }
 
   function removePeriod(index: number) {

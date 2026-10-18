@@ -19,6 +19,6 @@ export * from "@/db/schema/leaves";
 export * from "@/db/schema/permissions";
 export * from "@/db/schema/audit";
 export * from "@/db/schema/attachments";
-export * from "@/db/schema/curriculum";
+export * from "@/db/schema/syllabus";
 export * from "@/db/schema/classwork";
 export * from "@/db/schema/homework";

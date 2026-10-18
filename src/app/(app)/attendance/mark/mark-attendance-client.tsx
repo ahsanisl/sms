@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { Avatar } from "@/components/shared/avatar";
@@ -44,7 +44,7 @@ export function MarkAttendanceClient({
   roster: RosterStudent[];
   initialStatuses: Record<string, AttendanceStatus>;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [localDate, setLocalDate] = useState(date);
   const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>(initialStatuses);
   const [saving, setSaving] = useState(false);

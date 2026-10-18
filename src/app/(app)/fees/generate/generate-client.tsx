@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { FileStack } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -32,7 +32,7 @@ export function GenerateInvoicesClient({
   defaultCampusId?: string;
   isAllCampuses: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const classById = new Map(classes.map((c) => [c.id, c]));
   const campusById = new Map(campuses.map((c) => [c.id, c]));
 

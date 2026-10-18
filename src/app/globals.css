@@ -157,3 +157,25 @@ body {
 .animate-overlay-in {
   animation: overlay-in 0.12s ease-out;
 }
+
+/* Global loading indicators (components/shared/page-loader.tsx, sidebar link
+   spinners). Start invisible and fade in after a short delay, so a fast
+   navigation never flashes a loader. */
+@keyframes loader-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes loader-bar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
+}
+.loader-delayed {
+  opacity: 0;
+  animation: loader-fade-in 0.2s ease-out 0.15s forwards;
+}
+.loader-bar {
+  animation: loader-bar 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .loader-bar { animation: none; transform: none; width: 100%; opacity: 0.6; }
+}

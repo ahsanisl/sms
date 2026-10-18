@@ -21,8 +21,8 @@ export const PERMISSION_MODULE_LABEL: Record<PermissionModule, string> = {
   announcements: "Announcements",
   announcementsCreate: "Create Announcement",
   leave: "Leave Management",
-  curriculum: "Curriculum",
-  curriculumManage: "Manage Curriculum (add/edit/reorder topics)",
+  syllabus: "Syllabus",
+  syllabusManage: "Manage Syllabus (add/edit/reorder topics)",
   classwork: "Classwork",
   classworkCreate: "Post Classwork",
   homework: "Homework",
@@ -57,10 +57,10 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "announcementsCreate", prefixes: ["/announcements/create"] },
   { module: "announcements", prefixes: ["/announcements"] },
   { module: "leave", prefixes: ["/leave"] },
-  // curriculumManage and classworkCreate gate in-page actions (add/edit/reorder a
-  // topic on /curriculum; the Add modal on /classwork), not their own route — so
+  // syllabusManage and classworkCreate gate in-page actions (add/edit/reorder a
+  // topic on /syllabus; the Add modal on /classwork), not their own route — so
   // they have no MODULE_ROUTES entry, same as e.g. studentsManage's in-page actions.
-  { module: "curriculum", prefixes: ["/curriculum"] },
+  { module: "syllabus", prefixes: ["/syllabus"] },
   { module: "classwork", prefixes: ["/classwork"] },
   { module: "homeworkCreate", prefixes: ["/homework/new"] },
   { module: "homework", prefixes: ["/homework"] },
@@ -102,11 +102,10 @@ export function isParentOnlyRoute(pathname: string): boolean {
 }
 
 /**
- * Default route-view permissions per role. Persisted into AppDataState
- * (see lib/store/app-data-context.ts) so the Settings → Users & Roles matrix
- * is a real, enforced permission model rather than decorative UI: toggling
- * a module off there actually blocks that role from the route (see
- * components/layout/auth-guard.tsx).
+ * Default route-view permissions per role — the starting values src/db/seed.ts
+ * writes into the role_permissions table. After seeding, the database is the
+ * source of truth (Settings → Users & Roles edits it; lib/authorization.ts
+ * enforces it server-side, components/layout/auth-guard.tsx client-side).
  */
 export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boolean>> = {
   // Platform-level SaaS operator: manages the roster of schools (tenants) and
@@ -132,7 +131,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "examsCreate",
     "timetableBuilder",
     "announcementsCreate",
-    "curriculumManage", // the syllabus itself is admin-set — teachers only update progress, see curriculum.service.ts
+    "syllabusManage", // the syllabus itself is admin-set — teachers only update progress, see syllabus.service.ts
     "auditLog",
     "reports",
     "settings",
@@ -156,8 +155,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "timetableBuilder",
     "announcementsCreate",
     "leave",
-    "curriculum", // finance-only role — no academic access at all, matches its existing exam/attendance/timetable exclusions
-    "curriculumManage",
+    "syllabus", // finance-only role — no academic access at all, matches its existing exam/attendance/timetable exclusions
+    "syllabusManage",
     "classwork",
     "classworkCreate",
     "homework",
@@ -187,15 +186,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "timetableBuilder",
     "announcementsCreate",
     "leave",
-    // Same shape as "exams" above: the staff-facing /curriculum, /classwork,
+    // Same shape as "exams" above: the staff-facing /syllabus, /classwork,
     // /homework routes and their read functions require these role
     // permissions, which a parent never holds — matching how parent never
-    // gets "exams" either. Their own /portal/curriculum, /portal/classwork,
+    // gets "exams" either. Their own /portal/syllabus, /portal/classwork,
     // /portal/homework pages call separate ownership-checked service
     // functions that skip this permission entirely (mirrors
     // exam.service.getResultCardData), so this exclusion doesn't block them.
-    "curriculum",
-    "curriculumManage",
+    "syllabus",
+    "syllabusManage",
     "classwork",
     "classworkCreate",
     "homework",

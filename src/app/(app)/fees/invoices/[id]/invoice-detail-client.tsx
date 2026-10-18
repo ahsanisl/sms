@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Printer, GraduationCap, Tag, Undo2 } from "lucide-react";
@@ -53,7 +53,7 @@ export function InvoiceDetailClient({
   schoolName: string;
   schoolAddress: string;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [discountOpen, setDiscountOpen] = useState(false);
   const [reversing, setReversing] = useState<PaymentRow | null>(null);
   const [reversalReason, setReversalReason] = useState("");

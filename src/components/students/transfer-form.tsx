@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCampuses, useClasses } from "@/lib/store/hooks";
-import { campusName as mockCampusName, classLabel as mockClassLabel, GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 
 export interface TransferFormValues {
   date: string;
@@ -21,19 +20,13 @@ interface TransferFormProps {
   student: Student;
   onSubmit: (values: TransferFormValues) => void;
   onCancel?: () => void;
-  /** Real-data callers pass their own campus/class lists; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
-  classes?: ClassSection[];
+  campuses: Campus[];
+  classes: ClassSection[];
 }
 
-export function TransferForm({ student, onSubmit, onCancel, campuses: campusesProp, classes: classesProp }: TransferFormProps) {
-  const { campuses: mockCampuses } = useCampuses();
-  const { classes: mockClasses } = useClasses();
-  const campuses = campusesProp ?? mockCampuses;
-  const classes = classesProp ?? mockClasses;
-  const campusName = (id: string) => (campusesProp ? (campuses.find((c) => c.id === id)?.name ?? "—") : mockCampusName(id));
+export function TransferForm({ student, onSubmit, onCancel, campuses, classes }: TransferFormProps) {
+  const campusName = (id: string) => campuses.find((c) => c.id === id)?.name ?? "—";
   const classLabel = (classOrId: ClassSection | string) => {
-    if (!classesProp) return mockClassLabel(classOrId);
     const cls = typeof classOrId === "string" ? classes.find((c) => c.id === classOrId) : classOrId;
     return cls ? `${cls.grade}-${cls.section}` : "—";
   };

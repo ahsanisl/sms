@@ -60,7 +60,7 @@ export async function listHomeworkForParent(session: AuthSession) {
  * Single read used by the staff detail page, the parent portal detail page,
  * AND the /api/files ownership check — branches internally by role instead
  * of a blanket permission gate, exactly like exam.service.getResultCardData
- * (see the Curriculum/Classwork fix earlier this round for why that
+ * (see the Syllabus/Classwork fix earlier this round for why that
  * distinction matters). For a parent, also folds in their own child's
  * submission so the portal page needs only one call.
  */

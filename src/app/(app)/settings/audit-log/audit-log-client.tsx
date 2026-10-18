@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -69,7 +69,7 @@ export function AuditLogClient({
   filterOptions: FilterOptions;
   retentionDays: number | null;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [savingRetention, setSavingRetention] = useState(false);
   const [cleaningUp, setCleaningUp] = useState(false);
   const [confirmCleanUp, setConfirmCleanUp] = useState(false);

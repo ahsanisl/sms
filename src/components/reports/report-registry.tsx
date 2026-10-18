@@ -3,7 +3,7 @@
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import type { Student, AttendanceRecord, FeeInvoice, MarksEntry, Exam, Campus, ClassSection, Teacher, Subject } from "@/lib/types";
-import { attendanceRate } from "@/lib/mock/attendance";
+import { attendanceRate } from "@/lib/attendance";
 import { formatDate, formatPKR } from "@/lib/format";
 
 export interface ReportData {

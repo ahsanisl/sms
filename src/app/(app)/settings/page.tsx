@@ -7,7 +7,7 @@ import * as departmentService from "@/services/department.service";
 import { requireSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
 import { SettingsClient } from "@/app/(app)/settings/settings-client";
-import { activeSession } from "@/lib/mock/sessions";
+import { activeSession } from "@/lib/academic-session";
 
 export default async function SettingsPage() {
   const session = await requireSession();

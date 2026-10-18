@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
@@ -34,7 +34,7 @@ export function ExamsClient({
   pendingMarksCount: number;
   canPublish: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const upcoming = exams.filter((e) => e.status === "scheduled").length;

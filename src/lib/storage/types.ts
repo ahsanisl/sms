@@ -7,7 +7,7 @@
 export interface SaveFileInput {
   /** Tenant-separates files on disk too, even though disk access is never exposed directly — defense in depth. */
   schoolId: string;
-  /** Free text, same convention as role_permissions.module — e.g. "homework", "classwork", "curriculum_topic". */
+  /** Free text, same convention as role_permissions.module — e.g. "homework", "classwork", "syllabus_topic". */
   module: string;
   buffer: Buffer;
   fileName: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Plus, Pencil, Archive } from "lucide-react";
@@ -19,7 +19,7 @@ interface CampusWithStats extends Campus {
 }
 
 export function CampusManagementClient({ campuses }: { campuses: CampusWithStats[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<Campus | null>(null);
   const [archiving, setArchiving] = useState<Campus | null>(null);

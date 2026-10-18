@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -32,7 +32,7 @@ interface AnnouncementRow {
 }
 
 export function AnnouncementsClient({ announcements, canManage }: { announcements: AnnouncementRow[]; canManage: boolean }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [toDelete, setToDelete] = useState<AnnouncementRow | null>(null);
   const [busy, setBusy] = useState(false);
 

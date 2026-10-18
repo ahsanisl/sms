@@ -22,10 +22,10 @@ interface ChildRow {
   subjects: SubjectRow[];
 }
 
-export function ParentCurriculumClient({ childRows, sessionLabel }: { childRows: ChildRow[]; sessionLabel: string }) {
+export function ParentSyllabusClient({ childRows, sessionLabel }: { childRows: ChildRow[]; sessionLabel: string }) {
   return (
     <div>
-      <PageHeader title="Curriculum" description={`The syllabus plan and progress for each of your children — ${sessionLabel}.`} />
+      <PageHeader title="Syllabus" description={`The syllabus plan and progress for each of your children — ${sessionLabel}.`} />
 
       <div className="space-y-8">
         {childRows.map((child) => (

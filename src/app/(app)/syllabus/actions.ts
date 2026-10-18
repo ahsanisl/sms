@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import * as curriculumService from "@/services/curriculum.service";
+import * as syllabusService from "@/services/syllabus.service";
 import { requireSession } from "@/lib/tenancy";
 
 interface ActionResult {
@@ -16,8 +16,8 @@ function errorMessage(error: unknown): string {
 export async function createTopicAction(input: unknown): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await curriculumService.createTopic(session, input);
-    revalidatePath("/curriculum");
+    await syllabusService.createTopic(session, input);
+    revalidatePath("/syllabus");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
@@ -27,8 +27,8 @@ export async function createTopicAction(input: unknown): Promise<ActionResult> {
 export async function updateTopicAction(topicId: string, input: unknown): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await curriculumService.updateTopic(session, topicId, input);
-    revalidatePath("/curriculum");
+    await syllabusService.updateTopic(session, topicId, input);
+    revalidatePath("/syllabus");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
@@ -38,8 +38,8 @@ export async function updateTopicAction(topicId: string, input: unknown): Promis
 export async function updateTopicStatusAction(topicId: string, status: string): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await curriculumService.updateTopicStatus(session, topicId, status);
-    revalidatePath("/curriculum");
+    await syllabusService.updateTopicStatus(session, topicId, status);
+    revalidatePath("/syllabus");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
@@ -49,8 +49,8 @@ export async function updateTopicStatusAction(topicId: string, status: string): 
 export async function deleteTopicAction(topicId: string): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await curriculumService.deleteTopic(session, topicId);
-    revalidatePath("/curriculum");
+    await syllabusService.deleteTopic(session, topicId);
+    revalidatePath("/syllabus");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
@@ -60,8 +60,8 @@ export async function deleteTopicAction(topicId: string): Promise<ActionResult> 
 export async function reorderTopicsAction(classId: string, orderedIds: string[]): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await curriculumService.reorderTopics(session, classId, orderedIds);
-    revalidatePath("/curriculum");
+    await syllabusService.reorderTopics(session, classId, orderedIds);
+    revalidatePath("/syllabus");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };

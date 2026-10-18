@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveGradeScaleAction } from "@/app/(app)/settings/grade-scale/actions";
-import { GRADE_BAND_TEMPLATE } from "@/lib/mock/exams";
+import { DEFAULT_GRADE_BANDS } from "@/lib/constants";
 
 interface EditableBand {
   key: string;
@@ -17,7 +17,7 @@ interface EditableBand {
 }
 
 export function GradeScaleClient({ bands: savedBands }: { bands: { grade: string; minPercentage: number }[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [bands, setBands] = useState<EditableBand[]>(savedBands.map((b, i) => ({ key: `${i}`, ...b })));
   const [saving, setSaving] = useState(false);
 
@@ -32,7 +32,7 @@ export function GradeScaleClient({ bands: savedBands }: { bands: { grade: string
   }
 
   function loadStandardScale() {
-    setBands(GRADE_BAND_TEMPLATE.map((b, i) => ({ key: `std-${i}`, ...b })));
+    setBands(DEFAULT_GRADE_BANDS.map((b, i) => ({ key: `std-${i}`, ...b })));
   }
 
   function removeBand(key: string) {

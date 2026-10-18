@@ -6,7 +6,6 @@ import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useCampuses } from "@/lib/store/hooks";
 
 export type RoomFormValues = Omit<Room, "id" | "status">;
 
@@ -14,13 +13,10 @@ interface RoomFormProps {
   initialValues?: Room;
   onSubmit: (values: RoomFormValues) => void;
   onCancel?: () => void;
-  /** Real-data callers pass their own campus list; omitted, this falls back to the mock store (only the onboarding wizard still relies on that fallback). */
-  campuses?: Campus[];
+  campuses: Campus[];
 }
 
-export function RoomForm({ initialValues, onSubmit, onCancel, campuses: campusesProp }: RoomFormProps) {
-  const { campuses: mockCampuses } = useCampuses();
-  const campuses = campusesProp ?? mockCampuses;
+export function RoomForm({ initialValues, onSubmit, onCancel, campuses }: RoomFormProps) {
   const activeCampuses = campuses.filter((c) => c.status === "active");
 
   const [name, setName] = useState(initialValues?.name ?? "");

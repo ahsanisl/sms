@@ -1,8 +1,7 @@
 "use client";
 
-import { useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useGlobalLoading, useGlobalTransition, useLoadingRouter } from "@/components/layout/global-loader";
 import { Search, Bell, ChevronDown, LogOut, Settings, User, Check } from "lucide-react";
 import { Avatar } from "@/components/shared/avatar";
 import {
@@ -22,8 +21,9 @@ import type { TopbarCampusContext } from "@/components/layout/app-shell";
 
 export function Topbar({ campusContext }: { campusContext: TopbarCampusContext | null }) {
   const { user, logout } = useSession();
-  const router = useRouter();
-  const [isSwitching, startSwitching] = useTransition();
+  const router = useLoadingRouter();
+  const runGlobal = useGlobalTransition();
+  const isLoading = useGlobalLoading();
 
   if (!user) return null;
   const switchable = canSwitchCampus(user.role);
@@ -34,7 +34,8 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
 
   function switchCampus(campusId: string | null) {
     if (campusId === viewCampusId) return;
-    startSwitching(async () => {
+    // Global transition: the top progress bar stays up until the newly scoped data has rendered.
+    runGlobal(async () => {
       const result = await setViewCampusAction(campusId);
       if (!result.success) toast.error(result.error ?? "Couldn't switch campus.");
     });
@@ -63,11 +64,11 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
         {campusContext && switchable && (
           <DropdownMenu>
             <DropdownMenuTrigger
-              disabled={isSwitching}
+              disabled={isLoading}
               className="hidden md:flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-md border border-outline-variant hover:bg-surface-container-high transition-colors outline-none disabled:opacity-60"
             >
               <span className="text-label-md text-on-surface-variant">
-                {isSwitching ? "Switching…" : `${campusLabel(viewCampusId)}${sessionSuffix}`}
+                {`${campusLabel(viewCampusId)}${sessionSuffix}`}
               </span>
               <ChevronDown className="h-3.5 w-3.5" />
             </DropdownMenuTrigger>

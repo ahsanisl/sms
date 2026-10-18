@@ -25,7 +25,7 @@ async function attachSubjects<T extends { id: string }>(rows: T[]) {
   return rows.map((r) => ({ ...r, subjectIds: byTeacher.get(r.id) ?? [] }));
 }
 
-/** Backs the Curriculum/Classwork/Homework ownership check's early-adopter fallback (see services/scope.ts). */
+/** Backs the Syllabus/Classwork/Homework ownership check's early-adopter fallback (see services/scope.ts). */
 export async function teacherTeachesSubject(teacherId: string, subjectId: string) {
   const [row] = await db
     .select()

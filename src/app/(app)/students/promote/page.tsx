@@ -3,7 +3,7 @@ import * as studentService from "@/services/student.service";
 import * as attendanceService from "@/services/attendance.service";
 import { requireSession } from "@/lib/tenancy";
 import { PromoteClient } from "@/app/(app)/students/promote/promote-client";
-import { GRADE_ORDER } from "@/lib/mock/reference-data";
+import { GRADE_ORDER } from "@/lib/constants";
 import type { ClassSection } from "@/lib/types";
 
 function suggestTargetClassId(source: ClassSection, classes: ClassSection[]): string | "alumni" {

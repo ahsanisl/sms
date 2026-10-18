@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Pencil, Archive, GraduationCap } from "lucide-react";
@@ -14,7 +14,7 @@ import { Modal } from "@/components/shared/modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { ClassForm, type ClassFormValues } from "@/components/classes/class-form";
 import { archiveClassDetailAction, updateClassDetailAction } from "@/app/(app)/classes/[id]/actions";
-import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/mock/students";
+import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/constants";
 import type { Campus, ClassSection, Student, Teacher } from "@/lib/types";
 
 interface RosterRow extends Student {
@@ -42,7 +42,7 @@ export function ClassDetailClient({
   campuses: Campus[];
   teachers: Teacher[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
 

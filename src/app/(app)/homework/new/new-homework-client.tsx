@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { HomeworkForm } from "@/components/homework/homework-form";
@@ -18,7 +18,7 @@ export function NewHomeworkClient({
   teachers: { id: string; name: string; campusId: string }[];
   isTeacher: boolean;
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(formData: FormData) {

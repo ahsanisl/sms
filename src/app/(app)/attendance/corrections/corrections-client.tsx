@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Check, X } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -29,7 +29,7 @@ interface CorrectionRow {
 }
 
 export function CorrectionsClient({ isTeacher, corrections }: { isTeacher: boolean; corrections: CorrectionRow[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   async function handleApprove(id: string) {

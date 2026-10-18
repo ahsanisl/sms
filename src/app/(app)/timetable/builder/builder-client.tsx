@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { AlertTriangle, Ban, Save, Send, Undo2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -68,7 +68,7 @@ export function BuilderClient({
   initialSlots: InitialSlot[];
   otherEffectiveSlots: OtherSlot[];
 }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const cls = classes.find((c) => c.id === classId);
   const classById = new Map(classes.map((c) => [c.id, c]));
   const subjectById = new Map(subjects.map((s) => [s.id, s]));

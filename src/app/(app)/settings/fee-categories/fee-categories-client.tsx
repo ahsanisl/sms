@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -15,7 +15,7 @@ import { createFeeCategoryAction, updateFeeCategoryAction, archiveFeeCategoryAct
 import type { FeeCategory } from "@/lib/types";
 
 export function FeeCategoriesClient({ feeCategories, usageCounts }: { feeCategories: FeeCategory[]; usageCounts: Map<string, number> }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const [addOpen, setAddOpen] = useState(false);
   const [editing, setEditing] = useState<FeeCategory | null>(null);
   const [archiving, setArchiving] = useState<FeeCategory | null>(null);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
@@ -19,7 +19,7 @@ const DEV_ACCOUNTS = [
 const DEV_PASSWORD = "Password123!";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const { login } = useSession();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");

@@ -7,7 +7,7 @@ export const ClassworkInputSchema = z.object({
   // teacher's own session.teacherId always wins server-side regardless of
   // what's submitted here, see classwork.service.ts.
   teacherId: z.string().uuid().optional(),
-  curriculumTopicId: z.string().uuid().optional(),
+  syllabusTopicId: z.string().uuid().optional(),
   date: z.string().min(1, "A date is required."),
   title: z.string().trim().min(1, "A title is required."),
   description: z.string().trim().default(""),

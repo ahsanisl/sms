@@ -6,7 +6,7 @@ import { getViewCampusId } from "@/services/scope";
 import { requireSession, type AuthSession } from "@/lib/tenancy";
 import type { Role } from "@/lib/types";
 
-/** Roles that see the top bar's campus label/switcher — same set Topbar used to compute client-side from the mock store. */
+/** Roles that see the top bar's campus label/switcher (campus_admin sees a fixed label; the rest can switch). */
 const CAMPUS_LABEL_ROLES: Role[] = ["school_owner", "school_admin", "campus_admin", "accountant"];
 
 async function loadCampusContext(session: AuthSession): Promise<TopbarCampusContext | null> {

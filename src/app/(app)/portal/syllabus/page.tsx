@@ -2,12 +2,12 @@ import * as studentService from "@/services/student.service";
 import * as classService from "@/services/class.service";
 import * as subjectService from "@/services/subject.service";
 import * as sessionService from "@/services/academic-session.service";
-import * as curriculumService from "@/services/curriculum.service";
+import * as syllabusService from "@/services/syllabus.service";
 import { requireSession } from "@/lib/tenancy";
-import { ParentCurriculumClient } from "@/app/(app)/portal/curriculum/curriculum-client";
-import { activeSession } from "@/lib/mock/sessions";
+import { ParentSyllabusClient } from "@/app/(app)/portal/syllabus/syllabus-client";
+import { activeSession } from "@/lib/academic-session";
 
-export default async function ParentCurriculumPage() {
+export default async function ParentSyllabusPage() {
   const session = await requireSession();
   const [children, classes, subjects, sessions] = await Promise.all([
     studentService.listMyChildren(session),
@@ -28,7 +28,7 @@ export default async function ParentCurriculumPage() {
       const bySubject = currentSession
         ? await Promise.all(
             classSubjects.map(async (subject) => {
-              const topics = await curriculumService.listTopicsForParent(session, child.classId, subject.id, currentSession.id);
+              const topics = await syllabusService.listTopicsForParent(session, child.classId, subject.id, currentSession.id);
               const completed = topics.filter((t) => t.status === "completed").length;
               return {
                 subjectId: subject.id,
@@ -49,5 +49,5 @@ export default async function ParentCurriculumPage() {
     }),
   );
 
-  return <ParentCurriculumClient childRows={childRows} sessionLabel={currentSession?.label ?? "No active academic session"} />;
+  return <ParentSyllabusClient childRows={childRows} sessionLabel={currentSession?.label ?? "No active academic session"} />;
 }

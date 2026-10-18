@@ -1,7 +1,8 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
 import { Search } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { recordPaymentAction } from "@/app/(app)/fees/collect/actions";
-import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/mock/students";
+import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/constants";
 import { formatDate, formatPKR } from "@/lib/format";
 import type { ClassSection, FeeInvoice, PaymentMethod, Student } from "@/lib/types";
 
@@ -20,7 +21,7 @@ import type { ClassSection, FeeInvoice, PaymentMethod, Student } from "@/lib/typ
 type InvoiceRow = Omit<FeeInvoice, "items">;
 
 function CollectFeeContent({ students, classes, invoices }: { students: Student[]; classes: ClassSection[]; invoices: InvoiceRow[] }) {
-  const router = useRouter();
+  const router = useLoadingRouter();
   const params = useSearchParams();
   const classById = new Map(classes.map((c) => [c.id, c]));
   const classLabel = (classId: string) => (classById.get(classId) ? `${classById.get(classId)!.grade}-${classById.get(classId)!.section}` : "—");
