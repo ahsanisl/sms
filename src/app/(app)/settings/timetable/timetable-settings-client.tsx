@@ -89,7 +89,7 @@ export function TimetableSettingsClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Timetable Settings"
         description="Configure the working days and period schedule used across the school's timetables."
         actions={

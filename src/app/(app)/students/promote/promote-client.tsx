@@ -90,7 +90,7 @@ export function PromoteClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/students" backLabel="Students"
         title="Promote Students"
         description="Move an entire class's roster up to the next grade at year-end, or graduate a final-year class to Alumni."
         actions={
@@ -167,7 +167,7 @@ export function PromoteClient({
                     <p className="text-body-md font-medium text-on-surface">{s.name}</p>
                     <p className="text-label-sm text-on-surface-variant">Roll {s.rollNumber}</p>
                   </div>
-                  <span className={`text-label-md font-medium ${s.attendanceRate >= 75 ? "text-emerald-600" : "text-error"}`}>{s.attendanceRate}% attendance</span>
+                  <span className={`text-label-md font-medium ${s.attendanceRate >= 75 ? "text-success" : "text-error"}`}>{s.attendanceRate}% attendance</span>
                 </label>
               );
             })}

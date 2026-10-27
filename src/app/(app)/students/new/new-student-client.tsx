@@ -22,7 +22,7 @@ export function NewStudentClient({ campuses, classes }: { campuses: Campus[]; cl
 
   return (
     <div>
-      <PageHeader title="Add Student" description="Enroll a new student and assign them to a class." />
+      <PageHeader backHref="/students" backLabel="Students" title="Add Student" description="Enroll a new student and assign them to a class." />
       <div className="bg-surface-container-lowest rounded-lg border border-outline-variant/50 shadow-sm p-lg max-w-4xl">
         <StudentForm onSubmit={handleSubmit} onCancel={() => router.push("/students")} campuses={campuses} classes={classes} />
       </div>

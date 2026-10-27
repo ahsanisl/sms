@@ -1,125 +1,224 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import Link, { useLinkStatus } from "next/link";
-import { Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { toast } from "sonner";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { ChevronDown, ChevronsLeft, ChevronsRight, Loader2, Search, X } from "lucide-react";
 import { Icon } from "@/components/shared/icon";
-import { FOOTER_NAV, navForRole, ROLE_LABEL, type NavItem } from "@/lib/nav-config";
+import { Avatar } from "@/components/shared/avatar";
+import { useShell } from "@/components/layout/shell-context";
+import { activeNavHref, navGroupsForRole, ROLE_LABEL, type NavGroup } from "@/lib/nav-config";
 import { useSession } from "@/lib/auth/session-context";
+import { allows, usePermissions } from "@/lib/auth/permissions-context";
 import { moduleForPath } from "@/lib/permissions";
+import { usePersistedString } from "@/lib/use-persisted-state";
 import { cn } from "@/lib/utils";
-import type { PermissionModule } from "@/lib/types";
 
-interface PermissionsResponse {
-  permissions: Partial<Record<PermissionModule, boolean>>;
-  schoolName: string | null;
+/** The signed-in role's nav groups, with every item the live permission matrix denies removed (and empty groups dropped). */
+export function useVisibleNav(): NavGroup[] {
+  const { user } = useSession();
+  const perms = usePermissions();
+  return useMemo(() => {
+    if (!user) return [];
+    return navGroupsForRole(user.role)
+      .map((group) => ({ ...group, items: group.items.filter((item) => allows(perms, moduleForPath(item.href))) }))
+      .filter((group) => group.items.length > 0);
+  }, [user, perms]);
 }
 
+/** Desktop sidebar — full width with collapsible groups, or a 72px icon rail. */
 export function Sidebar() {
+  const { collapsed, setCollapsed } = useShell();
+  return (
+    <aside
+      className={cn(
+        "fixed left-0 top-0 z-20 hidden h-screen flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex",
+        "transition-[width] duration-200 motion-reduce:transition-none",
+        collapsed ? "w-[72px]" : "w-64",
+      )}
+    >
+      <SidebarContent collapsed={collapsed} />
+      <div className={cn("border-t border-sidebar-border p-sm", collapsed && "flex justify-center")}>
+        <button
+          type="button"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-label-md text-sidebar-muted transition-colors hover:bg-sidebar-hover hover:text-on-primary",
+            "outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim",
+            !collapsed && "w-full",
+          )}
+        >
+          {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+          {!collapsed && <span>Collapse</span>}
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+/** Slide-in drawer version of the same nav for small screens, opened from the top bar's menu button. */
+export function MobileSidebar() {
+  const { mobileNavOpen, setMobileNavOpen } = useShell();
+  return (
+    <DialogPrimitive.Root open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-inverse-surface/50 animate-overlay-in md:hidden" />
+        <DialogPrimitive.Content
+          className="fixed inset-y-0 left-0 z-50 flex w-[18rem] max-w-[85vw] flex-col bg-sidebar text-sidebar-foreground shadow-2xl animate-drawer-in focus:outline-none md:hidden"
+          aria-describedby={undefined}
+        >
+          <DialogPrimitive.Title className="sr-only">Navigation</DialogPrimitive.Title>
+          <DialogPrimitive.Close
+            className="absolute right-3 top-5 rounded-lg p-1.5 text-sidebar-muted hover:bg-sidebar-hover hover:text-on-primary outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim"
+            aria-label="Close navigation"
+          >
+            <X className="h-5 w-5" />
+          </DialogPrimitive.Close>
+          <SidebarContent collapsed={false} onNavigate={() => setMobileNavOpen(false)} />
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
+function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
   const { user } = useSession();
-  const [perms, setPerms] = useState<PermissionsResponse | null>(null);
-  const userId = user?.id;
-
-  // Same real, DB-backed source AuthGuard reads (see that component's own
-  // note) — nav-link visibility is cosmetic, not the access boundary, but it
-  // should still reflect what the role can actually reach rather than the
-  // mock store's separately-editable copy.
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-    fetch("/api/me/permissions")
-      .then((res) => (res.ok ? (res.json() as Promise<PermissionsResponse>) : null))
-      .then((data) => {
-        if (!cancelled) setPerms(data);
-      })
-      .catch(() => {
-        if (!cancelled) setPerms(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
+  const perms = usePermissions();
+  const { setSearchOpen } = useShell();
+  const groups = useVisibleNav();
+  // Comma-separated ids of groups the user has folded away.
+  const [foldedRaw, setFoldedRaw] = usePersistedString("eduflow:sidebar-folded-groups", "");
+  const folded = useMemo(() => new Set(foldedRaw.split(",").filter(Boolean)), [foldedRaw]);
 
   if (!user) return null;
 
-  const isVisible = (item: NavItem) => {
-    const routeModule = moduleForPath(item.href);
-    return !routeModule || perms?.permissions[routeModule] !== false;
-  };
+  const activeHref = activeNavHref(pathname, groups.flatMap((g) => g.items));
 
-  const navItems = navForRole(user.role).filter(isVisible);
-  const footerItems = FOOTER_NAV.filter(isVisible);
+  function toggleGroup(id: string) {
+    const next = new Set(folded);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setFoldedRaw([...next].join(","));
+  }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex-col py-md px-sm border-r border-outline-variant z-20 hidden md:flex">
-      <div className="mb-xl px-md flex items-center gap-md">
-        <div className="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-on-secondary-container">
-          <Icon name="school" className="h-6 w-6" />
+    <>
+      <div className={cn("flex items-center gap-3 px-md pt-md pb-lg", collapsed && "justify-center px-0")}>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-secondary-container to-secondary text-on-secondary shadow-lg shadow-secondary/30">
+          <Icon name="school" className="h-5 w-5" />
         </div>
-        <div>
-          <h1 className="text-headline-sm font-bold text-on-primary">EduFlow</h1>
-          <p className="text-label-sm text-primary-fixed-dim">
-            {ROLE_LABEL[user.role]}
-            {perms?.schoolName ? ` · ${perms.schoolName}` : ""}
-          </p>
-        </div>
+        {!collapsed && (
+          <div className="min-w-0">
+            <p className="text-title-lg font-bold leading-tight text-on-primary">EduFlow</p>
+            <p className="truncate text-label-sm text-sidebar-muted" title={perms?.schoolName ?? undefined}>
+              {perms?.schoolName ?? ROLE_LABEL[user.role]}
+            </p>
+          </div>
+        )}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="Primary">
-        {navItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+      <div className={cn("px-sm pb-sm", collapsed && "flex justify-center")}>
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            setSearchOpen(true);
+          }}
+          aria-label="Search"
+          title={collapsed ? "Search (Ctrl+K)" : undefined}
+          className={cn(
+            "flex items-center gap-3 rounded-lg border border-sidebar-border bg-sidebar-hover/60 text-label-md text-sidebar-muted transition-colors hover:text-on-primary",
+            "outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim",
+            collapsed ? "h-10 w-10 justify-center" : "w-full px-3 py-2",
+          )}
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          {!collapsed && (
+            <>
+              <span className="flex-1 text-left">Search…</span>
+              <kbd className="rounded border border-sidebar-border px-1.5 py-0.5 font-sans text-[10px]">Ctrl K</kbd>
+            </>
+          )}
+        </button>
+      </div>
+
+      <nav className="sidebar-scroll flex-1 overflow-y-auto px-sm pb-md" aria-label="Primary">
+        {groups.map((group, index) => {
+          const groupActive = group.items.some((i) => i.href === activeHref);
+          const open = collapsed || !folded.has(group.id);
+          const listId = `nav-group-${group.id}`;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-md px-md py-3 rounded-lg text-label-md transition-colors",
-                active
-                  ? "bg-secondary-container text-on-secondary-container font-bold shadow-sm"
-                  : "text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary",
+            <div key={group.id} className={cn(index > 0 && (collapsed ? "mt-2 border-t border-sidebar-border pt-2" : "mt-4"))}>
+              {!collapsed && (
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.id)}
+                  aria-expanded={open}
+                  aria-controls={listId}
+                  className="group/heading flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-sidebar-muted transition-colors hover:text-sidebar-foreground outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim"
+                >
+                  <span className="flex items-center gap-2">
+                    {group.label}
+                    {!open && groupActive && (
+                      <>
+                        <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-secondary-fixed-dim" />
+                        <span className="sr-only">(contains current page)</span>
+                      </>
+                    )}
+                  </span>
+                  <ChevronDown className={cn("h-3.5 w-3.5 transition-transform motion-reduce:transition-none", !open && "-rotate-90")} />
+                </button>
               )}
-            >
-              <Icon name={item.icon} className="h-5 w-5" />
-              {item.label}
-              <NavPendingSpinner />
-            </Link>
+              {open && (
+                <ul id={listId} className={cn("space-y-0.5", !collapsed && "mt-1")}>
+                  {group.items.map((item) => {
+                    const active = item.href === activeHref;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={onNavigate}
+                          aria-current={active ? "page" : undefined}
+                          title={collapsed ? item.label : undefined}
+                          className={cn(
+                            "relative flex items-center gap-3 rounded-lg text-body-md transition-colors outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim",
+                            collapsed ? "mx-auto h-10 w-10 justify-center" : "px-3 py-2",
+                            active
+                              ? "bg-secondary-container/90 font-semibold text-on-secondary-container shadow-sm shadow-secondary/20"
+                              : "text-sidebar-foreground/80 hover:bg-sidebar-hover hover:text-on-primary",
+                          )}
+                        >
+                          {active && !collapsed && <span aria-hidden className="absolute -left-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-secondary-fixed-dim" />}
+                          <Icon name={item.icon} className="h-[18px] w-[18px] shrink-0" />
+                          {collapsed ? <span className="sr-only">{item.label}</span> : <span className="truncate">{item.label}</span>}
+                          {!collapsed && <NavPendingSpinner />}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
           );
         })}
       </nav>
 
-      <div className="mt-auto pt-md border-t border-primary-container/60 space-y-1">
-        {footerItems.map((item) => {
-          const active = pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-md px-md py-3 rounded-lg text-label-md transition-colors",
-                active
-                  ? "bg-secondary-container text-on-secondary-container font-bold shadow-sm"
-                  : "text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary",
-              )}
-            >
-              <Icon name={item.icon} className="h-5 w-5" />
-              {item.label}
-              <NavPendingSpinner />
-            </Link>
-          );
-        })}
-        <button
-          onClick={() => toast.info("Support chat isn't available in this preview.")}
-          className="w-full flex items-center gap-md px-md py-3 rounded-lg text-label-md text-on-primary-container hover:bg-primary-container/70 hover:text-on-primary transition-colors"
-        >
-          <Icon name="help" className="h-5 w-5" />
-          Support
-        </button>
+      <div className={cn("border-t border-sidebar-border p-sm", collapsed && "flex justify-center")}>
+        <div className={cn("flex items-center gap-3 rounded-lg px-2 py-2", collapsed && "px-0")} title={collapsed ? `${user.name} · ${ROLE_LABEL[user.role]}` : undefined}>
+          <Avatar name={user.name} />
+          {!collapsed && (
+            <div className="min-w-0">
+              <p className="truncate text-label-md font-semibold text-on-primary">{user.name}</p>
+              <p className="truncate text-label-sm text-sidebar-muted">{ROLE_LABEL[user.role]}</p>
+            </div>
+          )}
+        </div>
       </div>
-    </aside>
+    </>
   );
 }
 

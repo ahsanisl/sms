@@ -98,7 +98,7 @@ export function HomeworkDetailClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/homework" backLabel="Homework"
         title={homework.title}
         description={`${homework.classLabel} · ${homework.subjectName} · ${homework.teacherName}`}
         actions={
@@ -116,7 +116,7 @@ export function HomeworkDetailClient({
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+        <div className="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
           <h3 className="text-title-lg font-semibold text-primary mb-3">Description</h3>
           <p className="text-body-md text-on-surface whitespace-pre-wrap">{homework.description || "No description provided."}</p>
 
@@ -134,7 +134,7 @@ export function HomeworkDetailClient({
           )}
         </div>
 
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
           <h3 className="text-title-lg font-semibold text-primary mb-3">Details</h3>
           <dl className="space-y-3 text-body-md">
             <div>
@@ -150,7 +150,7 @@ export function HomeworkDetailClient({
       </div>
 
       {canManage && (
-        <div className="bg-surface border border-outline-variant rounded-xl card-shadow overflow-hidden">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl card-shadow overflow-hidden">
           <div className="p-lg border-b border-outline-variant/40">
             <h3 className="text-title-lg font-semibold text-primary">Submissions</h3>
           </div>
@@ -158,17 +158,17 @@ export function HomeworkDetailClient({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant">
-                  <th className="p-3 pl-lg font-semibold text-label-sm text-on-surface-variant uppercase">Student</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Roll No.</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Status</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Submitted</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Grade</th>
-                  <th className="p-3 pr-lg font-semibold text-label-sm text-on-surface-variant uppercase text-right">Actions</th>
+                  <th scope="col" className="p-3 pl-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Student</th>
+                  <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Roll No.</th>
+                  <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Status</th>
+                  <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Submitted</th>
+                  <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Grade</th>
+                  <th scope="col" className="p-3 pr-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
                 {submissions.map((s) => (
-                  <tr key={s.studentId} className="hover:bg-surface-bright transition-colors">
+                  <tr key={s.studentId} className="hover:bg-surface-container-low/60 transition-colors">
                     <td className="p-3 pl-lg font-medium text-on-surface">{s.studentName}</td>
                     <td className="p-3 text-on-surface-variant">{s.rollNumber}</td>
                     <td className="p-3"><StatusBadge label={STATUS_LABEL[s.status]} tone={STATUS_TONE[s.status]} /></td>

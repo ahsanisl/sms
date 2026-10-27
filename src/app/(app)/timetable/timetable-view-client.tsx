@@ -17,7 +17,7 @@ interface Slot {
   roomId?: string;
 }
 
-const SUBJECT_TONE = ["border-l-secondary bg-secondary/5", "border-l-tertiary-container bg-tertiary-container/5", "border-l-emerald-500 bg-emerald-500/5", "border-l-amber-500 bg-amber-500/5"];
+const SUBJECT_TONE = ["border-l-secondary bg-secondary/5", "border-l-tertiary-container bg-tertiary-container/5", "border-l-success bg-success/5", "border-l-amber-500 bg-amber-500/5"];
 
 export function TimetableViewClient({
   classId,

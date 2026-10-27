@@ -84,7 +84,7 @@ export function UsersAndRolesClient({
 
   return (
     <div>
-      <PageHeader title="Users & Roles" description="Manage staff accounts and role-based page access." />
+      <PageHeader backHref="/settings" backLabel="Settings" title="Users & Roles" description="Manage staff accounts and role-based page access." />
 
       <div className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm mb-8">
         <div className="p-lg border-b border-outline-variant/40">
@@ -123,8 +123,8 @@ export function UsersAndRolesClient({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-md text-label-sm text-on-surface-variant uppercase tracking-wide">Page / Module</th>
-                <th className="p-md text-label-sm text-on-surface-variant uppercase tracking-wide text-center w-32">Access</th>
+                <th scope="col" className="p-md text-label-md text-on-surface-variant uppercase tracking-wide">Page / Module</th>
+                <th scope="col" className="p-md text-label-md text-on-surface-variant uppercase tracking-wide text-center w-32">Access</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">

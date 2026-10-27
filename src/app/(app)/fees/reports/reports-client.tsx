@@ -74,7 +74,7 @@ export function FeeReportsClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/fees" backLabel="Fees"
         title="Fee Reports"
         description={isAllCampuses ? "Payment history and collection summary across all campuses." : "Payment history and collection summary for this campus."}
         actions={

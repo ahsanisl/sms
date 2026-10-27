@@ -91,7 +91,7 @@ export function FeesDashboardClient({
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
           <h3 className="text-label-md font-medium tracking-wide text-on-surface-variant uppercase mb-4 border-b border-outline-variant pb-2">
             This Month at a Glance
           </h3>
@@ -102,7 +102,7 @@ export function FeesDashboardClient({
             </div>
             <div className="flex justify-between text-body-md">
               <span className="text-on-surface-variant">Fully Paid</span>
-              <span className="font-semibold text-emerald-600">{currentMonthPaidCount}</span>
+              <span className="font-semibold text-success">{currentMonthPaidCount}</span>
             </div>
             <div className="flex justify-between text-body-md">
               <span className="text-on-surface-variant">Unpaid</span>
@@ -124,16 +124,16 @@ export function FeesDashboardClient({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-4 text-label-sm text-on-surface-variant uppercase font-semibold">Student</th>
-                <th className="p-4 text-label-sm text-on-surface-variant uppercase font-semibold">Method</th>
-                <th className="p-4 text-label-sm text-on-surface-variant uppercase font-semibold text-right">Amount</th>
-                <th className="p-4 text-label-sm text-on-surface-variant uppercase font-semibold">Date</th>
-                <th className="p-4 text-label-sm text-on-surface-variant uppercase font-semibold">Status</th>
+                <th scope="col" className="p-4 text-label-md text-on-surface-variant uppercase tracking-wide font-semibold">Student</th>
+                <th scope="col" className="p-4 text-label-md text-on-surface-variant uppercase tracking-wide font-semibold">Method</th>
+                <th scope="col" className="p-4 text-label-md text-on-surface-variant uppercase tracking-wide font-semibold text-right">Amount</th>
+                <th scope="col" className="p-4 text-label-md text-on-surface-variant uppercase tracking-wide font-semibold">Date</th>
+                <th scope="col" className="p-4 text-label-md text-on-surface-variant uppercase tracking-wide font-semibold">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
               {recentTransactions.map((p) => (
-                <tr key={p.id} className="hover:bg-surface-bright transition-colors">
+                <tr key={p.id} className="hover:bg-surface-container-low/60 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">
                       <Avatar name={p.studentName} />

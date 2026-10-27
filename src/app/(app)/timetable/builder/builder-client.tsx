@@ -186,7 +186,7 @@ export function BuilderClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/timetable" backLabel="Timetable"
         title="Timetable Builder"
         description={cls ? `Assign subjects, teachers and rooms for ${cls.grade}-${cls.section}.` : "Select a class to begin."}
         actions={

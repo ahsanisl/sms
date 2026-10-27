@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -10,8 +11,10 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Avatar } from "@/components/shared/avatar";
 import { Button } from "@/components/ui/button";
 import { StudentRowActions } from "@/components/students/student-row-actions";
+import { ImportStudentsDialog } from "@/components/students/import-students-dialog";
 import { STUDENT_STATUS_LABEL, studentStatusTone } from "@/lib/constants";
 import { downloadCsv } from "@/lib/csv-export";
+import { STUDENT_CSV_HEADERS, STUDENT_EXPORT_EXTRA_HEADERS, studentCsvRow } from "@/lib/student-csv";
 import type { Campus, ClassSection, Student } from "@/lib/types";
 
 interface StudentRow extends Student {
@@ -33,6 +36,7 @@ export function StudentsClient({
   canManage: boolean;
 }) {
   const router = useLoadingRouter();
+  const [importOpen, setImportOpen] = useState(false);
 
   const columns: Column<StudentRow>[] = [
     {
@@ -47,15 +51,16 @@ export function StudentsClient({
         </div>
       ),
     },
-    { key: "rollNumber", header: "Roll No.", accessor: (s) => s.rollNumber, className: "text-on-surface-variant" },
+    { key: "rollNumber", header: "Roll No.", sortable: true, accessor: (s) => s.rollNumber, className: "text-on-surface-variant tabular-nums" },
     { key: "class", header: "Class", sortable: true, accessor: (s) => s.classLabel, className: "text-on-surface-variant" },
     { key: "parentName", header: "Parent", accessor: (s) => s.parentName, className: "text-on-surface-variant" },
     {
       key: "attendance",
       header: "Attendance",
-      className: "text-right font-medium",
+      sortable: true,
+      className: "text-right font-medium tabular-nums",
       accessor: (s) => s.attendanceRate,
-      render: (s) => `${s.attendanceRate}%`,
+      render: (s) => <span className={s.attendanceRate >= 90 ? "text-success" : s.attendanceRate >= 75 ? "text-on-surface" : "text-error"}>{s.attendanceRate}%</span>,
     },
     {
       key: "feeStatus",
@@ -73,12 +78,13 @@ export function StudentsClient({
   ];
 
   function handleExport() {
+    // Same columns as the import template (lib/student-csv.ts), so this file can be edited and imported back; the last two columns are informational.
     downloadCsv(
-      "students",
-      ["Name", "Roll No.", "Admission No.", "Class", "Campus", "Parent Name", "Parent Phone", "Attendance %", "Status"],
-      students.map((s) => [s.name, s.rollNumber, s.admissionNo, s.classLabel, s.campusName, s.parentName, s.parentPhone, s.attendanceRate, STUDENT_STATUS_LABEL[s.status]]),
+      `students-${new Date().toISOString().slice(0, 10)}`,
+      [...STUDENT_CSV_HEADERS, ...STUDENT_EXPORT_EXTRA_HEADERS],
+      students.map((s) => [...studentCsvRow(s, s.classLabel, s.campusName), s.attendanceRate, STUDENT_STATUS_LABEL[s.status]]),
     );
-    toast.success("Students exported.");
+    toast.success(`Exported ${students.length} student${students.length === 1 ? "" : "s"}.`);
   }
 
   return (
@@ -95,7 +101,7 @@ export function StudentsClient({
               <Button variant="secondary" size="sm" onClick={handleExport}>
                 <Download size={16} /> Export
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => toast.info("Bulk student import isn't wired up in this prototype.")}>
+              <Button variant="secondary" size="sm" onClick={() => setImportOpen(true)}>
                 <Upload size={16} /> Import Students
               </Button>
               <Button size="sm" asChild>
@@ -138,6 +144,7 @@ export function StudentsClient({
         emptyTitle="No students found"
         emptyDescription="Try adjusting your search or filters, or add a new student."
       />
+      {canManage && <ImportStudentsDialog open={importOpen} onOpenChange={setImportOpen} classes={classes} campuses={campuses} existingStudents={students} />}
     </div>
   );
 }

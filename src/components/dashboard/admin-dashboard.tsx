@@ -16,8 +16,11 @@ import {
 import { StatCard } from "@/components/shared/stat-card";
 import { ChartCard } from "@/components/shared/chart-card";
 import { Icon } from "@/components/shared/icon";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { DashboardHeader, EventList, ProgressBar, QuickActions, TaskList, rateTone, type DashboardEvent, type DashboardTask } from "@/components/dashboard/widgets";
 import { formatCompactNumber, formatCompactPKR, formatDate, timeAgo } from "@/lib/format";
+import type { NavItem } from "@/lib/nav-config";
+import { cn } from "@/lib/utils";
 
 interface CampusGlanceRow {
   id: string;
@@ -33,33 +36,49 @@ interface AdminDashboardProps {
   userName: string;
   campusLabel: string;
   today: string;
+  monthLabel: string;
   totalStudents: number;
   totalTeachers: number;
   todayRate: number;
   yesterdayRate: number;
+  classesMarked: number;
+  totalClasses: number;
+  billed: number;
   collected: number;
   outstanding: number;
+  showFees: boolean;
   showCampusGlance: boolean;
   campusGlance: CampusGlanceRow[];
   attendanceTrend: { date: string; rate: number }[];
   feeByCampus: { campus: string; collected: number; outstanding: number }[];
   classAttendance: { id: string; label: string; rate: number }[];
-  latestStudentActivity?: { name: string; classLabel: string; admissionDate: string };
-  latestPayments: { id: string; amount: number; date: string }[];
+  latestStudentActivity?: { id: string; name: string; classLabel: string; admissionDate: string };
+  latestPayments: { id: string; amount: number; date: string; studentName: string | null }[];
   absentToday: number;
-  upcomingExams: { id: string; name: string; startDate: string }[];
+  tasks: DashboardTask[];
+  upcomingEvents: DashboardEvent[];
+  quickActions: NavItem[];
+  /** Destination for each card — omitted when the role can't open that screen. */
+  links: Partial<Record<"students" | "teachers" | "attendance" | "fees" | "feeReports" | "classes" | "campuses", string>>;
 }
+
+const axisTick = { fontSize: 12, fill: "var(--color-on-surface-variant)" };
 
 export function AdminDashboard({
   userName,
   campusLabel,
   today,
+  monthLabel,
   totalStudents,
   totalTeachers,
   todayRate,
   yesterdayRate,
+  classesMarked,
+  totalClasses,
+  billed,
   collected,
   outstanding,
+  showFees,
   showCampusGlance,
   campusGlance,
   attendanceTrend,
@@ -68,224 +87,229 @@ export function AdminDashboard({
   latestStudentActivity,
   latestPayments,
   absentToday,
-  upcomingExams,
+  tasks,
+  upcomingEvents,
+  quickActions,
+  links,
 }: AdminDashboardProps) {
+  const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
+  const rateDelta = todayRate - yesterdayRate;
+  const hasAttendanceToday = classesMarked > 0;
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-        <div>
-          <h2 className="text-headline-lg font-semibold text-primary mb-1">
-            Good morning, {userName.split(" ")[0]}
-          </h2>
-          <p className="text-body-md text-on-surface-variant">
-            Here&apos;s what&apos;s happening across your school today.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline-variant card-shadow">
-            <Icon name="business" className="h-4 w-4 text-on-surface-variant" />
-            <span className="text-label-md">{campusLabel}</span>
-          </div>
-          <div className="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline-variant card-shadow">
-            <Icon name="calendar_today" className="h-4 w-4 text-on-surface-variant" />
-            <span className="text-label-md">{formatDate(today)}</span>
-          </div>
-        </div>
-      </div>
+      <DashboardHeader
+        name={userName}
+        subtitle="Here's what's happening across your school today."
+        chips={[
+          { icon: "business", label: campusLabel },
+          { icon: "calendar_today", label: formatDate(today) },
+        ]}
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <StatCard label="Total Students" value={totalStudents.toLocaleString()} icon="group" trend={{ direction: "up", label: "Across all classes" }} />
-        <StatCard label="Teachers" value={totalTeachers.toLocaleString()} icon="school" trend={{ direction: "flat", label: "Active faculty" }} />
+      <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", showFees ? "xl:grid-cols-5" : "xl:grid-cols-3")}>
+        <StatCard label="Active Students" value={totalStudents.toLocaleString()} icon="group" href={links.students} />
+        <StatCard label="Active Teachers" value={totalTeachers.toLocaleString()} icon="school" href={links.teachers} />
         <StatCard
           label="Today's Attendance"
-          value={`${todayRate}%`}
+          value={hasAttendanceToday ? `${todayRate}%` : "—"}
           icon="fact_check"
-          trend={{ direction: todayRate >= yesterdayRate ? "up" : "down", label: `${Math.abs(todayRate - yesterdayRate)}% vs yesterday` }}
+          tone={hasAttendanceToday ? rateTone(todayRate) : "default"}
+          href={links.attendance}
+          trend={
+            hasAttendanceToday
+              ? { direction: rateDelta > 0 ? "up" : rateDelta < 0 ? "down" : "flat", label: `${classesMarked}/${totalClasses} classes · ${rateDelta >= 0 ? "+" : ""}${rateDelta}% vs yesterday` }
+              : { direction: "flat", label: `0/${totalClasses} classes marked yet` }
+          }
         />
-        <StatCard label="Fees Collected" value={formatCompactPKR(collected)} icon="payments" trend={{ direction: "up", label: "This month" }} />
-        <StatCard label="Outstanding Fees" value={formatCompactPKR(outstanding)} icon="account_balance_wallet" trend={{ direction: "down", label: "This month" }} />
+        {showFees && (
+          <StatCard
+            label="Collected This Month"
+            value={formatCompactPKR(collected)}
+            icon="payments"
+            tone="success"
+            href={links.fees}
+            trend={{ direction: collectionRate >= 75 ? "up" : collectionRate > 0 ? "flat" : "down", label: billed > 0 ? `${collectionRate}% of ${formatCompactPKR(billed)} billed` : "No invoices this month" }}
+          />
+        )}
+        {showFees && (
+          <StatCard
+            label="Outstanding"
+            value={formatCompactPKR(outstanding)}
+            icon="account_balance_wallet"
+            tone={outstanding > 0 ? "error" : "success"}
+            href={links.feeReports}
+            trend={{ direction: "flat", label: monthLabel }}
+          />
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <TaskList tasks={tasks} />
+        <ChartCard title="Attendance trend" description="School-wide attendance, last 7 days" className="lg:col-span-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={attendanceTrend} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+              <defs>
+                <linearGradient id="attendanceFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--color-secondary)" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" strokeOpacity={0.6} vertical={false} />
+              <XAxis dataKey="date" tick={axisTick} axisLine={false} tickLine={false} />
+              <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={axisTick} axisLine={false} tickLine={false} />
+              <Tooltip formatter={(v) => [`${v}%`, "Attendance"]} contentStyle={{ borderRadius: 8, borderColor: "var(--color-outline-variant)" }} />
+              <Area type="monotone" dataKey="rate" stroke="var(--color-secondary)" strokeWidth={2.5} fill="url(#attendanceFill)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <EventList
+          title="Upcoming events"
+          description="Exams and staff leave, next 30 days"
+          events={upcomingEvents}
+          emptyText="Nothing scheduled in the next 30 days."
+        />
+        {showFees ? (
+          <ChartCard title="Fee collection by campus" description={monthLabel} className="lg:col-span-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={feeByCampus} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" strokeOpacity={0.6} vertical={false} />
+                <XAxis dataKey="campus" tick={axisTick} axisLine={false} tickLine={false} />
+                <YAxis tickFormatter={(v) => formatCompactNumber(v)} width={44} tick={axisTick} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v) => formatCompactPKR(Number(v))} contentStyle={{ borderRadius: 8, borderColor: "var(--color-outline-variant)" }} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Bar dataKey="collected" name="Collected" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="outstanding" name="Outstanding" fill="var(--color-error)" radius={[4, 4, 0, 0]} fillOpacity={0.55} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        ) : (
+          <QuickActions actions={quickActions} className="lg:col-span-2" />
+        )}
       </div>
 
       {showCampusGlance && (
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow mt-8">
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Campuses at a Glance</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+        <Card>
+          <CardHeader
+            title="Campuses at a glance"
+            description={`Today's attendance and ${monthLabel} fee collection`}
+            action={links.campuses && <Link href={links.campuses} className="text-label-md font-semibold text-secondary hover:underline">Manage campuses</Link>}
+          />
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-outline-variant">
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Campus</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase text-right">Students</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase text-right">Teachers</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase text-right">Today&apos;s Attendance</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase text-right">Collected (Aug)</th>
-                  <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase text-right">Outstanding (Aug)</th>
+                <tr className="border-y border-outline-variant/50 bg-surface-container-low/60">
+                  <th scope="col" className="px-lg py-3 text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Campus</th>
+                  <th scope="col" className="px-4 py-3 text-right text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Students</th>
+                  <th scope="col" className="px-4 py-3 text-right text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Teachers</th>
+                  <th scope="col" className="px-4 py-3 text-right text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Attendance</th>
+                  <th scope="col" className="px-4 py-3 text-right text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Collected</th>
+                  <th scope="col" className="px-lg py-3 text-right text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Outstanding</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/20">
+              <tbody className="divide-y divide-outline-variant/30">
                 {campusGlance.map((c) => (
-                  <tr key={c.id} className="hover:bg-surface-bright transition-colors">
-                    <td className="p-3 font-medium text-on-surface">
-                      <Link href="/settings/campuses" className="hover:text-secondary hover:underline">{c.name}</Link>
+                  <tr key={c.id} className="transition-colors hover:bg-surface-container-low/60">
+                    <td className="px-lg py-3 font-medium text-on-surface">{c.name}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-on-surface-variant">{c.students}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-on-surface-variant">{c.teachers}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      <span className={cn("font-semibold", { success: "text-success", warning: "text-warning", error: "text-error" }[rateTone(c.attendanceRate)])}>{c.attendanceRate}%</span>
                     </td>
-                    <td className="p-3 text-right text-on-surface-variant">{c.students}</td>
-                    <td className="p-3 text-right text-on-surface-variant">{c.teachers}</td>
-                    <td className="p-3 text-right">
-                      <span className={c.attendanceRate >= 90 ? "text-emerald-600 font-semibold" : c.attendanceRate >= 75 ? "text-on-surface" : "text-error font-semibold"}>
-                        {c.attendanceRate}%
-                      </span>
-                    </td>
-                    <td className="p-3 text-right text-on-surface-variant">{formatCompactPKR(c.collected)}</td>
-                    <td className="p-3 text-right text-error">{formatCompactPKR(c.outstanding)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-on-surface-variant">{formatCompactPKR(c.collected)}</td>
+                    <td className="px-lg py-3 text-right tabular-nums text-error">{formatCompactPKR(c.outstanding)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        <ChartCard title="Attendance Overview (last 7 days)">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={attendanceTrend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="attendanceFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--color-secondary)" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="var(--color-secondary)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v) => [`${v}%`, "Attendance"]} />
-              <Area type="monotone" dataKey="rate" stroke="var(--color-secondary)" strokeWidth={2} fill="url(#attendanceFill)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartCard>
-
-        <ChartCard title={`Fee Collection by Campus (${new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })})`}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={feeByCampus} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
-              <XAxis dataKey="campus" tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => formatCompactNumber(v)} width={44} tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v) => formatCompactPKR(Number(v))} />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="collected" name="Collected" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="outstanding" name="Outstanding" fill="var(--color-error)" radius={[4, 4, 0, 0]} fillOpacity={0.6} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-6">Today&apos;s Attendance</h3>
-          <div className="space-y-5">
-            {classAttendance.map(({ id, label, rate: r }) => (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="flex flex-col">
+          <CardHeader title="Lowest attendance today" description="Classes marked so far, lowest first" />
+          <div className="flex-1 space-y-4 p-lg pt-md">
+            {classAttendance.map(({ id, label, rate }) => (
               <div key={id}>
-                <div className="flex justify-between text-label-md mb-2">
-                  <span className="text-on-surface font-semibold">{label}</span>
-                  <span className={r >= 90 ? "text-emerald-600 font-bold" : r >= 80 ? "text-on-surface-variant font-bold" : "text-error font-bold"}>
-                    {r}%
-                  </span>
+                <div className="mb-1.5 flex justify-between text-label-md">
+                  <span className="font-semibold text-on-surface">Class {label}</span>
+                  <span className={cn("font-bold tabular-nums", { success: "text-success", warning: "text-warning", error: "text-error" }[rateTone(rate)])}>{rate}%</span>
                 </div>
-                <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full ${r >= 80 ? "bg-secondary" : "bg-error"}`} style={{ width: `${r}%` }} />
-                </div>
+                <ProgressBar value={rate} tone={rateTone(rate)} label={`Class ${label} attendance`} />
               </div>
             ))}
-            {classAttendance.length === 0 && <p className="text-body-md text-on-surface-variant">No attendance recorded yet today.</p>}
+            {classAttendance.length === 0 && <p className="py-4 text-center text-body-md text-on-surface-variant">No attendance recorded yet today.</p>}
           </div>
-          <Button variant="link" asChild className="w-full mt-6 justify-center">
-            <Link href="/classes">View All Classes</Link>
-          </Button>
-        </div>
+          {links.classes && (
+            <div className="border-t border-outline-variant/50 px-lg py-3">
+              <Link href={links.attendance ?? links.classes} className="text-label-md font-semibold text-secondary hover:underline">View attendance overview →</Link>
+            </div>
+          )}
+        </Card>
 
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow col-span-1 lg:col-span-2">
-          <h3 className="text-title-lg font-semibold text-primary mb-6">Recent Activity</h3>
-          <div className="space-y-4">
+        <Card className="lg:col-span-2">
+          <CardHeader title="Recent activity" />
+          <div className="space-y-1 p-sm pt-md">
             {latestStudentActivity && (
               <ActivityItem
                 icon="person_add"
                 tone="secondary"
-                text={<><span className="font-semibold">{latestStudentActivity.name}</span> was admitted to <span className="font-semibold">{latestStudentActivity.classLabel}</span></>}
+                href={links.students ? `/students/${latestStudentActivity.id}` : undefined}
+                text={<><span className="font-semibold">{latestStudentActivity.name}</span> was admitted to <span className="font-semibold">Class {latestStudentActivity.classLabel}</span></>}
                 time={formatDate(latestStudentActivity.admissionDate)}
               />
             )}
             {latestPayments.map((p) => (
-              <ActivityItem key={p.id} icon="payments" tone="success" text={<><span className="font-semibold">{formatCompactPKR(p.amount)}</span> fee payment received</>} time={timeAgo(p.date)} />
+              <ActivityItem
+                key={p.id}
+                icon="payments"
+                tone="success"
+                text={<><span className="font-semibold">{formatCompactPKR(p.amount)}</span> fee payment received{p.studentName && <> from <span className="font-semibold">{p.studentName}</span></>}</>}
+                time={timeAgo(p.date)}
+              />
             ))}
             {absentToday > 0 && (
-              <ActivityItem icon="cancel" tone="error" text={<><span className="font-semibold">{absentToday} students</span> marked absent today</>} time={formatDate(today)} />
+              <ActivityItem icon="cancel" tone="error" href={links.attendance} text={<><span className="font-semibold">{absentToday} student{absentToday === 1 ? "" : "s"}</span> marked absent today</>} time={formatDate(today)} />
             )}
             {!latestStudentActivity && latestPayments.length === 0 && absentToday === 0 && (
-              <p className="text-body-md text-on-surface-variant">Nothing to show yet.</p>
+              <p className="px-3 py-6 text-center text-body-md text-on-surface-variant">Nothing to show yet.</p>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Upcoming Events</h3>
-          <div className="space-y-3">
-            {upcomingExams.length === 0 && <p className="text-body-md text-on-surface-variant">No upcoming exams scheduled.</p>}
-            {upcomingExams.map((exam) => (
-              <div key={exam.id} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-secondary-container/20 text-secondary flex items-center justify-center shrink-0">
-                  <Icon name="event_upcoming" className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="text-body-md text-on-surface font-medium">{exam.name}</p>
-                  <p className="text-label-sm text-on-surface-variant">{formatDate(exam.startDate)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="lg:col-span-2 bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <QuickAction href="/students/new" icon="person_add" label="Add Student" />
-            <QuickAction href="/attendance/mark" icon="how_to_reg" label="Mark Attendance" />
-            <QuickAction href="/fees/collect" icon="point_of_sale" label="Collect Fee" />
-            <QuickAction href="/announcements/create" icon="campaign" label="New Announcement" />
-          </div>
-        </div>
-      </div>
+      {showFees && <QuickActions actions={quickActions} />}
     </div>
   );
 }
 
-function ActivityItem({ icon, tone, text, time }: { icon: string; tone: "secondary" | "success" | "error"; text: React.ReactNode; time: string }) {
+function ActivityItem({ icon, tone, text, time, href }: { icon: string; tone: "secondary" | "success" | "error"; text: React.ReactNode; time: string; href?: string }) {
   const toneClasses = {
-    secondary: "bg-secondary-container/20 text-secondary",
-    success: "bg-emerald-100 text-emerald-600",
-    error: "bg-error-container/50 text-error",
+    secondary: "bg-secondary-fixed text-secondary",
+    success: "bg-success-container text-success",
+    error: "bg-error-container/70 text-error",
   }[tone];
-  return (
-    <div className="flex items-start gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors">
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${toneClasses}`}>
-        <Icon name={icon} className="h-4 w-4" />
+  const body = (
+    <>
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${toneClasses}`}>
+        <Icon name={icon} className="h-4 w-4" aria-hidden />
       </div>
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <p className="text-body-md text-on-surface">{text}</p>
-        <p className="text-label-sm text-on-surface-variant mt-1">{time}</p>
+        <p className="mt-0.5 text-label-sm text-on-surface-variant">{time}</p>
       </div>
-    </div>
+    </>
   );
-}
-
-function QuickAction({ href, icon, label }: { href: string; icon: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex flex-col items-center justify-center gap-2 rounded-lg border border-outline-variant p-4 text-center hover:bg-surface-container-low hover:border-secondary/40 transition-colors"
-    >
-      <Icon name={icon} className="h-5 w-5 text-secondary" />
-      <span className="text-label-md font-medium text-on-surface">{label}</span>
+  const classes = "flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-surface-container-low";
+  return href ? (
+    <Link href={href} className={classes}>
+      {body}
     </Link>
+  ) : (
+    <div className={classes}>{body}</div>
   );
 }

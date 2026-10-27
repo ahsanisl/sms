@@ -29,6 +29,13 @@
       "when": 1792340469991,
       "tag": "0003_rename_curriculum_to_syllabus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793015740376,
+      "tag": "0004_add_student_profile_fields",
+      "breakpoints": true
     }
   ]
 }

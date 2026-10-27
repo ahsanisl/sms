@@ -11,8 +11,8 @@ export function Checkbox({
   return (
     <CheckboxPrimitive.Root
       className={cn(
-        "peer h-4 w-4 shrink-0 rounded-sm border border-outline-variant bg-surface",
-        "focus:outline-none focus:ring-1 focus:ring-secondary",
+        "peer h-4 w-4 shrink-0 rounded border border-outline bg-surface-container-lowest",
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40",
         "data-[state=checked]:bg-secondary data-[state=checked]:border-secondary",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,

@@ -161,9 +161,25 @@ export interface Student {
   gender: "male" | "female";
   dob: string;
   bloodGroup: string;
+  /** B-Form (child registration) / CNIC number, as entered. */
+  bFormNumber: string;
+  nationality: string;
+  religion: string;
+  previousSchool: string;
+  /** Conditions, allergies, medication. */
+  medicalNotes: string;
   parentName: string;
+  /** Primary parent/guardian's relationship to the student, e.g. "Father". */
+  parentRelation: string;
   parentPhone: string;
   parentEmail: string;
+  secondaryGuardianName: string;
+  secondaryGuardianRelation: string;
+  secondaryGuardianPhone: string;
+  secondaryGuardianEmail: string;
+  emergencyContactName: string;
+  emergencyContactRelation: string;
+  emergencyContactPhone: string;
   address: string;
   admissionDate: string;
   status: StudentStatus;

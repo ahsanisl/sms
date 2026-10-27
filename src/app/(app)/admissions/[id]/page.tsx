@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import Link from "next/link";
 import { InquiryDetailClient } from "@/app/(app)/admissions/[id]/inquiry-detail-client";
 import type { Student } from "@/lib/types";
+import { EMPTY_STUDENT_EXTRA_FIELDS } from "@/lib/constants";
 
 export default async function InquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -45,6 +46,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
     gender: "male",
     dob: "",
     bloodGroup: "O+",
+    ...EMPTY_STUDENT_EXTRA_FIELDS,
     parentName: inquiry.parentName,
     parentPhone: inquiry.parentPhone,
     parentEmail: inquiry.parentEmail,

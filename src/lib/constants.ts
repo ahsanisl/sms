@@ -1,4 +1,4 @@
-import type { GradeBand, InquiryStage, StudentStatus, TimetableDay } from "@/lib/types";
+import type { GradeBand, InquiryStage, Student, StudentStatus, TimetableDay } from "@/lib/types";
 
 /**
  * Fixed reference values and display labels shared across screens. None of
@@ -81,3 +81,23 @@ export const DEFAULT_PERIODS = [
   { period: 7, startTime: "12:20", endTime: "13:00" },
 ];
 export const DEFAULT_BREAK_AFTER_PERIOD = 3;
+
+/** Blank values for the optional student profile fields (identity, medical, extra contacts) — spread into any new-student seed object. */
+export const EMPTY_STUDENT_EXTRA_FIELDS = {
+  bFormNumber: "",
+  nationality: "",
+  religion: "",
+  previousSchool: "",
+  medicalNotes: "",
+  parentRelation: "",
+  secondaryGuardianName: "",
+  secondaryGuardianRelation: "",
+  secondaryGuardianPhone: "",
+  secondaryGuardianEmail: "",
+  emergencyContactName: "",
+  emergencyContactRelation: "",
+  emergencyContactPhone: "",
+} as const satisfies Partial<Record<keyof Student, string>>;
+
+/** Suggestions for the free-text relationship fields — offered via <datalist>, not enforced. */
+export const RELATION_SUGGESTIONS = ["Father", "Mother", "Grandfather", "Grandmother", "Uncle", "Aunt", "Brother", "Sister", "Guardian"];

@@ -9,6 +9,11 @@ interface ActionResult {
 }
 
 function errorMessage(error: unknown): string {
+  // A ZodError's .message is a JSON dump of every issue — show the first issue's own message instead.
+  if (error && typeof error === "object" && "issues" in error && Array.isArray((error as { issues: unknown[] }).issues)) {
+    const issue = (error as { issues: { message?: string }[] }).issues[0];
+    if (issue?.message) return issue.message;
+  }
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 

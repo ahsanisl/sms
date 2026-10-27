@@ -197,7 +197,7 @@ export function SyllabusClient({
                   </p>
                 )}
                 {topic.status === "completed" && topic.completedDate && (
-                  <p className="text-label-sm text-emerald-600 mt-1">Completed {formatDate(topic.completedDate)}</p>
+                  <p className="text-label-sm text-success mt-1">Completed {formatDate(topic.completedDate)}</p>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">

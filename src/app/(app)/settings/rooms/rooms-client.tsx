@@ -87,7 +87,7 @@ export function RoomManagementClient({ rooms, campuses }: { rooms: Room[]; campu
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Room Management"
         description="Manage classrooms, labs and halls used by the Timetable Builder for room assignment and conflict checks."
         actions={

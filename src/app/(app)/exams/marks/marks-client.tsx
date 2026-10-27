@@ -102,7 +102,7 @@ export function MarksClient({
 
   return (
     <div>
-      <PageHeader title={`Enter Marks${classLabel ? `: ${classLabel}` : ""}`} description={examName} />
+      <PageHeader backHref="/exams" backLabel="Exams" title={`Enter Marks${classLabel ? `: ${classLabel}` : ""}`} description={examName} />
 
       <div className="bg-surface-container-lowest rounded-lg border border-outline-variant/50 shadow-sm">
         <div className="p-lg border-b border-outline-variant/40 flex flex-col md:flex-row gap-3">
@@ -122,9 +122,9 @@ export function MarksClient({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th className="p-sm pl-6 text-label-sm text-on-surface-variant sticky left-0 bg-surface-bright z-10 w-64">Student</th>
+                <th scope="col" className="p-sm pl-6 text-label-md text-on-surface-variant sticky left-0 bg-surface-bright z-10 w-64">Student</th>
                 {subjects.map((subject) => (
-                  <th key={subject.id} className="p-sm text-label-sm text-on-surface-variant text-center w-28">
+                  <th scope="col" key={subject.id} className="p-sm text-label-md text-on-surface-variant text-center w-28">
                     {subject.name}
                   </th>
                 ))}

@@ -5,6 +5,12 @@ import { revalidatePath } from "next/cache";
 import { requireSession } from "@/lib/tenancy";
 import { canSwitchCampus, VIEW_CAMPUS_COOKIE } from "@/lib/campus-scope";
 import { assertCampusInScope } from "@/services/scope";
+import { can } from "@/lib/authorization";
+import * as studentService from "@/services/student.service";
+import * as teacherService from "@/services/teacher.service";
+import * as classService from "@/services/class.service";
+import * as admissionService from "@/services/admission.service";
+import { buildNotificationItems } from "@/app/(app)/notifications/build-items";
 
 interface ActionResult {
   success: boolean;
@@ -37,5 +43,92 @@ export async function setViewCampusAction(campusId: string | null): Promise<Acti
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
+  }
+}
+
+export interface SearchResult {
+  id: string;
+  kind: "student" | "teacher" | "class" | "inquiry";
+  title: string;
+  subtitle: string;
+  href: string;
+}
+
+const SEARCH_LIMIT_PER_KIND = 5;
+
+/**
+ * Backs the top bar / Ctrl+K command palette's record search. Each kind is
+ * only searched when the caller's role can already open that list elsewhere
+ * (the same `can()` checks the pages use), and every read goes through the
+ * normal campus-scoped services — so search never reveals more than the rest
+ * of the app does. A parent only ever matches their own children.
+ */
+export async function globalSearchAction(rawQuery: string): Promise<SearchResult[]> {
+  const query = rawQuery.trim().toLowerCase();
+  if (query.length < 2) return [];
+  try {
+    const session = await requireSession();
+    if (!session.schoolId) return [];
+    const matches = (...values: (string | undefined | null)[]) => values.some((v) => v?.toLowerCase().includes(query));
+
+    const [canStudents, canTeachers, canClasses, canAdmissions] = await Promise.all([
+      can(session.role, "students"),
+      can(session.role, "teachers"),
+      can(session.role, "classes"),
+      can(session.role, "admissions"),
+    ]);
+    const isParent = session.role === "parent";
+
+    const [students, teachers, classes, inquiries] = await Promise.all([
+      isParent || canStudents ? studentService.listStudents(session) : Promise.resolve([]),
+      canTeachers && !isParent ? teacherService.listTeachers(session) : Promise.resolve([]),
+      canClasses && !isParent ? classService.listClasses(session) : Promise.resolve([]),
+      canAdmissions && !isParent ? admissionService.listInquiries(session) : Promise.resolve([]),
+    ]);
+    const classLabel = (classId: string) => {
+      const cls = classes.find((c) => c.id === classId);
+      return cls ? `Class ${cls.grade}-${cls.section}` : null;
+    };
+
+    const results: SearchResult[] = [];
+    students
+      .filter((s) => matches(s.name, s.rollNumber, s.admissionNo, s.parentName, s.parentPhone))
+      .slice(0, SEARCH_LIMIT_PER_KIND)
+      .forEach((s) =>
+        results.push({
+          id: s.id,
+          kind: "student",
+          title: s.name,
+          subtitle: [classLabel(s.classId), `Adm. ${s.admissionNo}`, s.status !== "active" ? s.status : null].filter(Boolean).join(" · "),
+          href: `/students/${s.id}`,
+        }),
+      );
+    teachers
+      .filter((t) => matches(t.name, t.employeeId, t.email, t.phone))
+      .slice(0, SEARCH_LIMIT_PER_KIND)
+      .forEach((t) => results.push({ id: t.id, kind: "teacher", title: t.name, subtitle: [t.employeeId, t.qualification].filter(Boolean).join(" · "), href: `/teachers/${t.id}` }));
+    classes
+      .filter((c) => c.status === "active" && matches(`${c.grade}-${c.section}`, `${c.grade} ${c.section}`, `class ${c.grade}`))
+      .slice(0, SEARCH_LIMIT_PER_KIND)
+      .forEach((c) => results.push({ id: c.id, kind: "class", title: `Class ${c.grade}-${c.section}`, subtitle: `Capacity ${c.studentCapacity}`, href: `/classes/${c.id}` }));
+    inquiries
+      .filter((i) => matches(i.childName, i.parentName, i.parentPhone, i.parentEmail))
+      .slice(0, SEARCH_LIMIT_PER_KIND)
+      .forEach((i) => results.push({ id: i.id, kind: "inquiry", title: i.childName, subtitle: `Admission inquiry · ${i.gradeAppliedFor} · ${i.stage}`, href: `/admissions/${i.id}` }));
+    return results;
+  } catch {
+    return [];
+  }
+}
+
+/** Ids of the viewer's current derived notifications — backs the top bar's unread badge (read state itself is kept per browser; see lib/notification-read-state.ts). */
+export async function notificationIdsAction(): Promise<string[]> {
+  try {
+    const session = await requireSession();
+    if (!session.schoolId) return [];
+    const items = await buildNotificationItems(session);
+    return items.map((i) => i.id);
+  } catch {
+    return [];
   }
 }

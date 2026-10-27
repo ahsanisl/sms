@@ -4,11 +4,12 @@ import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
-import { Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Avatar } from "@/components/shared/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { FormField } from "@/components/shared/form-field";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -77,7 +78,7 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
 
   return (
     <div>
-      <PageHeader title="Fee Collection" description="Search a student and record a fee payment." />
+      <PageHeader title="Fee Collection" description="Search a student and record a fee payment." backHref="/fees" backLabel="Fees" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
@@ -86,16 +87,23 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search student by name or ID…"
-              className="w-full pl-10 pr-4 py-2 bg-surface-container rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-secondary text-body-md text-on-surface placeholder:text-on-surface-variant"
+              placeholder="Search student by name, roll or admission no…"
+              aria-label="Search student by name, roll or admission number"
+              className="h-10 w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-4 text-body-md text-on-surface placeholder:text-on-surface-variant/70 hover:border-outline focus:border-secondary focus:outline-none focus:ring-2 focus:ring-secondary/20"
             />
+            {query.trim() && searchResults.length === 0 && (
+              <div className="absolute z-10 mt-1 w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-3 text-body-md text-on-surface-variant shadow-lg">
+                No students match “{query.trim()}”.
+              </div>
+            )}
             {searchResults.length > 0 && (
               <div className="absolute z-10 mt-1 w-full bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg overflow-hidden">
                 {searchResults.map((s) => (
                   <button
                     key={s.id}
+                    type="button"
                     onClick={() => selectStudent(s.id)}
-                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-surface-container-low transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2 hover:bg-surface-container-low focus-visible:bg-surface-container-low outline-none transition-colors text-left"
                   >
                     <Avatar name={s.name} size="sm" />
                     <div>
@@ -109,7 +117,7 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
           </div>
 
           {student ? (
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
+            <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
               <div className="flex items-center gap-3 mb-4">
                 <Avatar name={student.name} size="lg" />
                 <div>
@@ -133,32 +141,48 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
               </div>
             </div>
           ) : (
-            <p className="text-body-md text-on-surface-variant p-4">Search and select a student to record a payment.</p>
+            <div className="rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest/60">
+              <EmptyState icon="search" title="Find a student" description="Search by name, roll number or admission number to load their invoices." compact />
+            </div>
           )}
         </div>
 
         <div className="lg:col-span-2">
           {student ? (
-            <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg space-y-6">
+            <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl card-shadow p-lg space-y-6">
               <div>
                 <h3 className="text-title-lg font-semibold text-primary mb-3">Select Invoice</h3>
+                {studentInvoices.length === 0 ? (
+                  <EmptyState icon="receipt_long" title="No invoices yet" description="This student has no fee invoices. Generate invoices from Fees → Generate." compact />
+                ) : (
+                <div className="overflow-x-auto rounded-lg border border-outline-variant/60">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-surface-container-low border-b border-outline-variant text-label-sm text-on-surface-variant">
+                  <thead className="bg-surface-container-low border-b border-outline-variant text-label-md text-on-surface-variant">
                     <tr>
-                      <th className="px-lg py-sm font-medium w-8"></th>
-                      <th className="px-lg py-sm font-medium">Month</th>
-                      <th className="px-lg py-sm font-medium">Due Date</th>
-                      <th className="px-lg py-sm font-medium text-right">Amount (Rs.)</th>
-                      <th className="px-lg py-sm font-medium">Status</th>
+                      <th scope="col" className="px-lg py-sm font-medium w-8"><span className="sr-only">Select</span></th>
+                      <th scope="col" className="px-lg py-sm font-medium">Month</th>
+                      <th scope="col" className="px-lg py-sm font-medium">Due Date</th>
+                      <th scope="col" className="px-lg py-sm font-medium text-right">Amount (Rs.)</th>
+                      <th scope="col" className="px-lg py-sm font-medium">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/30">
                     {studentInvoices.map((inv) => (
-                      <tr key={inv.id} className="hover:bg-surface-bright transition-colors">
+                      <tr
+                        key={inv.id}
+                        className={`transition-colors ${inv.totalAmount <= inv.paidAmount ? "opacity-60" : "cursor-pointer hover:bg-surface-container-low"} ${invoiceId === inv.id ? "bg-secondary-fixed/40" : ""}`}
+                        onClick={() => {
+                          if (inv.totalAmount <= inv.paidAmount) return;
+                          setInvoiceId(inv.id);
+                          setAmount(inv.totalAmount - inv.paidAmount);
+                        }}
+                      >
                         <td className="px-lg py-sm">
                           <input
                             type="radio"
                             name="invoice"
+                            aria-label={`${inv.month} invoice, ${(inv.totalAmount - inv.paidAmount).toLocaleString()} rupees due`}
+                            className="h-4 w-4 accent-secondary"
                             checked={invoiceId === inv.id}
                             onChange={() => {
                               setInvoiceId(inv.id);
@@ -182,10 +206,18 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
                     ))}
                   </tbody>
                 </table>
+                </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField label="Payment Amount (Rs.)" htmlFor="amount">
+                <FormField
+                  label="Payment Amount (Rs.)"
+                  htmlFor="amount"
+                  required
+                  hint={selectedInvoice ? `Balance on ${selectedInvoice.month}: ${formatPKR(selectedInvoice.totalAmount - selectedInvoice.paidAmount)}` : undefined}
+                  error={amount < 0 ? "Amount can't be negative." : undefined}
+                >
                   <Input id="amount" type="number" min={0} value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
                 </FormField>
                 <FormField label="Payment Date" htmlFor="date">
@@ -209,13 +241,14 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
                   Cancel
                 </Button>
                 <Button type="submit" disabled={!invoiceId || submitting}>
-                  {submitting ? "Recording…" : "Record Payment"}
+                  {submitting && <Loader2 className="motion-safe:animate-spin" />}
+                  {submitting ? "Recording…" : selectedInvoice && amount > 0 ? `Record ${formatPKR(amount)}` : "Record Payment"}
                 </Button>
               </div>
             </form>
           ) : (
-            <div className="h-full flex items-center justify-center border border-dashed border-outline-variant rounded-xl p-12 text-on-surface-variant text-body-md">
-              Select a student to view their invoices.
+            <div className="flex h-full min-h-[16rem] items-center justify-center rounded-xl border border-dashed border-outline-variant bg-surface-container-lowest/60">
+              <EmptyState icon="receipt_long" title="No student selected" description="Select a student to view their invoices and record a payment." compact />
             </div>
           )}
         </div>

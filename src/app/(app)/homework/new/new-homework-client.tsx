@@ -35,7 +35,7 @@ export function NewHomeworkClient({
 
   return (
     <div>
-      <PageHeader title="New Homework" description="Assign homework to a class and subject." />
+      <PageHeader backHref="/homework" backLabel="Homework" title="New Homework" description="Assign homework to a class and subject." />
       <div className="max-w-2xl bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
         <HomeworkForm
           classes={classes}

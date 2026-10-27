@@ -60,7 +60,7 @@ export function CorrectionsClient({ isTeacher, corrections }: { isTeacher: boole
     const pending = corrections.filter((c) => c.status === "pending").length;
     return (
       <div>
-        <PageHeader title="My Correction Requests" description="Attendance correction requests you've submitted." />
+        <PageHeader backHref="/attendance" backLabel="Attendance" title="My Correction Requests" description="Attendance correction requests you've submitted." />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <StatCard label="Total Requests" value={String(corrections.length)} icon="history" />
@@ -96,7 +96,7 @@ export function CorrectionsClient({ isTeacher, corrections }: { isTeacher: boole
 
   return (
     <div>
-      <PageHeader title="Attendance Corrections" description="Review teacher-submitted corrections to already-saved attendance records." />
+      <PageHeader backHref="/attendance" backLabel="Attendance" title="Attendance Corrections" description="Review teacher-submitted corrections to already-saved attendance records." />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <StatCard label="Total Requests" value={String(corrections.length)} icon="history" />
@@ -112,18 +112,18 @@ export function CorrectionsClient({ isTeacher, corrections }: { isTeacher: boole
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-4 pl-lg font-semibold text-label-sm text-on-surface-variant uppercase">Student</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Class</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Date</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Change</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Requested By</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Status</th>
-                <th className="p-4 pr-lg font-semibold text-label-sm text-on-surface-variant uppercase text-right">Actions</th>
+                <th scope="col" className="p-4 pl-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Student</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Class</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Date</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Change</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Requested By</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Status</th>
+                <th scope="col" className="p-4 pr-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
               {corrections.map((c) => (
-                <tr key={c.id} className="hover:bg-surface-bright transition-colors">
+                <tr key={c.id} className="hover:bg-surface-container-low/60 transition-colors">
                   <td className="p-4 pl-lg font-medium text-on-surface">{c.studentName}</td>
                   <td className="p-4 text-on-surface-variant">{c.classLabel}</td>
                   <td className="p-4 text-on-surface-variant whitespace-nowrap">{formatDate(c.date)}</td>
@@ -136,7 +136,7 @@ export function CorrectionsClient({ isTeacher, corrections }: { isTeacher: boole
                     {c.status === "pending" ? (
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          className="p-1.5 text-on-surface-variant hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors disabled:opacity-50"
+                          className="p-1.5 text-on-surface-variant hover:text-success hover:bg-success-container/50 rounded transition-colors disabled:opacity-50"
                           title="Approve"
                           onClick={() => handleApprove(c.id)}
                           disabled={busyId === c.id}

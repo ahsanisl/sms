@@ -53,7 +53,7 @@ export function CreateExamClient({ campuses, classes, subjects, defaultCampusId 
 
   return (
     <div>
-      <PageHeader title="Create New Examination" description="Set up a new exam and assign classes and subjects." />
+      <PageHeader backHref="/exams" backLabel="Exams" title="Create New Examination" description="Set up a new exam and assign classes and subjects." />
 
       <form onSubmit={handleSubmit} className="bg-surface-container-lowest rounded-lg border border-outline-variant/50 shadow-sm p-lg max-w-3xl space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

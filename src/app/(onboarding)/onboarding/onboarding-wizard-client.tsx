@@ -287,7 +287,7 @@ export function OnboardingWizardClient({
 
       {/* Step content */}
       {!isFinish ? (
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm mb-6">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg shadow-sm mb-6">
           {currentKey === "campus" && (
             <StepShell title="Add at least one Campus" description="Every class, teacher, and student belongs to a campus — start here.">
               <WizardListStep
@@ -417,7 +417,7 @@ export function OnboardingWizardClient({
           )}
         </div>
       ) : (
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg shadow-sm mb-6 space-y-4">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg shadow-sm mb-6 space-y-4">
           <h2 className="text-title-lg font-semibold text-on-surface">Review</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {STEPS.map((step) => (

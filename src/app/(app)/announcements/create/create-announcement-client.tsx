@@ -62,7 +62,7 @@ export function CreateAnnouncementClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/announcements" backLabel="Announcements"
         title="New Announcement"
         description={scopeLabel ? `Compose and publish a message to ${scopeLabel}.` : "Compose and publish a message to the school community."}
       />

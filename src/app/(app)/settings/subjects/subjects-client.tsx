@@ -87,7 +87,7 @@ export function SubjectsClient({ subjects }: { subjects: SubjectWithClassCount[]
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Subject Management"
         description="Add, edit and archive the subjects taught across the school."
         actions={

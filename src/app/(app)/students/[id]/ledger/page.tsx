@@ -41,6 +41,7 @@ export default async function StudentLedgerPage({ params }: { params: Promise<{ 
 
   return (
     <LedgerClient
+      backHref={`/students/${id}`}
       studentName={student.name}
       classLabel={cls ? `${cls.grade}-${cls.section}` : "—"}
       campusName={campus?.name ?? "—"}

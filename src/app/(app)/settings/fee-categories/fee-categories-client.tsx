@@ -82,7 +82,7 @@ export function FeeCategoriesClient({ feeCategories, usageCounts }: { feeCategor
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Fee Categories"
         description="Manage the canonical list of fee item names used across Fee Structure — keeps campuses from drifting into typo'd, one-off category names."
         actions={

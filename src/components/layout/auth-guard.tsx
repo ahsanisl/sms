@@ -7,12 +7,7 @@ import { toast } from "sonner";
 import { PageLoader } from "@/components/shared/page-loader";
 import { useSession } from "@/lib/auth/session-context";
 import { isAlwaysAllowed, isParentOnlyRoute, moduleForPath } from "@/lib/permissions";
-import type { PermissionModule } from "@/lib/types";
-
-interface PermissionsResponse {
-  permissions: Partial<Record<PermissionModule, boolean>>;
-  onboardingComplete: boolean | null;
-}
+import { PermissionsProvider, type PermissionsResponse } from "@/lib/auth/permissions-context";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useSession();
@@ -43,10 +38,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     fetch("/api/me/permissions")
       .then((res) => (res.ok ? (res.json() as Promise<PermissionsResponse>) : null))
       .then((data) => {
-        if (!cancelled) setPerms(data ?? { permissions: {}, onboardingComplete: null });
+        if (!cancelled) setPerms(data ?? { permissions: {}, onboardingComplete: null, schoolName: null });
       })
       .catch(() => {
-        if (!cancelled) setPerms({ permissions: {}, onboardingComplete: null });
+        if (!cancelled) setPerms({ permissions: {}, onboardingComplete: null, schoolName: null });
       });
     return () => {
       cancelled = true;
@@ -92,5 +87,5 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return <>{children}</>;
+  return <PermissionsProvider value={perms}>{children}</PermissionsProvider>;
 }

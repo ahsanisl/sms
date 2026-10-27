@@ -100,7 +100,7 @@ export function InquiryDetailClient({
 
   return (
     <div className="max-w-4xl">
-      <PageHeader
+      <PageHeader backHref="/admissions" backLabel="Admissions"
         title={childName}
         description={`${gradeAppliedFor} · ${campusName}`}
         actions={<StatusBadge label={INQUIRY_STAGE_LABEL[stage]} tone={INQUIRY_STAGE_TONE[stage]} />}

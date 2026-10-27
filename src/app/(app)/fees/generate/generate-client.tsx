@@ -92,7 +92,7 @@ export function GenerateInvoicesClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/fees" backLabel="Fees"
         title="Generate Invoices"
         description="Bulk-create this month's invoices for every active student, from their class's monthly fee structure."
       />

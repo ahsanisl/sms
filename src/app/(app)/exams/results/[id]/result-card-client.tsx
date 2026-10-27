@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { gradeFor } from "@/lib/grade";
 import { formatDate } from "@/lib/format";
+import { BackLink } from "@/components/shared/page-header";
 
 interface MarkEntry {
   id: string;
@@ -29,6 +30,8 @@ interface ExamOption {
 }
 
 export function ResultCardClient({
+  backHref,
+  backLabel,
   studentName,
   classLabel,
   rollNumber,
@@ -42,6 +45,9 @@ export function ResultCardClient({
   showSignatureLines,
   reportCardFooter,
 }: {
+  /** Where the back link above the card goes — the parent portal or the student profile. */
+  backHref?: string;
+  backLabel?: string;
   studentName: string;
   classLabel: string;
   rollNumber: string;
@@ -66,6 +72,7 @@ export function ResultCardClient({
 
   return (
     <div className="max-w-3xl mx-auto">
+      {backHref && <BackLink href={backHref} label={backLabel} />}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 print:hidden">
         <h2 className="text-headline-md font-semibold text-on-surface">Student Result</h2>
         <div className="flex items-center gap-3">
@@ -117,13 +124,14 @@ export function ResultCardClient({
 
           <div>
             <h3 className="text-title-lg font-semibold text-primary mb-4">Academic Performance</h3>
+            <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-outline-variant">
-                  <th className="px-6 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide">Subject</th>
-                  <th className="px-6 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Max Marks</th>
-                  <th className="px-6 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Marks Obtained</th>
-                  <th className="px-6 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-center">Grade</th>
+                  <th scope="col" className="px-6 py-3 text-label-md text-on-surface-variant uppercase tracking-wide">Subject</th>
+                  <th scope="col" className="px-6 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-right">Max Marks</th>
+                  <th scope="col" className="px-6 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-right">Marks Obtained</th>
+                  <th scope="col" className="px-6 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-center">Grade</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/30">
@@ -142,6 +150,7 @@ export function ResultCardClient({
                 })}
               </tbody>
             </table>
+            </div>
           </div>
 
           <div>
@@ -186,7 +195,7 @@ export function ResultCardClient({
 }
 
 function SummaryTile({ label, value, highlight, tone }: { label: string; value: string; highlight?: boolean; tone?: "success" | "error" }) {
-  const color = tone === "success" ? "text-emerald-600" : tone === "error" ? "text-error" : highlight ? "text-secondary" : "text-primary";
+  const color = tone === "success" ? "text-success" : tone === "error" ? "text-error" : highlight ? "text-secondary" : "text-primary";
   return (
     <div className="bg-surface-bright border border-outline-variant/50 rounded-lg p-4">
       <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-1">{label}</p>

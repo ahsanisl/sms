@@ -53,6 +53,8 @@ export default async function StudentResultPage({ params }: { params: Promise<{ 
 
   return (
     <ResultCardClient
+      backHref={session.role === "parent" ? "/portal/exams" : `/students/${id}`}
+      backLabel={session.role === "parent" ? "Results" : "Student profile"}
       studentName={data.student.name}
       classLabel={cls ? `${cls.grade}-${cls.section}` : ""}
       rollNumber={data.student.rollNumber}

@@ -4,6 +4,7 @@ import { Printer } from "lucide-react";
 import { Avatar } from "@/components/shared/avatar";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatPKR } from "@/lib/format";
+import { BackLink } from "@/components/shared/page-header";
 
 const METHOD_LABEL: Record<string, string> = {
   cash: "Cash",
@@ -20,6 +21,7 @@ interface LedgerRow {
 }
 
 export function LedgerClient({
+  backHref,
   studentName,
   classLabel,
   campusName,
@@ -28,6 +30,8 @@ export function LedgerClient({
   payments,
   reversals,
 }: {
+  /** Where the "← Student profile" link goes. */
+  backHref?: string;
   studentName: string;
   classLabel: string;
   campusName: string;
@@ -59,6 +63,7 @@ export function LedgerClient({
 
   return (
     <div className="max-w-4xl mx-auto">
+      {backHref && <BackLink href={backHref} label="Student profile" />}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 print:hidden">
         <h2 className="text-headline-md font-semibold text-on-surface">Financial Statement</h2>
         <Button variant="secondary" onClick={() => window.print()}>
@@ -84,25 +89,26 @@ export function LedgerClient({
             </div>
             <div>
               <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Paid</p>
-              <p className="text-title-lg font-semibold text-emerald-600">{formatPKR(totalPaid)}</p>
+              <p className="text-title-lg font-semibold text-success">{formatPKR(totalPaid)}</p>
             </div>
             <div>
               <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Balance</p>
-              <p className={`text-title-lg font-semibold ${balance > 0 ? "text-error" : "text-emerald-600"}`}>{formatPKR(balance)}</p>
+              <p className={`text-title-lg font-semibold ${balance > 0 ? "text-error" : "text-success"}`}>{formatPKR(balance)}</p>
             </div>
           </div>
         </div>
 
         <div>
           <h3 className="text-title-lg font-semibold text-primary mb-4">Transaction History</h3>
+          <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide">Date</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide">Description</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Charge</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Payment</th>
-                <th className="px-4 py-3 text-label-sm text-on-surface-variant uppercase tracking-wide text-right">Balance</th>
+                <th scope="col" className="px-4 py-3 text-label-md text-on-surface-variant uppercase tracking-wide">Date</th>
+                <th scope="col" className="px-4 py-3 text-label-md text-on-surface-variant uppercase tracking-wide">Description</th>
+                <th scope="col" className="px-4 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-right">Charge</th>
+                <th scope="col" className="px-4 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-right">Payment</th>
+                <th scope="col" className="px-4 py-3 text-label-md text-on-surface-variant uppercase tracking-wide text-right">Balance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/30">
@@ -111,7 +117,7 @@ export function LedgerClient({
                   <td className="px-4 py-3 text-body-md text-on-surface-variant whitespace-nowrap">{formatDate(r.date)}</td>
                   <td className="px-4 py-3 text-body-md text-on-surface">{r.description}</td>
                   <td className="px-4 py-3 text-body-md text-error text-right">{r.debit ? formatPKR(r.debit) : "—"}</td>
-                  <td className="px-4 py-3 text-body-md text-emerald-600 text-right">{r.credit ? formatPKR(r.credit) : "—"}</td>
+                  <td className="px-4 py-3 text-body-md text-success text-right">{r.credit ? formatPKR(r.credit) : "—"}</td>
                   <td className="px-4 py-3 text-body-md font-medium text-on-surface text-right">{formatPKR(r.balance)}</td>
                 </tr>
               ))}
@@ -122,6 +128,7 @@ export function LedgerClient({
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

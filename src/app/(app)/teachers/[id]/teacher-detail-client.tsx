@@ -6,6 +6,7 @@ import { Mail, Phone, GraduationCap, Pencil, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/shared/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { BackLink } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Modal } from "@/components/shared/modal";
@@ -64,7 +65,8 @@ export function TeacherDetailClient({
 
   return (
     <div>
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col md:flex-row md:flex-wrap items-start md:items-center justify-between gap-6 mb-6 shadow-sm">
+      <BackLink href="/teachers" label="Teachers" />
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/70 p-lg flex flex-col md:flex-row md:flex-wrap items-start md:items-center justify-between gap-6 mb-6 shadow-sm">
         <div className="flex items-center gap-6">
           <Avatar name={teacher.name} size="lg" className="h-24 w-24 text-2xl" />
           <div>

@@ -17,7 +17,7 @@ export async function setRetentionDaysAction(days: number | null): Promise<Actio
   try {
     const session = await requireSession();
     await auditService.setRetentionDays(session, days);
-    revalidatePath("/settings/audit-log");
+    revalidatePath("/audit-log");
     return { success: true };
   } catch (error) {
     return { success: false, error: errorMessage(error) };
@@ -28,7 +28,7 @@ export async function cleanUpNowAction(): Promise<ActionResult & { deletedCount?
   try {
     const session = await requireSession();
     const deletedCount = await auditService.cleanUpNow(session);
-    revalidatePath("/settings/audit-log");
+    revalidatePath("/audit-log");
     return { success: true, deletedCount };
   } catch (error) {
     return { success: false, error: errorMessage(error) };

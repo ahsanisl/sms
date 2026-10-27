@@ -33,6 +33,8 @@ export function FilterBar({ filters, values, onChange, className }: FilterBarPro
           key={filter.key}
           value={values[filter.key] ?? ""}
           onChange={(e) => onChange(filter.key, e.target.value)}
+          aria-label={filter.label}
+          className={cn("h-10", values[filter.key] && "border-secondary bg-secondary-fixed/40 text-on-secondary-fixed")}
         >
           <option value="">{filter.label}</option>
           {filter.options.map((opt) => (

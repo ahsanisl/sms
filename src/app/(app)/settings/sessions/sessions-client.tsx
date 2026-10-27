@@ -53,7 +53,7 @@ export function AcademicSessionsClient({ sessions }: { sessions: AcademicSession
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Academic Sessions"
         description="Manage academic years and terms. Only one session is active at a time."
         actions={

@@ -129,6 +129,38 @@ const FEMALE_NAMES = ["Fatima", "Ayesha", "Zainab", "Maryam", "Hira", "Aliza", "
 const FATHER_NAMES = ["Tariq", "Imran", "Kamran", "Asif", "Naveed", "Shahid", "Faisal", "Adnan", "Waqas", "Junaid", "Rashid", "Salman", "Nadeem", "Khalid", "Javed"];
 const SURNAMES = ["Khan", "Ahmed", "Malik", "Qureshi", "Siddiqui", "Sheikh", "Hussain", "Chaudhry", "Butt", "Mirza", "Abbasi", "Baig", "Javed", "Iqbal", "Shah", "Rana", "Hashmi", "Ansari", "Akhtar", "Memon"];
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+"];
+const PREVIOUS_SCHOOLS = ["The City School", "Beaconhouse School System", "Karachi Grammar School", "Lyceum School", "The Educators", "Roots International"];
+const MEDICAL_NOTES = [
+  "Asthma — carries an inhaler; avoid strenuous outdoor activity on high-pollen days.",
+  "Allergic to peanuts and tree nuts. Parents have provided an EpiPen kept at the front office.",
+  "Wears glasses for distance — seat near the board.",
+  "Type 1 diabetes — may need a snack or a glucose check during class.",
+];
+
+/**
+ * Optional profile fields (identity, health, extra contacts) for the i-th
+ * seeded student. Derived from the index rather than rand() so adding these
+ * fields doesn't shift the random sequence every later section of the seed
+ * (attendance, fees, marks) depends on.
+ */
+function studentExtras(i: number, studentName: string) {
+  // The family name the child carries (e.g. "Ahmed Raza", whose father is "Mr. Raza Ahmed", is a Raza).
+  const surname = studentName.trim().split(/\s+/).pop() ?? "";
+  const phone = (offset: number) => `+92 3${(i + offset) % 5}${(i * 3 + offset) % 10} ${String(1000000 + ((i * 7919 + offset * 104729) % 9000000)).slice(0, 7)}`;
+  return {
+    bFormNumber: `42101-${String(1000000 + ((i * 48271) % 9000000)).slice(0, 7)}-${(i % 9) + 1}`,
+    nationality: "Pakistani",
+    previousSchool: i % 4 === 0 ? PREVIOUS_SCHOOLS[i % PREVIOUS_SCHOOLS.length] : "",
+    medicalNotes: i % 7 === 3 ? MEDICAL_NOTES[i % MEDICAL_NOTES.length] : "",
+    parentRelation: "Father",
+    secondaryGuardianName: `${FEMALE_NAMES[(i * 7) % FEMALE_NAMES.length]} ${surname}`,
+    secondaryGuardianRelation: "Mother",
+    secondaryGuardianPhone: phone(1),
+    emergencyContactName: `${FATHER_NAMES[(i + 3) % FATHER_NAMES.length]} ${surname}`,
+    emergencyContactRelation: i % 3 === 0 ? "Grandfather" : "Uncle",
+    emergencyContactPhone: phone(2),
+  };
+}
 
 const SUBJECTS = [
   { name: "English", code: "ENG" },
@@ -423,6 +455,7 @@ async function main() {
           address: `House ${Math.floor(between(1, 300))}, ${pick(["DHA Phase 6", "Clifton Block 2", "Gulshan Block 13", "PECHS", "North Nazimabad", "Bahadurabad"])}, Karachi`,
           admissionDate: `${sessionStartYear - Math.floor(rand() * 4)}-08-01`,
           status: p.status,
+          ...studentExtras(i, p.name),
         };
       }),
     )

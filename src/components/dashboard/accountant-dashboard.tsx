@@ -4,8 +4,13 @@ import Link from "next/link";
 import { BarChart, Bar, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { StatCard } from "@/components/shared/stat-card";
 import { ChartCard } from "@/components/shared/chart-card";
+import { Avatar } from "@/components/shared/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Icon } from "@/components/shared/icon";
-import { formatCompactNumber, formatCompactPKR, formatDate, timeAgo } from "@/lib/format";
+import { DashboardHeader, ProgressBar, QuickActions, TaskList, type DashboardTask } from "@/components/dashboard/widgets";
+import { formatCompactNumber, formatCompactPKR, formatDate, formatPKR, timeAgo } from "@/lib/format";
+import type { NavItem } from "@/lib/nav-config";
 
 const METHOD_LABEL: Record<string, string> = {
   cash: "Cash",
@@ -14,106 +19,129 @@ const METHOD_LABEL: Record<string, string> = {
   cheque: "Cheque",
 };
 
+const axisTick = { fontSize: 12, fill: "var(--color-on-surface-variant)" };
+
 interface AccountantDashboardProps {
   userName: string;
   isAllCampuses: boolean;
+  billed: number;
   collected: number;
   outstanding: number;
   overdueCount: number;
   totalCollectedAllTime: number;
   feeByCampus: { campus: string; collected: number; outstanding: number }[];
   recentPayments: { id: string; studentName: string; method: string; amount: number; date: string }[];
+  tasks: DashboardTask[];
+  quickActions: NavItem[];
 }
 
 export function AccountantDashboard({
   userName,
   isAllCampuses,
+  billed,
   collected,
   outstanding,
   overdueCount,
   totalCollectedAllTime,
   feeByCampus,
   recentPayments,
+  tasks,
+  quickActions,
 }: AccountantDashboardProps) {
   const monthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
+  const canCollect = quickActions.some((a) => a.href === "/fees/collect");
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
-        <div>
-          <h2 className="text-headline-lg font-semibold text-primary mb-1">Good morning, {userName.split(" ")[0]}</h2>
-          <p className="text-body-md text-on-surface-variant">
-            {isAllCampuses ? "Here's the fee collection picture across all campuses." : "Here's the fee collection picture for this campus."}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 bg-surface px-3 py-2 rounded-lg border border-outline-variant card-shadow">
-          <Icon name="calendar_today" className="h-4 w-4 text-on-surface-variant" />
-          <span className="text-label-md">{formatDate(new Date().toISOString().slice(0, 10))}</span>
-        </div>
-      </div>
+      <DashboardHeader
+        name={userName}
+        subtitle={isAllCampuses ? "Here's the fee collection picture across all campuses." : "Here's the fee collection picture for this campus."}
+        chips={[{ icon: "calendar_today", label: formatDate(new Date().toISOString().slice(0, 10)) }]}
+        actions={
+          <>
+            <Button variant="secondary" asChild>
+              <Link href="/fees/reports">
+                <Icon name="analytics" /> Fee Reports
+              </Link>
+            </Button>
+            {canCollect && (
+              <Button asChild>
+                <Link href="/fees/collect">
+                  <Icon name="point_of_sale" /> Collect Payment
+                </Link>
+              </Button>
+            )}
+          </>
+        }
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label={`Collected (${monthLabel})`} value={formatCompactPKR(collected)} icon="payments" trend={{ direction: "up", label: "This month" }} />
-        <StatCard label={`Outstanding (${monthLabel})`} value={formatCompactPKR(outstanding)} icon="account_balance_wallet" trend={{ direction: "down", label: "This month" }} />
-        <StatCard label="Overdue Invoices" value={String(overdueCount)} icon="warning" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Collected This Month" value={formatCompactPKR(collected)} icon="payments" tone="success" href="/fees" trend={{ direction: "flat", label: monthLabel }} />
+        <StatCard label="Outstanding This Month" value={formatCompactPKR(outstanding)} icon="account_balance_wallet" tone={outstanding > 0 ? "error" : "success"} href="/fees" trend={{ direction: "flat", label: monthLabel }} />
+        <StatCard label="Overdue Invoices" value={String(overdueCount)} icon="warning" tone={overdueCount > 0 ? "warning" : "success"} href="/fees/reports" />
         <StatCard label="Total Collected (All Time)" value={formatCompactPKR(totalCollectedAllTime)} icon="savings" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <ChartCard title={`Fee Collection by Campus (${monthLabel})`} className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <Card className="flex flex-col justify-between">
+          <CardHeader title="Collection progress" description={monthLabel} />
+          <div className="p-lg pt-md">
+            <p className="text-display-sm font-bold tracking-tight text-primary tabular-nums">{collectionRate}%</p>
+            <p className="mb-4 text-body-md text-on-surface-variant">of {formatPKR(billed)} billed has been collected</p>
+            <ProgressBar value={collectionRate} tone={collectionRate >= 75 ? "success" : collectionRate >= 40 ? "warning" : "error"} label="Collection rate this month" />
+            <div className="mt-4 grid grid-cols-2 gap-3 text-label-md">
+              <div className="rounded-lg bg-success-container/50 p-3">
+                <p className="text-on-surface-variant">Collected</p>
+                <p className="mt-0.5 font-semibold text-success tabular-nums">{formatCompactPKR(collected)}</p>
+              </div>
+              <div className="rounded-lg bg-error-container/40 p-3">
+                <p className="text-on-surface-variant">Remaining</p>
+                <p className="mt-0.5 font-semibold text-error tabular-nums">{formatCompactPKR(outstanding)}</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <ChartCard title="Fee collection by campus" description={monthLabel} className="lg:col-span-2">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={feeByCampus} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" vertical={false} />
-              <XAxis dataKey="campus" tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <YAxis tickFormatter={(v) => formatCompactNumber(v)} width={44} tick={{ fontSize: 12, fill: "var(--color-on-surface-variant)" }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v) => formatCompactPKR(Number(v))} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" strokeOpacity={0.6} vertical={false} />
+              <XAxis dataKey="campus" tick={axisTick} axisLine={false} tickLine={false} />
+              <YAxis tickFormatter={(v) => formatCompactNumber(v)} width={44} tick={axisTick} axisLine={false} tickLine={false} />
+              <Tooltip formatter={(v) => formatCompactPKR(Number(v))} contentStyle={{ borderRadius: 8, borderColor: "var(--color-outline-variant)" }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="collected" name="Collected" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="outstanding" name="Outstanding" fill="var(--color-error)" radius={[4, 4, 0, 0]} fillOpacity={0.6} />
+              <Bar dataKey="outstanding" name="Outstanding" fill="var(--color-error)" radius={[4, 4, 0, 0]} fillOpacity={0.55} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
-
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 gap-3">
-            <QuickAction href="/fees/collect" icon="point_of_sale" label="Collect Fee" />
-            <QuickAction href="/fees/structure" icon="receipt_long" label="Fee Structure" />
-            <QuickAction href="/fees/reports" icon="analytics" label="Fee Reports" />
-          </div>
-        </div>
       </div>
 
-      <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-title-lg font-semibold text-primary">Recent Payments</h3>
-          <Link href="/fees/reports" className="text-label-md text-secondary hover:underline">View All →</Link>
-        </div>
-        <div className="divide-y divide-outline-variant/20">
-          {recentPayments.map((p) => (
-            <div key={p.id} className="flex items-center justify-between py-3">
-              <div>
-                <p className="text-body-md text-on-surface font-medium">{p.studentName}</p>
-                <p className="text-label-sm text-on-surface-variant">{METHOD_LABEL[p.method] ?? p.method} · {timeAgo(p.date)}</p>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <TaskList tasks={tasks} />
+
+        <Card className="lg:col-span-2">
+          <CardHeader title="Recent payments" action={<Link href="/fees/reports" className="text-label-md font-semibold text-secondary hover:underline">View all</Link>} />
+          <div className="divide-y divide-outline-variant/30 px-lg pb-sm pt-sm">
+            {recentPayments.map((p) => (
+              <div key={p.id} className="flex items-center gap-3 py-3">
+                <Avatar name={p.studentName} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-body-md font-medium text-on-surface">{p.studentName}</p>
+                  <p className="text-label-sm text-on-surface-variant">
+                    {METHOD_LABEL[p.method] ?? p.method} · {timeAgo(p.date)}
+                  </p>
+                </div>
+                <span className="text-body-md font-semibold text-success tabular-nums">+{formatCompactPKR(p.amount)}</span>
               </div>
-              <span className="text-body-md font-semibold text-emerald-600">{formatCompactPKR(p.amount)}</span>
-            </div>
-          ))}
-          {recentPayments.length === 0 && <p className="text-body-md text-on-surface-variant py-6">No payments recorded yet.</p>}
-        </div>
+            ))}
+            {recentPayments.length === 0 && <p className="py-8 text-center text-body-md text-on-surface-variant">No payments recorded yet.</p>}
+          </div>
+        </Card>
       </div>
-    </div>
-  );
-}
 
-function QuickAction({ href, icon, label }: { href: string; icon: string; label: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 rounded-lg border border-outline-variant p-4 hover:bg-surface-container-low hover:border-secondary/40 transition-colors"
-    >
-      <Icon name={icon} className="h-5 w-5 text-secondary" />
-      <span className="text-label-md font-medium text-on-surface">{label}</span>
-    </Link>
+      <QuickActions actions={quickActions} />
+    </div>
   );
 }

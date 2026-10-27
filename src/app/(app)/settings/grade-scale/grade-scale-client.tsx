@@ -66,7 +66,7 @@ export function GradeScaleClient({ bands: savedBands }: { bands: { grade: string
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Grade Scale"
         description="Define the percentage boundaries each letter grade covers, used everywhere a mark is turned into a grade."
         actions={<Button onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save Changes"}</Button>}

@@ -84,7 +84,7 @@ export function AlumniClient({
 
   return (
     <div>
-      <PageHeader title="Alumni Directory" description={description} />
+      <PageHeader backHref="/students" backLabel="Students" title="Alumni Directory" description={description} />
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <StatCard label="Total Alumni" value={String(alumni.length)} icon="school" />

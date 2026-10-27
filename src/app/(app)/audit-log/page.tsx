@@ -1,6 +1,6 @@
 import * as auditService from "@/services/audit.service";
 import { requireSession } from "@/lib/tenancy";
-import { AuditLogClient } from "@/app/(app)/settings/audit-log/audit-log-client";
+import { AuditLogClient } from "@/app/(app)/audit-log/audit-log-client";
 
 interface AuditLogSearchParams {
   page?: string;

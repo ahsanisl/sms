@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+/** Optional free-text field: trimmed, defaults to "". */
+const optionalText = (max = 200) => z.string().trim().max(max).default("");
+
+/** Optional email: blank, or a valid address. */
+const optionalEmail = z
+  .string()
+  .trim()
+  .default("")
+  .refine((v) => v === "" || z.email().safeParse(v).success, "Enter a valid email address.");
+
 export const StudentInputSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
   rollNumber: z.string().trim().default(""),
@@ -9,9 +19,27 @@ export const StudentInputSchema = z.object({
   gender: z.enum(["male", "female"]),
   dob: z.string().min(1, "Date of birth is required."),
   bloodGroup: z.string().trim().default(""),
+  // B-Form / CNIC: 13 digits, dashes and spaces allowed ("35202-1234567-1"). Blank is fine.
+  bFormNumber: z
+    .string()
+    .trim()
+    .default("")
+    .refine((v) => v === "" || /^\d{13}$/.test(v.replace(/[\s-]/g, "")), "B-Form / CNIC number must have 13 digits, e.g. 35202-1234567-1."),
+  nationality: optionalText(80),
+  religion: optionalText(80),
+  previousSchool: optionalText(),
+  medicalNotes: optionalText(2000),
   parentName: z.string().trim().min(1, "Parent/Guardian name is required."),
+  parentRelation: optionalText(50),
   parentPhone: z.string().trim().min(1, "Phone number is required."),
   parentEmail: z.string().trim().default(""),
+  secondaryGuardianName: optionalText(),
+  secondaryGuardianRelation: optionalText(50),
+  secondaryGuardianPhone: optionalText(50),
+  secondaryGuardianEmail: optionalEmail,
+  emergencyContactName: optionalText(),
+  emergencyContactRelation: optionalText(50),
+  emergencyContactPhone: optionalText(50),
   address: z.string().trim().default(""),
   admissionDate: z.string().optional(),
   status: z.enum(["active", "inactive", "withdrawn", "alumni"]).default("active"),

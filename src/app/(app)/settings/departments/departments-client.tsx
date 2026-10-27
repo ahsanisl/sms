@@ -102,7 +102,7 @@ export function DepartmentsClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Departments"
         description="Group subjects and teaching staff under a department with a head of department."
         actions={

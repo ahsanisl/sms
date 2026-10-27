@@ -61,7 +61,7 @@ export function CampusManagementClient({ campuses }: { campuses: CampusWithStats
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/settings" backLabel="Settings"
         title="Campus Management"
         description="Add, edit and archive campuses across the school."
         actions={

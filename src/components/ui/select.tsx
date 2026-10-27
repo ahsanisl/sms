@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 /**
  * Native <select> styled to match the Stitch filter/select pattern
  * (custom chevron, bordered pill). Kept native rather than a Radix Select
- * for simplicity — every use case here is a plain single-choice dropdown.
+ * for simplicity — every use case here is a plain single-choice dropdown,
+ * and the native control is fully keyboard/screen-reader accessible.
  */
 export function Select({
   className,
@@ -17,8 +18,9 @@ export function Select({
       <select
         className={cn(
           "appearance-none pr-8 pl-3 py-1.5 bg-surface-container-lowest border border-outline-variant",
-          "rounded text-label-md font-label-md text-on-surface",
-          "focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary",
+          "rounded-lg text-label-md font-label-md text-on-surface cursor-pointer",
+          "hover:border-outline focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20",
+          "aria-[invalid=true]:border-error",
           "disabled:opacity-50 disabled:cursor-not-allowed transition-colors",
           className,
         )}
@@ -26,7 +28,7 @@ export function Select({
       >
         {children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
+      <ChevronDown aria-hidden className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
     </div>
   );
 }

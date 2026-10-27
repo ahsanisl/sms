@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/curriculum/:path*", destination: "/syllabus/:path*", permanent: true },
       { source: "/portal/curriculum/:path*", destination: "/portal/syllabus/:path*", permanent: true },
+      // Audit Log moved from Settings to the Insights section.
+      { source: "/settings/audit-log", destination: "/audit-log", permanent: true },
     ];
   },
 };

@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { Avatar } from "@/components/shared/avatar";
 import { Icon } from "@/components/shared/icon";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader } from "@/components/ui/card";
+import { DashboardHeader, EventList, ProgressBar, rateTone, type DashboardEvent } from "@/components/dashboard/widgets";
 import { formatCompactPKR, timeAgo } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 interface ChildRow {
   id: string;
@@ -19,102 +24,131 @@ interface AnnouncementRow {
   id: string;
   title: string;
   publishedAt: string;
+  important?: boolean;
 }
 
-export function ParentDashboardClient({ parentName, childRows, announcements }: { parentName: string; childRows: ChildRow[]; announcements: AnnouncementRow[] }) {
-  const firstChildId = childRows[0]?.id;
+const QUICK_LINKS = [
+  { href: "/portal/exams", icon: "grade", label: "Results" },
+  { href: "/portal/homework", icon: "assignment", label: "Homework" },
+  { href: "/portal/fees", icon: "payments", label: "Fee Payments" },
+  { href: "/timetable", icon: "event", label: "Timetable" },
+  { href: "/portal/syllabus", icon: "menu_book", label: "Syllabus" },
+  { href: "/portal/classwork", icon: "edit_note", label: "Classwork" },
+];
+
+export function ParentDashboardClient({
+  parentName,
+  childRows,
+  announcements,
+  homeworkDue = [],
+}: {
+  parentName: string;
+  childRows: ChildRow[];
+  announcements: AnnouncementRow[];
+  homeworkDue?: DashboardEvent[];
+}) {
+  const totalDue = childRows.reduce((s, c) => s + c.feesDue, 0);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-headline-lg font-semibold text-primary mb-1">Welcome, {parentName}</h2>
-        <p className="text-body-md text-on-surface-variant">Here&apos;s an overview of your children&apos;s progress.</p>
-      </div>
-
-      <div>
-        <h3 className="text-title-lg font-semibold text-primary border-b-2 border-primary pb-1 inline-block mb-4">
-          My Children
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {childRows.map((child) => (
-            <div key={child.id} className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <Avatar name={child.name} size="lg" />
-                <div>
-                  <p className="text-title-lg font-semibold text-on-surface">{child.name}</p>
-                  <p className="text-label-sm text-on-surface-variant">{child.classLabel} · Roll {child.rollNumber}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-label-sm text-on-surface-variant uppercase mb-1">Attendance</p>
-                  <p className="text-headline-sm font-semibold text-emerald-600">{child.attendanceRate}%</p>
-                </div>
-                <div>
-                  <p className={`text-label-sm uppercase mb-1 ${child.feesDue > 0 ? "text-on-error-container" : "text-[#166534]"}`}>Fees Due</p>
-                  <p className={`text-headline-sm font-semibold ${child.feesDue > 0 ? "text-error" : "text-emerald-600"}`}>
-                    {child.feesDue > 0 ? formatCompactPKR(child.feesDue) : "Paid"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <Button variant="secondary" size="sm" asChild className="flex-1">
-                  <Link href={`/students/${child.id}`}>View Profile</Link>
-                </Button>
-                <Button variant="secondary" size="sm" asChild className="flex-1">
-                  <Link href="/portal/fees">Fees</Link>
-                </Button>
-              </div>
-            </div>
-          ))}
-          {childRows.length === 0 && (
-            <p className="text-body-md text-on-surface-variant">No children linked to this account. Contact the school office if this looks wrong.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-4 flex items-center gap-2">
-            <Icon name="campaign" className="h-5 w-5 text-secondary" /> Announcements
-          </h3>
-          <div className="space-y-4">
-            {announcements.map((a) => (
-              <div key={a.id} className="border-b border-outline-variant/30 pb-3 last:border-0 last:pb-0">
-                <p className="text-body-md font-medium text-on-surface">{a.title}</p>
-                <p className="text-label-sm text-on-surface-variant mt-1">{timeAgo(a.publishedAt)}</p>
-              </div>
-            ))}
-            {announcements.length === 0 && <p className="text-body-md text-on-surface-variant">No announcements yet.</p>}
-          </div>
-          <Button variant="link" asChild className="mt-4 w-full justify-center">
-            <Link href="/announcements">View All Announcements</Link>
-          </Button>
-        </div>
-
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
-          <h3 className="text-title-lg font-semibold text-primary mb-4">Quick Links</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href="/portal/exams" className="flex flex-col items-center justify-center gap-2 rounded-lg border border-outline-variant p-4 text-center hover:bg-surface-container-low transition-colors">
-              <Icon name="grade" className="h-5 w-5 text-secondary" />
-              <span className="text-label-md font-medium text-on-surface">Academics</span>
-            </Link>
-            <Link href="/timetable" className="flex flex-col items-center justify-center gap-2 rounded-lg border border-outline-variant p-4 text-center hover:bg-surface-container-low transition-colors">
-              <Icon name="event" className="h-5 w-5 text-secondary" />
-              <span className="text-label-md font-medium text-on-surface">Timetable</span>
-            </Link>
-            <Link href="/portal/fees" className="flex flex-col items-center justify-center gap-2 rounded-lg border border-outline-variant p-4 text-center hover:bg-surface-container-low transition-colors">
-              <Icon name="payments" className="h-5 w-5 text-secondary" />
-              <span className="text-label-md font-medium text-on-surface">Fee Payments</span>
-            </Link>
-            {firstChildId && (
-              <Link href={`/students/${firstChildId}`} className="flex flex-col items-center justify-center gap-2 rounded-lg border border-outline-variant p-4 text-center hover:bg-surface-container-low transition-colors">
-                <Icon name="event_available" className="h-5 w-5 text-secondary" />
-                <span className="text-label-md font-medium text-on-surface">Attendance</span>
+    <div className="space-y-6">
+      <DashboardHeader
+        name={parentName}
+        subtitle="Here's an overview of your children's progress."
+        actions={
+          totalDue > 0 ? (
+            <Button asChild>
+              <Link href="/portal/fees">
+                <Icon name="payments" /> View dues · {formatCompactPKR(totalDue)}
               </Link>
-            )}
+            </Button>
+          ) : undefined
+        }
+      />
+
+      <section aria-labelledby="children-heading">
+        <h2 id="children-heading" className="mb-3 text-title-lg font-semibold text-primary">
+          My children
+        </h2>
+        {childRows.length === 0 ? (
+          <Card>
+            <EmptyState icon="face" title="No children linked yet" description="No children are linked to this account. Contact the school office if this looks wrong." />
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {childRows.map((child) => (
+              <Card key={child.id} className="p-lg">
+                <div className="mb-5 flex items-center gap-3">
+                  <Avatar name={child.name} size="lg" />
+                  <div className="min-w-0">
+                    <p className="truncate text-title-lg font-semibold text-on-surface">{child.name}</p>
+                    <p className="text-label-md text-on-surface-variant">
+                      Class {child.classLabel} · Roll {child.rollNumber}
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between text-label-md">
+                      <span className="text-on-surface-variant">Attendance</span>
+                      <span className={cn("font-bold tabular-nums", { success: "text-success", warning: "text-warning", error: "text-error" }[rateTone(child.attendanceRate)])}>{child.attendanceRate}%</span>
+                    </div>
+                    <ProgressBar value={child.attendanceRate} tone={rateTone(child.attendanceRate)} label={`${child.name} attendance`} />
+                  </div>
+                  <div className="flex items-center justify-between text-label-md">
+                    <span className="text-on-surface-variant">This month&apos;s fees</span>
+                    {child.feesDue > 0 ? <StatusBadge label={`${formatCompactPKR(child.feesDue)} due`} tone="error" /> : <StatusBadge label="Paid" tone="success" />}
+                  </div>
+                </div>
+                <div className="mt-5 flex gap-2">
+                  <Button variant="secondary" size="sm" asChild className="flex-1">
+                    <Link href={`/students/${child.id}`}>View Profile</Link>
+                  </Button>
+                  <Button variant="secondary" size="sm" asChild className="flex-1">
+                    <Link href="/portal/exams">Results</Link>
+                  </Button>
+                </div>
+              </Card>
+            ))}
           </div>
-        </div>
+        )}
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <EventList title="Homework due" description="Upcoming deadlines for your children" events={homeworkDue} emptyText="No upcoming homework deadlines." footer={<Link href="/portal/homework" className="text-label-md font-semibold text-secondary hover:underline">All homework →</Link>} />
+
+        <Card className="flex flex-col">
+          <CardHeader title="Announcements" action={<Link href="/announcements" className="text-label-md font-semibold text-secondary hover:underline">View all</Link>} />
+          <div className="flex-1 space-y-1 p-sm pt-md">
+            {announcements.map((a) => (
+              <Link key={a.id} href="/announcements" className="block rounded-lg px-3 py-2.5 transition-colors hover:bg-surface-container-low">
+                <span className="flex items-center gap-2">
+                  <span className="truncate text-body-md font-medium text-on-surface">{a.title}</span>
+                  {a.important && <StatusBadge label="Important" tone="warning" />}
+                </span>
+                <span className="mt-0.5 block text-label-sm text-on-surface-variant">{timeAgo(a.publishedAt)}</span>
+              </Link>
+            ))}
+            {announcements.length === 0 && <p className="px-3 py-6 text-center text-body-md text-on-surface-variant">No announcements yet.</p>}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader title="Quick links" />
+          <div className="grid grid-cols-2 gap-3 p-lg pt-md">
+            {QUICK_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="group flex flex-col items-start gap-2 rounded-xl border border-outline-variant/70 p-3 transition-colors hover:border-secondary/50 hover:bg-secondary-fixed/30"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary-fixed text-secondary transition-colors group-hover:bg-secondary group-hover:text-on-secondary">
+                  <Icon name={link.icon} className="h-4 w-4" aria-hidden />
+                </span>
+                <span className="text-label-md font-medium text-on-surface">{link.label}</span>
+              </Link>
+            ))}
+          </div>
+        </Card>
       </div>
     </div>
   );

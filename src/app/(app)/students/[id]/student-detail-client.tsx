@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLoadingRouter } from "@/components/layout/global-loader";
-import { Printer, Pencil, Users, GraduationCap as GradIcon, ClipboardList, User as UserIcon, UserMinus, ArrowRightLeft, RotateCcw, History } from "lucide-react";
+import { Printer, Pencil, Users, GraduationCap as GradIcon, ClipboardList, User as UserIcon, UserMinus, ArrowRightLeft, RotateCcw, History, HeartPulse, PhoneCall } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar } from "@/components/shared/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { BackLink } from "@/components/shared/page-header";
+import { useSession } from "@/lib/auth/session-context";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Modal } from "@/components/shared/modal";
@@ -177,9 +179,12 @@ export function StudentDetailClient({
     setCorrecting(null);
   }
 
+  const isParentViewer = useSession().user?.role === "parent";
+
   return (
     <div>
-      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-lg flex flex-col md:flex-row md:flex-wrap items-start md:items-center justify-between gap-6 mb-6 shadow-sm">
+      <BackLink href="/students" label={isParentViewer ? "My Children" : "Students"} />
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/70 p-lg flex flex-col md:flex-row md:flex-wrap items-start md:items-center justify-between gap-6 mb-6 shadow-sm">
         <div className="flex items-center gap-6">
           <Avatar name={student.name} size="lg" className="h-24 w-24 text-2xl" />
           <div>
@@ -231,11 +236,22 @@ export function StudentDetailClient({
         </TabsList>
 
         <TabsContent value="overview">
+          {student.medicalNotes?.trim() && (
+            <div role="note" className="mb-md flex items-start gap-3 rounded-xl border border-warning/30 bg-warning-container/60 p-4 text-on-warning-container">
+              <HeartPulse size={20} className="mt-0.5 shrink-0" aria-hidden />
+              <div>
+                <p className="text-label-md font-semibold uppercase tracking-wide">Medical note</p>
+                <p className="mt-0.5 whitespace-pre-line text-body-md">{student.medicalNotes}</p>
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
             <InfoCard icon={<UserIcon size={18} />} title="Personal Information">
-              <InfoRow label="Date of Birth" value={formatDate(student.dob)} />
+              <InfoRow label="Date of Birth" value={student.dob ? formatDate(student.dob) : ""} />
               <InfoRow label="Gender" value={student.gender === "male" ? "Male" : "Female"} />
-              <InfoRow label="Blood Group" value={student.bloodGroup} />
+              <InfoRow label="B-Form / CNIC No." value={student.bFormNumber} />
+              <InfoRow label="Nationality" value={student.nationality} />
+              <InfoRow label="Religion" value={student.religion} />
               <InfoRow label="Address" value={student.address} span2 />
             </InfoCard>
 
@@ -243,13 +259,23 @@ export function StudentDetailClient({
               <InfoRow label="Current Grade" value={classGrade} />
               <InfoRow label="Section" value={classSection} />
               <InfoRow label="Class Teacher" value={classTeacherName} />
-              <InfoRow label="Attendance Rate" value={`${attendanceRate}%`} valueClassName="text-green-700 font-semibold" />
+              <InfoRow label="Attendance Rate" value={`${attendanceRate}%`} valueClassName="text-success font-semibold" />
             </InfoCard>
 
             <InfoCard icon={<Users size={18} />} title="Parent Information">
-              <InfoRow label="Parent/Guardian" value={student.parentName} />
+              <InfoRow label="Parent/Guardian" value={student.parentRelation ? `${student.parentName} (${student.parentRelation})` : student.parentName} />
               <InfoRow label="Phone" value={student.parentPhone} />
               <InfoRow label="Email" value={student.parentEmail} span2 />
+              {student.secondaryGuardianName?.trim() && (
+                <>
+                  <InfoRow
+                    label="Second Guardian"
+                    value={student.secondaryGuardianRelation ? `${student.secondaryGuardianName} (${student.secondaryGuardianRelation})` : student.secondaryGuardianName}
+                  />
+                  <InfoRow label="Phone" value={student.secondaryGuardianPhone} />
+                  <InfoRow label="Email" value={student.secondaryGuardianEmail} span2 />
+                </>
+              )}
             </InfoCard>
 
             <InfoCard icon={<ClipboardList size={18} />} title="Admission Information">
@@ -257,6 +283,20 @@ export function StudentDetailClient({
               <InfoRow label="Admission No." value={student.admissionNo} />
               <InfoRow label="Roll Number" value={student.rollNumber} />
               <InfoRow label="Status" value={STUDENT_STATUS_LABEL[student.status]} />
+              <InfoRow label="Previous School" value={student.previousSchool} span2 />
+            </InfoCard>
+
+            <InfoCard icon={<HeartPulse size={18} />} title="Health">
+              <InfoRow label="Blood Group" value={student.bloodGroup} />
+              <InfoRow label="Medical Conditions & Allergies" value={student.medicalNotes} span2 />
+            </InfoCard>
+
+            <InfoCard icon={<PhoneCall size={18} />} title="Emergency Contact">
+              <InfoRow
+                label="Name"
+                value={student.emergencyContactRelation ? `${student.emergencyContactName} (${student.emergencyContactRelation})` : student.emergencyContactName}
+              />
+              <InfoRow label="Phone" value={student.emergencyContactPhone} />
             </InfoCard>
           </div>
         </TabsContent>
@@ -265,7 +305,7 @@ export function StudentDetailClient({
           <div className="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
             <div className="p-lg flex items-center justify-between border-b border-outline-variant/40">
               <p className="text-title-lg font-semibold text-primary">Attendance History</p>
-              <p className="text-headline-md font-semibold text-emerald-600">{attendanceRate}%</p>
+              <p className="text-headline-md font-semibold text-success">{attendanceRate}%</p>
             </div>
             <div className="divide-y divide-outline-variant/20 max-h-96 overflow-y-auto">
               {[...attendanceRecords].reverse().map((r) => (
@@ -436,11 +476,13 @@ function InfoCard({ icon, title, children }: { icon: React.ReactNode; title: str
   );
 }
 
-function InfoRow({ label, value, span2, valueClassName }: { label: string; value: string; span2?: boolean; valueClassName?: string }) {
+function InfoRow({ label, value, span2, valueClassName }: { label: string; value: string | null | undefined; span2?: boolean; valueClassName?: string }) {
+  const empty = !value?.trim();
   return (
     <div className={span2 ? "col-span-2" : undefined}>
       <p className="text-label-sm text-on-surface-variant mb-1">{label}</p>
-      <p className={`text-body-md text-on-surface ${valueClassName ?? ""}`}>{value}</p>
+      {/* "—" for fields left blank (e.g. optional fields on records created before they existed). */}
+      <p className={empty ? "text-body-md text-on-surface-variant/60" : `text-body-md text-on-surface whitespace-pre-line ${valueClassName ?? ""}`}>{empty ? "—" : value}</p>
     </div>
   );
 }

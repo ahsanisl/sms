@@ -43,7 +43,7 @@ export function FeeStructureClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/fees" backLabel="Fees"
         title="Fee Structure Configuration"
         description="Define tuition and other fee items per grade and campus."
         actions={
@@ -67,11 +67,11 @@ export function FeeStructureClient({
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-outline-variant/40">
-                      <th className="px-md py-sm text-label-sm text-on-surface-variant font-medium">Grade</th>
-                      <th className="px-md py-sm text-label-sm text-on-surface-variant font-medium">Tuition (Monthly)</th>
-                      <th className="px-md py-sm text-label-sm text-on-surface-variant font-medium">Exam Fee (Quarterly)</th>
-                      <th className="px-md py-sm text-label-sm text-on-surface-variant font-medium">Annual Fund</th>
-                      <th className="px-md py-sm text-label-sm text-on-surface-variant font-medium">Admission Fee</th>
+                      <th scope="col" className="px-md py-sm text-label-md text-on-surface-variant font-medium">Grade</th>
+                      <th scope="col" className="px-md py-sm text-label-md text-on-surface-variant font-medium">Tuition (Monthly)</th>
+                      <th scope="col" className="px-md py-sm text-label-md text-on-surface-variant font-medium">Exam Fee (Quarterly)</th>
+                      <th scope="col" className="px-md py-sm text-label-md text-on-surface-variant font-medium">Annual Fund</th>
+                      <th scope="col" className="px-md py-sm text-label-md text-on-surface-variant font-medium">Admission Fee</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-outline-variant/20">
@@ -79,7 +79,7 @@ export function FeeStructureClient({
                       const items = structureItems.filter((f) => f.campusId === campus.id && classById.get(f.classId)?.grade === grade);
                       const find = (name: string) => items.find((i) => i.name === name)?.amount;
                       return (
-                        <tr key={grade} className="hover:bg-surface-bright transition-colors">
+                        <tr key={grade} className="hover:bg-surface-container-low/60 transition-colors">
                           <td className="px-md py-sm font-medium text-on-surface">{grade}</td>
                           <td className="px-md py-sm text-on-surface-variant">{formatPKR(find("Tuition Fee") ?? 0)}</td>
                           <td className="px-md py-sm text-on-surface-variant">{formatPKR(find("Examination Fee") ?? 0)}</td>

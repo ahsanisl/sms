@@ -153,18 +153,19 @@ export function InvoiceDetailClient({
           </p>
         </div>
 
+        <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse my-lg">
           <thead>
             <tr className="border-b border-outline-variant">
-              <th className="py-sm px-md text-label-sm text-on-surface-variant uppercase tracking-wide w-full">Description</th>
-              <th className="py-sm px-md text-label-sm text-on-surface-variant uppercase tracking-wide text-right whitespace-nowrap">Amount (Rs.)</th>
+              <th scope="col" className="py-sm px-md text-label-md text-on-surface-variant uppercase tracking-wide w-full">Description</th>
+              <th scope="col" className="py-sm px-md text-label-md text-on-surface-variant uppercase tracking-wide text-right whitespace-nowrap">Amount (Rs.)</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/30">
             {invoice.items.map((item) => (
               <tr key={item.id}>
-                <td className={`py-sm px-md text-body-md ${item.isDiscount ? "text-emerald-700" : "text-on-surface"}`}>{item.name}</td>
-                <td className={`py-sm px-md text-body-md text-right ${item.isDiscount ? "text-emerald-700" : "text-on-surface"}`}>
+                <td className={`py-sm px-md text-body-md ${item.isDiscount ? "text-success" : "text-on-surface"}`}>{item.name}</td>
+                <td className={`py-sm px-md text-body-md text-right ${item.isDiscount ? "text-success" : "text-on-surface"}`}>
                   {item.isDiscount ? "-" : ""}
                   {Math.abs(item.amount).toLocaleString()}
                 </td>
@@ -172,6 +173,7 @@ export function InvoiceDetailClient({
             ))}
           </tbody>
         </table>
+        </div>
 
         <div className="flex flex-col md:flex-row justify-between gap-6">
           <p className="text-body-md text-on-surface-variant text-sm max-w-[24rem] flex-1 min-w-0">

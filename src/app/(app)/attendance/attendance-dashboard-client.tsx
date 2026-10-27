@@ -87,7 +87,7 @@ export function AttendanceDashboardClient({
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
           <h3 className="text-title-lg font-semibold text-primary mb-4">Class Breakdown</h3>
           <div className="space-y-3 max-h-64 overflow-y-auto">
             {classBreakdown.map((row) => (
@@ -102,7 +102,7 @@ export function AttendanceDashboardClient({
                     {row.present} present · {row.absent} absent · {row.total} total
                   </p>
                 </div>
-                <span className={`text-title-lg font-semibold ${row.rate >= 90 ? "text-emerald-600" : row.rate >= 75 ? "text-on-surface" : "text-error"}`}>{row.rate}%</span>
+                <span className={`text-title-lg font-semibold ${row.rate >= 90 ? "text-success" : row.rate >= 75 ? "text-on-surface" : "text-error"}`}>{row.rate}%</span>
               </Link>
             ))}
             {classBreakdown.length === 0 && <p className="text-body-md text-on-surface-variant">No classes to show.</p>}

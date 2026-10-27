@@ -16,7 +16,9 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { EmptyState } from "@/components/shared/empty-state";
+import { RotateCcw } from "lucide-react";
+import { Icon } from "@/components/shared/icon";
+import { Button } from "@/components/ui/button";
 
 export default function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
@@ -25,17 +27,23 @@ export default function AppError({ error, reset }: { error: Error & { digest?: s
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="text-center space-y-4">
-        <EmptyState
-          icon="lock"
-          title="This page isn't available"
-          description="You may not have access to it, or something went wrong loading it. Try going back to the dashboard."
-          actionLabel="Try Again"
-          onAction={reset}
-        />
-        <Link href="/dashboard" className="text-label-md text-secondary hover:underline">
-          Back to Dashboard
-        </Link>
+      <div role="alert" className="w-full max-w-[30rem] rounded-2xl border border-outline-variant/70 bg-surface-container-lowest p-xl text-center card-shadow">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-error-container/70 text-error">
+          <Icon name="lock" className="h-6 w-6" aria-hidden />
+        </div>
+        <h1 className="mt-4 text-title-lg font-semibold text-primary">This page isn&apos;t available</h1>
+        <p className="mt-1 text-body-md text-on-surface-variant">
+          You may not have access to it, or something went wrong while loading it. Try again, or head back to your dashboard.
+        </p>
+        <div className="mt-6 flex flex-col-reverse justify-center gap-2 sm:flex-row">
+          <Button variant="secondary" asChild>
+            <Link href="/dashboard">Back to Dashboard</Link>
+          </Button>
+          <Button onClick={reset}>
+            <RotateCcw /> Try Again
+          </Button>
+        </div>
+        {error.digest && <p className="mt-4 text-label-sm text-on-surface-variant">Reference: {error.digest}</p>}
       </div>
     </div>
   );

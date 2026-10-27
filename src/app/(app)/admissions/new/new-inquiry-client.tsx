@@ -48,7 +48,7 @@ export function NewInquiryClient({ campuses, defaultCampusId }: { campuses: Camp
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Log Inquiry" description="Capture a new prospective student inquiry." />
+      <PageHeader backHref="/admissions" backLabel="Admissions" title="Log Inquiry" description="Capture a new prospective student inquiry." />
 
       <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

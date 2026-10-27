@@ -9,6 +9,7 @@ import { StatCard } from "@/components/shared/stat-card";
 import { DataTable, type Column } from "@/components/shared/data-table";
 import { Avatar } from "@/components/shared/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { BackLink } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/shared/modal";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -100,6 +101,7 @@ export function ClassDetailClient({
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
+          <BackLink href="/classes" label="Classes" />
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-headline-lg font-semibold text-primary">{cls.grade}-{cls.section}</h1>
             {cls.status === "archived" && <StatusBadge label="Archived" tone="neutral" />}

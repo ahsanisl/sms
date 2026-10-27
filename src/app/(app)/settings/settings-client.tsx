@@ -24,11 +24,10 @@ const SECTIONS = [
   { label: "Fee Settings", module: "feesStructure" as const },
   { label: "Notification Settings", module: null },
   { label: "Users & Roles", module: "settingsUsers" as const },
-  { label: "Audit Log", module: "auditLog" as const },
 ] as const;
 
 type SectionLabel = (typeof SECTIONS)[number]["label"];
-type VisibilityModule = "settingsCampuses" | "timetableBuilder" | "feesStructure" | "settingsUsers" | "auditLog";
+type VisibilityModule = "settingsCampuses" | "timetableBuilder" | "feesStructure" | "settingsUsers";
 
 interface SchoolProfile {
   name: string;
@@ -307,14 +306,6 @@ export function SettingsClient({ school, visibility, activeCampuses, currentSess
             </div>
           )}
 
-          {section === "Audit Log" && (
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm">
-              <p className="text-body-md text-on-surface-variant mb-4">Every tracked change and action across your school, with a configurable retention window.</p>
-              <Button asChild>
-                <Link href="/settings/audit-log">Open Audit Log</Link>
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </div>

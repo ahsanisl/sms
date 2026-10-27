@@ -12,7 +12,7 @@ import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { setRetentionDaysAction, cleanUpNowAction } from "@/app/(app)/settings/audit-log/actions";
+import { setRetentionDaysAction, cleanUpNowAction } from "@/app/(app)/audit-log/actions";
 import { ROLE_LABEL } from "@/lib/nav-config";
 import { formatDate, timeAgo } from "@/lib/format";
 import type { Role } from "@/lib/types";
@@ -84,7 +84,7 @@ export function AuditLogClient({
     if (merged.dateFrom) usp.set("dateFrom", merged.dateFrom);
     if (merged.dateTo) usp.set("dateTo", merged.dateTo);
     if (merged.page && merged.page !== 1) usp.set("page", String(merged.page));
-    router.push(`/settings/audit-log${usp.toString() ? `?${usp.toString()}` : ""}`);
+    router.push(`/audit-log${usp.toString() ? `?${usp.toString()}` : ""}`);
   }
 
   async function handleRetentionChange(value: string) {
@@ -177,21 +177,21 @@ export function AuditLogClient({
         </div>
       </div>
 
-      <div className="bg-surface border border-outline-variant rounded-xl card-shadow overflow-hidden">
+      <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl card-shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-3 pl-lg font-semibold text-label-sm text-on-surface-variant uppercase">When</th>
-                <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">User</th>
-                <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Action</th>
-                <th className="p-3 font-semibold text-label-sm text-on-surface-variant uppercase">Entity</th>
-                <th className="p-3 pr-lg font-semibold text-label-sm text-on-surface-variant uppercase text-right">Details</th>
+                <th scope="col" className="p-3 pl-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">When</th>
+                <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">User</th>
+                <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Action</th>
+                <th scope="col" className="p-3 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Entity</th>
+                <th scope="col" className="p-3 pr-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide text-right">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
               {rows.map((row) => (
-                <tr key={row.id} className="hover:bg-surface-bright transition-colors">
+                <tr key={row.id} className="hover:bg-surface-container-low/60 transition-colors">
                   <td className="p-3 pl-lg text-on-surface-variant whitespace-nowrap" title={formatDate(row.createdAt)}>{timeAgo(row.createdAt)}</td>
                   <td className="p-3 text-on-surface">
                     {row.userName}

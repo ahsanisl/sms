@@ -51,7 +51,7 @@ export function ParentFeesClient({ childRows }: { childRows: ChildRow[] }) {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <p className="text-label-sm text-on-surface-variant uppercase tracking-wide">Outstanding Balance</p>
-                      <p className={`text-headline-sm font-semibold ${outstanding > 0 ? "text-error" : "text-emerald-600"}`}>
+                      <p className={`text-headline-sm font-semibold ${outstanding > 0 ? "text-error" : "text-success"}`}>
                         {outstanding > 0 ? formatPKR(outstanding) : "Fully Paid"}
                       </p>
                     </div>

@@ -43,7 +43,7 @@ function SimpleTable({ headers, rows }: { headers: string[]; rows: React.ReactNo
         <thead>
           <tr className="border-b border-outline-variant">
             {headers.map((h) => (
-              <th key={h} className="px-3 py-2 text-label-sm text-on-surface-variant uppercase">{h}</th>
+              <th scope="col" key={h} className="px-3 py-2 text-label-md text-on-surface-variant uppercase tracking-wide">{h}</th>
             ))}
           </tr>
         </thead>

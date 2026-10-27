@@ -160,17 +160,17 @@ export function LeaveClient({ view, requests, isAllCampuses }: { view: "teacher"
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-4 pl-lg font-semibold text-label-sm text-on-surface-variant uppercase">Teacher</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Type</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Dates</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Reason</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Status</th>
-                <th className="p-4 pr-lg font-semibold text-label-sm text-on-surface-variant uppercase text-right">Actions</th>
+                <th scope="col" className="p-4 pl-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Teacher</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Type</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Dates</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Reason</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Status</th>
+                <th scope="col" className="p-4 pr-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
               {requests.map((r) => (
-                <tr key={r.id} className="hover:bg-surface-bright transition-colors">
+                <tr key={r.id} className="hover:bg-surface-container-low/60 transition-colors">
                   <td className="p-4 pl-lg font-medium text-on-surface">{r.teacherName}</td>
                   <td className="p-4 text-on-surface-variant">{TYPE_LABEL[r.type]}</td>
                   <td className="p-4 text-on-surface-variant whitespace-nowrap">{formatDate(r.startDate)} – {formatDate(r.endDate)}</td>
@@ -183,7 +183,7 @@ export function LeaveClient({ view, requests, isAllCampuses }: { view: "teacher"
                       <div className="flex items-center justify-end gap-2">
                         <button
                           disabled={isPending}
-                          className="p-1.5 text-on-surface-variant hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors disabled:opacity-50"
+                          className="p-1.5 text-on-surface-variant hover:text-success hover:bg-success-container/50 rounded transition-colors disabled:opacity-50"
                           title="Approve"
                           onClick={() => handleApprove(r)}
                         >

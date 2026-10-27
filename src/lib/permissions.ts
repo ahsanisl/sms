@@ -42,7 +42,7 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "settingsCampuses", prefixes: ["/settings/campuses"] },
   { module: "settingsSubjects", prefixes: ["/settings/subjects"] },
   { module: "settingsSchools", prefixes: ["/settings/schools"] },
-  { module: "auditLog", prefixes: ["/settings/audit-log"] },
+  { module: "auditLog", prefixes: ["/audit-log"] },
   { module: "settings", prefixes: ["/settings"] },
   { module: "attendanceMark", prefixes: ["/attendance/mark"] },
   { module: "attendance", prefixes: ["/attendance"] },

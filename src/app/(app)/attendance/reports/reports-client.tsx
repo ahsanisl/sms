@@ -50,7 +50,7 @@ export function AttendanceReportsClient({
       header: "Attendance %",
       sortable: true,
       accessor: (r) => r.rate,
-      render: (r) => <span className={r.rate >= 90 ? "text-emerald-600 font-semibold" : r.rate >= 75 ? "font-medium" : "text-error font-semibold"}>{r.rate}%</span>,
+      render: (r) => <span className={r.rate >= 90 ? "text-success font-semibold" : r.rate >= 75 ? "font-medium" : "text-error font-semibold"}>{r.rate}%</span>,
     },
     {
       key: "action",
@@ -75,7 +75,7 @@ export function AttendanceReportsClient({
 
   return (
     <div>
-      <PageHeader
+      <PageHeader backHref="/attendance" backLabel="Attendance"
         title="Attendance Reports"
         description="Cumulative report across every attendance record on file."
         actions={
@@ -99,7 +99,7 @@ export function AttendanceReportsClient({
           </ResponsiveContainer>
         </ChartCard>
 
-        <div className="lg:col-span-2 bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+        <div className="lg:col-span-2 bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
           <h3 className="text-title-lg font-semibold text-primary mb-4">Summary</h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <SummaryStat label="Overall Rate" value={`${overallRate}%`} />

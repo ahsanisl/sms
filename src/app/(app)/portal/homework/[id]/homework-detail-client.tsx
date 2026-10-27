@@ -75,11 +75,11 @@ export function ParentHomeworkDetailClient({
 
   return (
     <div>
-      <PageHeader title={title} description={`${classLabel} · ${subjectName} · ${teacherName}`} />
+      <PageHeader backHref="/portal/homework" backLabel="Homework" title={title} description={`${classLabel} · ${subjectName} · ${teacherName}`} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+          <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
             <h3 className="text-title-lg font-semibold text-primary mb-3">Description</h3>
             <p className="text-body-md text-on-surface whitespace-pre-wrap">{description || "No description provided."}</p>
             {attachments.length > 0 && (
@@ -96,16 +96,16 @@ export function ParentHomeworkDetailClient({
             )}
           </div>
 
-          <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+          <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-title-lg font-semibold text-primary">{submission ? "Your Submission" : "Submit Homework"}</h3>
               {submission && <StatusBadge label={STATUS_LABEL[submission.status]} tone={STATUS_TONE[submission.status]} />}
             </div>
 
             {submission?.status === "graded" && (
-              <div className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-                <p className="text-body-md font-semibold text-emerald-700">Grade: {submission.grade}</p>
-                {submission.teacherComment && <p className="text-body-md text-emerald-700 mt-1">{submission.teacherComment}</p>}
+              <div className="mb-4 p-3 rounded-lg bg-success-container/40 border border-success/30">
+                <p className="text-body-md font-semibold text-success">Grade: {submission.grade}</p>
+                {submission.teacherComment && <p className="text-body-md text-success mt-1">{submission.teacherComment}</p>}
               </div>
             )}
 
@@ -135,7 +135,7 @@ export function ParentHomeworkDetailClient({
           </div>
         </div>
 
-        <div className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow h-fit">
+        <div className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow h-fit">
           <h3 className="text-title-lg font-semibold text-primary mb-3">Details</h3>
           <dl className="space-y-3 text-body-md">
             <div>

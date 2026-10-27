@@ -92,17 +92,17 @@ export function ExamsClient({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-outline-variant">
-                <th className="p-4 pl-lg font-semibold text-label-sm text-on-surface-variant uppercase">Exam Title</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Target Group</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Date Range</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Status</th>
-                <th className="p-4 font-semibold text-label-sm text-on-surface-variant uppercase">Results</th>
-                <th className="p-4 pr-lg font-semibold text-label-sm text-on-surface-variant uppercase text-right">Actions</th>
+                <th scope="col" className="p-4 pl-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Exam Title</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Target Group</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Date Range</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Status</th>
+                <th scope="col" className="p-4 font-semibold text-label-md text-on-surface-variant uppercase tracking-wide">Results</th>
+                <th scope="col" className="p-4 pr-lg font-semibold text-label-md text-on-surface-variant uppercase tracking-wide text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/20">
               {exams.map((exam) => (
-                <tr key={exam.id} className="hover:bg-surface-bright transition-colors">
+                <tr key={exam.id} className="hover:bg-surface-container-low/60 transition-colors">
                   <td className="p-4 pl-lg">
                     <p className="font-medium text-on-surface">{exam.name}</p>
                     <p className="text-label-sm text-on-surface-variant">{exam.term}</p>

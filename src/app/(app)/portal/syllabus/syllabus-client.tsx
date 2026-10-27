@@ -29,7 +29,7 @@ export function ParentSyllabusClient({ childRows, sessionLabel }: { childRows: C
 
       <div className="space-y-8">
         {childRows.map((child) => (
-          <div key={child.id} className="bg-surface border border-outline-variant rounded-xl p-lg card-shadow">
+          <div key={child.id} className="bg-surface-container-lowest border border-outline-variant/70 rounded-xl p-lg card-shadow">
             <h3 className="text-title-lg font-semibold text-primary mb-1">{child.name}</h3>
             <p className="text-label-sm text-on-surface-variant mb-4">{child.classLabel}</p>
 
