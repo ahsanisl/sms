@@ -22,6 +22,7 @@ const TYPE_LABEL: Record<LeaveType, string> = {
   casual: "Casual Leave",
   annual: "Annual Leave",
   other: "Other",
+  unpaid: "Unpaid Leave",
 };
 
 const STATUS_TONE = { pending: "warning", approved: "success", rejected: "error" } as const;

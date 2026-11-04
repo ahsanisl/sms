@@ -28,6 +28,12 @@ async function assertCanViewOwner(module: string, entityId: string) {
       await getClasswork(await requireSession(), entityId);
       return;
     }
+    case "expense": {
+      // A receipt is visible to anyone who can see the expense it's attached to.
+      const { getExpense } = await import("@/services/expense.service");
+      await getExpense(await requireSession(), entityId);
+      return;
+    }
     default:
       throw new NotFoundError("File");
   }

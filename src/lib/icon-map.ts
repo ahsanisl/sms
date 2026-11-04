@@ -107,6 +107,11 @@ import {
   History,
   Lock,
   PiggyBank,
+  Zap,
+  ReceiptText,
+  BadgeDollarSign,
+  Scale,
+  Banknote,
   Inbox,
   Hourglass,
   Sparkles,
@@ -261,6 +266,11 @@ export const iconMap: Record<string, LucideIcon> = {
   dark_mode: Moon,
   wb_twilight: Sunrise,
   workspace_premium: Award,
+  receipt: ReceiptText,
+  bolt: Zap,
+  badge_dollar: BadgeDollarSign,
+  balance: Scale,
+  banknote: Banknote,
 };
 
 export type IconName = keyof typeof iconMap;

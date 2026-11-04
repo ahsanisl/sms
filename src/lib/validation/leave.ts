@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const LeaveRequestInputSchema = z
   .object({
-    type: z.enum(["sick", "casual", "annual", "other"]),
+    type: z.enum(["sick", "casual", "annual", "other", "unpaid"]),
     startDate: z.string().min(1, "Start date is required."),
     endDate: z.string().min(1, "End date is required."),
     reason: z.string().trim().min(1, "Please add a reason for your leave request."),

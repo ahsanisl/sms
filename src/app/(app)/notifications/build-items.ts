@@ -6,6 +6,8 @@ import * as attendanceService from "@/services/attendance.service";
 import * as feeService from "@/services/fee.service";
 import * as examService from "@/services/exam.service";
 import * as announcementService from "@/services/announcement.service";
+import * as expenseService from "@/services/expense.service";
+import { billDueState, daysBetween, todayIso } from "@/lib/finance";
 import type { AuthSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
 import { attendanceRate } from "@/lib/attendance";
@@ -105,6 +107,38 @@ export async function buildNotificationItems(session: AuthSession): Promise<Noti
       .sort((a, b) => (a.startDate > b.startDate ? 1 : -1))
       .slice(0, 2)
       .forEach((e) => items.push({ id: `upcoming-${e.id}`, kind: "events", title: "Upcoming Exam", description: `${examName(e)} begins ${formatDate(e.startDate)}.`, time: formatDate(e.startDate) }));
+  }
+
+  // -- Bills due and expenses waiting for approval --------------------------------------------------------
+  if (!isParent && (await can(session, "expenses"))) {
+    const today = todayIso();
+    const bills = (await expenseService.listBills(session, { inView: true })).filter((b) => b.status === "active" && billDueState(b.nextDueDate, today) !== "upcoming");
+    bills
+      .sort((a, b) => (a.nextDueDate > b.nextDueDate ? 1 : -1))
+      .slice(0, 3)
+      .forEach((b) => {
+        const days = daysBetween(today, b.nextDueDate);
+        items.push({
+          id: `bill-${b.id}-${b.nextDueDate}`,
+          kind: "fees",
+          title: days < 0 ? "Bill Overdue" : "Bill Due Soon",
+          description: `${b.name} (${formatCompactPKR(b.amount)}) ${days < 0 ? `was due ${formatDate(b.nextDueDate)}` : days === 0 ? "is due today" : `is due ${formatDate(b.nextDueDate)}`}.`,
+          time: formatDate(b.nextDueDate),
+        });
+      });
+    if (await can(session, "expensesApprove")) {
+      const pending = (await expenseService.listExpenses(session, { inView: true })).filter((e) => e.status === "pending");
+      if (pending.length) {
+        items.push({
+          // Changes whenever a new expense is waiting, so it shows as unread again.
+          id: `expenses-pending-${pending.length}-${pending[0].id}`,
+          kind: "fees",
+          title: "Expenses Awaiting Approval",
+          description: `${pending.length} expense${pending.length === 1 ? "" : "s"} (${formatCompactPKR(pending.reduce((sum, e) => sum + e.amount, 0))}) recorded by staff need${pending.length === 1 ? "s" : ""} your review.`,
+          time: timeAgo(pending[pending.length - 1].createdAt.toISOString()),
+        });
+      }
+    }
   }
 
   // -- Announcements for this viewer's audience --------------------------------------------------------

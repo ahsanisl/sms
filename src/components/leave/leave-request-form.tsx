@@ -13,6 +13,7 @@ const TYPE_LABEL: Record<LeaveType, string> = {
   casual: "Casual Leave",
   annual: "Annual Leave",
   other: "Other",
+  unpaid: "Unpaid Leave",
 };
 
 export interface LeaveRequestFormValues {

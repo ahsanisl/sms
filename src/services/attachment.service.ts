@@ -62,6 +62,12 @@ export async function listAttachments(session: AuthSession, module: string, enti
   return rows.filter((r) => r.schoolId === schoolId);
 }
 
+export async function listAttachmentsForEntities(session: AuthSession, module: string, entityIds: string[]) {
+  const schoolId = requireSchoolId(session);
+  const rows = await attachmentRepo.listAttachmentsForEntities(module, entityIds);
+  return rows.filter((r) => r.schoolId === schoolId);
+}
+
 /** Tenant-isolation only — see the module note above. Callers must independently authorize the owning entity before a download is allowed to reach this far. */
 export async function getAttachmentForDownload(session: AuthSession, attachmentId: string) {
   const schoolId = requireSchoolId(session);

@@ -57,6 +57,13 @@
       "when": 1793770004687,
       "tag": "0007_login_lockout",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793782838684,
+      "tag": "0008_finance_expenses_payroll",
+      "breakpoints": true
     }
   ]
 }

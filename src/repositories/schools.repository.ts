@@ -1,7 +1,8 @@
 import "server-only";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { schools, users, type NewSchool, type School } from "@/db/schema";
+import { expenseCategories, schools, users, type NewSchool, type School } from "@/db/schema";
+import { DEFAULT_EXPENSE_CATEGORIES } from "@/lib/constants";
 import { createSystemRoles } from "@/repositories/school-roles.repository";
 
 export async function listSchools() {
@@ -33,6 +34,7 @@ export async function createSchoolWithOwner(schoolInput: NewSchool, ownerName: s
     const [school] = await tx.insert(schools).values(schoolInput).returning();
     // Every school starts with its own copy of the six default roles (see lib/school-roles.ts).
     const roles = await createSystemRoles(tx, school.id);
+    await tx.insert(expenseCategories).values(DEFAULT_EXPENSE_CATEGORIES.map((name) => ({ schoolId: school.id, name })));
     const [owner] = await tx
       .insert(users)
       .values({

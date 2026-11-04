@@ -65,7 +65,7 @@ const MODULE_GROUPS: { label: string; modules: PermissionModule[] }[] = [
   { label: "School Management", modules: ["settingsCampuses", "admissions", "students", "studentsManage", "teachers"] },
   { label: "Daily Operations", modules: ["attendance", "attendanceMark", "timetable", "timetableBuilder", "leave"] },
   { label: "Academics", modules: ["classes", "classesManage", "syllabus", "syllabusManage", "classwork", "classworkCreate", "homework", "homeworkCreate", "exams", "examsCreate", "examsMarks"] },
-  { label: "Finance", modules: ["fees", "feesCollect", "feesStructure"] },
+  { label: "Finance", modules: ["fees", "feesCollect", "feesStructure", "expenses", "expensesApprove", "payroll", "financeReport"] },
   { label: "Communication", modules: ["announcements", "announcementsCreate"] },
   { label: "Insights", modules: ["reports", "auditLog"] },
   { label: "Administration", modules: ["settings", "settingsUsers", "settingsSubjects"] },

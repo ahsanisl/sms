@@ -13,6 +13,10 @@ export const PERMISSION_MODULE_LABEL: Record<PermissionModule, string> = {
   fees: "Fees & Finances",
   feesCollect: "Collect Payment",
   feesStructure: "Fee Structure",
+  expenses: "Expenses & Bills (view/record)",
+  expensesApprove: "Approve Expenses",
+  payroll: "Salaries (Payroll)",
+  financeReport: "Income & Expenses Report",
   exams: "Exams & Results",
   examsCreate: "Create Exam",
   examsMarks: "Enter Marks",
@@ -49,6 +53,10 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
   { module: "feesCollect", prefixes: ["/fees/collect"] },
   { module: "feesStructure", prefixes: ["/fees/structure", "/fees/generate"] },
   { module: "fees", prefixes: ["/fees"] },
+  // expensesApprove gates in-page actions (approve/reject) on /expenses, not a route.
+  { module: "expenses", prefixes: ["/expenses"] },
+  { module: "payroll", prefixes: ["/payroll"] },
+  { module: "financeReport", prefixes: ["/finance"] },
   { module: "examsCreate", prefixes: ["/exams/create"] },
   { module: "examsMarks", prefixes: ["/exams/marks"] },
   { module: "exams", prefixes: ["/exams"] },
@@ -121,7 +129,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
   // has no campusId column, so there's no way to scope it to just one
   // campus without a bigger schema change; showing every campus's entries
   // to a campus-scoped role isn't the right default.
-  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects", "settingsSchools", "auditLog"]),
+  // Campus Admins record their campus's expenses, but approving them, salaries and
+  // the school-wide income report stay with the Owner / School Admin by default.
+  campus_admin: allTrueExcept(["settingsUsers", "settingsCampuses", "settingsSubjects", "settingsSchools", "auditLog", "expensesApprove", "payroll", "financeReport"]),
   teacher: allTrueExcept([
     "studentsManage",
     "admissions",
@@ -130,6 +140,10 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "fees",
     "feesCollect",
     "feesStructure",
+    "expenses",
+    "expensesApprove",
+    "payroll",
+    "financeReport",
     "examsCreate",
     "timetableBuilder",
     "announcementsCreate",
@@ -142,7 +156,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "settingsSubjects",
     "settingsSchools",
   ]),
+  // Accountants record expenses and run payroll; approving spending stays with the Owner / School Admin.
   accountant: allTrueExcept([
+    "expensesApprove",
     "studentsManage",
     "admissions",
     "teachers",
@@ -182,6 +198,10 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boo
     "fees",
     "feesCollect",
     "feesStructure",
+    "expenses",
+    "expensesApprove",
+    "payroll",
+    "financeReport",
     "examsCreate",
     "examsMarks",
     "exams",

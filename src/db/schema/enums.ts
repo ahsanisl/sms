@@ -71,10 +71,21 @@ export const announcementAudienceEnum = pgEnum("announcement_audience", ["all", 
 
 export const announcementPriorityEnum = pgEnum("announcement_priority", ["normal", "important"]);
 
-export const leaveTypeEnum = pgEnum("leave_type", ["sick", "casual", "annual", "other"]);
+/** "unpaid" days are deducted from the teacher's salary when payroll is run (services/payroll.service.ts). */
+export const leaveTypeEnum = pgEnum("leave_type", ["sick", "casual", "annual", "other", "unpaid"]);
 
 export const leaveStatusEnum = pgEnum("leave_status", ["pending", "approved", "rejected"]);
 
 export const syllabusTopicStatusEnum = pgEnum("syllabus_topic_status", ["not_started", "in_progress", "completed"]);
 
 export const homeworkSubmissionStatusEnum = pgEnum("homework_submission_status", ["not_submitted", "submitted", "graded"]);
+
+/** Expenses: recorded by staff, approved by a role holding "expensesApprove" (an approver's own entries are approved straight away). */
+export const expenseStatusEnum = pgEnum("expense_status", ["pending", "approved", "rejected"]);
+
+export const billFrequencyEnum = pgEnum("bill_frequency", ["monthly", "quarterly", "annual"]);
+
+/** DRAFT (figures still editable) → FINALIZED (locked; payslips can be marked paid). */
+export const payrollRunStatusEnum = pgEnum("payroll_run_status", ["draft", "finalized"]);
+
+export const payslipStatusEnum = pgEnum("payslip_status", ["unpaid", "paid"]);

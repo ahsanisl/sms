@@ -53,6 +53,10 @@ export type PermissionModule =
   | "fees"
   | "feesCollect"
   | "feesStructure"
+  | "expenses"
+  | "expensesApprove"
+  | "payroll"
+  | "financeReport"
   | "exams"
   | "examsCreate"
   | "examsMarks"
@@ -424,7 +428,7 @@ export interface Announcement {
   author: string;
 }
 
-export type LeaveType = "sick" | "casual" | "annual" | "other";
+export type LeaveType = "sick" | "casual" | "annual" | "other" | "unpaid";
 export type LeaveStatus = "pending" | "approved" | "rejected";
 
 export interface LeaveRequest {

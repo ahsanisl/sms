@@ -33,6 +33,8 @@ interface CampusGlanceRow {
 }
 
 interface AdminDashboardProps {
+  /** This month's fee income minus expenses and salaries paid — null without the Income & Expenses report permission. */
+  financeMonth: { income: number; expenses: number; salaries: number; net: number } | null;
   userName: string;
   campusLabel: string;
   today: string;
@@ -98,12 +100,13 @@ export function AdminDashboard({
   upcomingEvents,
   quickActions,
   links,
+  financeMonth,
 }: AdminDashboardProps) {
   const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
   const rateDelta = todayRate - yesterdayRate;
   const hasAttendanceToday = classesMarked > 0;
-  const kpiCount = [showStudents, showTeachers, showAttendance, showFees, showFees].filter(Boolean).length;
-  const kpiCols = ({ 0: "", 1: "xl:grid-cols-1", 2: "xl:grid-cols-2", 3: "xl:grid-cols-3", 4: "xl:grid-cols-4", 5: "xl:grid-cols-5" } as Record<number, string>)[kpiCount];
+  const kpiCount = [showStudents, showTeachers, showAttendance, showFees, showFees, !!financeMonth].filter(Boolean).length;
+  const kpiCols = ({ 0: "", 1: "xl:grid-cols-1", 2: "xl:grid-cols-2", 3: "xl:grid-cols-3", 4: "xl:grid-cols-4", 5: "xl:grid-cols-5", 6: "lg:grid-cols-3 2xl:grid-cols-6" } as Record<number, string>)[kpiCount];
   const events = (
     <EventList title="Upcoming events" description="Exams and staff leave, next 30 days" events={upcomingEvents} emptyText="Nothing scheduled in the next 30 days." className={showAttendance ? undefined : "lg:col-span-2"} />
   );
@@ -153,6 +156,16 @@ export function AdminDashboard({
             tone={outstanding > 0 ? "error" : "success"}
             href={links.feeReports}
             trend={{ direction: "flat", label: monthLabel }}
+          />
+        )}
+        {financeMonth && (
+          <StatCard
+            label="Net This Month"
+            value={financeMonth.net < 0 ? `− ${formatCompactPKR(-financeMonth.net)}` : formatCompactPKR(financeMonth.net)}
+            icon="balance"
+            tone={financeMonth.net >= 0 ? "success" : "error"}
+            href="/finance"
+            trend={{ direction: "flat", label: `after ${formatCompactPKR(financeMonth.expenses + financeMonth.salaries)} expenses & salaries` }}
           />
         )}
       </div>

@@ -33,6 +33,8 @@ interface AccountantDashboardProps {
   recentPayments: { id: string; studentName: string; method: string; amount: number; date: string }[];
   tasks: DashboardTask[];
   quickActions: NavItem[];
+  /** This month's fee income minus expenses and salaries paid — null without the Income & Expenses report permission. */
+  financeMonth: { income: number; expenses: number; salaries: number; net: number } | null;
 }
 
 export function AccountantDashboard({
@@ -47,6 +49,7 @@ export function AccountantDashboard({
   recentPayments,
   tasks,
   quickActions,
+  financeMonth,
 }: AccountantDashboardProps) {
   const monthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
   const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
@@ -80,7 +83,18 @@ export function AccountantDashboard({
         <StatCard label="Collected This Month" value={formatCompactPKR(collected)} icon="payments" tone="success" href="/fees" trend={{ direction: "flat", label: monthLabel }} />
         <StatCard label="Outstanding This Month" value={formatCompactPKR(outstanding)} icon="account_balance_wallet" tone={outstanding > 0 ? "error" : "success"} href="/fees" trend={{ direction: "flat", label: monthLabel }} />
         <StatCard label="Overdue Invoices" value={String(overdueCount)} icon="warning" tone={overdueCount > 0 ? "warning" : "success"} href="/fees/reports" />
-        <StatCard label="Total Collected (All Time)" value={formatCompactPKR(totalCollectedAllTime)} icon="savings" />
+        {financeMonth ? (
+          <StatCard
+            label="Net This Month"
+            value={financeMonth.net < 0 ? `− ${formatCompactPKR(-financeMonth.net)}` : formatCompactPKR(financeMonth.net)}
+            icon="balance"
+            tone={financeMonth.net >= 0 ? "success" : "error"}
+            href="/finance"
+            trend={{ direction: "flat", label: `after ${formatCompactPKR(financeMonth.expenses + financeMonth.salaries)} expenses & salaries` }}
+          />
+        ) : (
+          <StatCard label="Total Collected (All Time)" value={formatCompactPKR(totalCollectedAllTime)} icon="savings" />
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

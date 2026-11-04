@@ -57,8 +57,16 @@ import {
   timetableStatus,
   users,
   auditLogs,
+  expenseCategories,
+  expenses,
+  recurringBills,
+  salaryProfiles,
+  payrollRuns,
+  payslips,
 } from "@/db/schema";
 import { SCHOOL_ROLE_MODULES, systemRoleRows } from "@/lib/school-roles";
+import { DEFAULT_EXPENSE_CATEGORIES } from "@/lib/constants";
+import { countWorkingDays, leaveDeductionFor, monthRange, nextBillDueDate, payslipTotals } from "@/lib/finance";
 import type { PermissionModule, Role } from "@/lib/types";
 
 /**
@@ -903,6 +911,239 @@ async function main() {
     { teacherId: teacherByName("Kashif Mehmood").id, type: "other", startDate: iso(daysAgo(6)), endDate: iso(daysAgo(6)), reason: "Personal work", status: "rejected", requestedAt: daysAgo(9), reviewedBy: adminUser.id, reviewNote: "Unit Test 2 invigilation that day." },
   ]);
 
+  // -- Finance: expense categories, recurring bills, expenses, salaries and payroll --------------------------------------------------------
+  // Own random stream, so adding this section doesn't shift any of the data generated above.
+  const frand = mulberry32(4242);
+  const fBetween = (min: number, max: number) => min + frand() * (max - min);
+  const roundTo = (n: number, step: number) => Math.round(n / step) * step;
+  const campusAdminUser = userByEmail("campus.admin@eduflow.dev");
+  const ownerUserForPayroll = userByRole("school_owner");
+
+  const expenseCategoryRows = await db
+    .insert(expenseCategories)
+    .values(DEFAULT_EXPENSE_CATEGORIES.map((name) => ({ schoolId: school.id, name })))
+    .returning();
+  const expenseCategory = (name: string) => expenseCategoryRows.find((c) => c.name === name)!.id;
+  // One category the school stopped using — shows archiving.
+  await db.update(expenseCategories).set({ status: "archived" }).where(eq(expenseCategories.id, expenseCategory("Marketing")));
+
+  // Months with financial history: the same months as the fee invoices (session start, at most the last 4, through this month).
+  const financeMonths = invoiceMonths.map((m) => iso(m).slice(0, 7));
+  const thisMonthKey = iso(TODAY).slice(0, 7);
+  const dueOn = (monthKey: string, day: number) => `${monthKey}-${String(day).padStart(2, "0")}`;
+
+  // Recurring bills. Main and Gulshan campuses are owned; Clifton is rented.
+  const billPlan = [
+    { name: "Electricity — Main Campus", payee: "K-Electric", category: "Utilities", campusId: mainCampus.id, amount: 32000, frequency: "monthly" as const, dueDay: 12, vary: 0.18, notes: "Consumer no. LA-0412-778" },
+    { name: "Electricity — Clifton Campus", payee: "K-Electric", category: "Utilities", campusId: cliftonCampus.id, amount: 24000, frequency: "monthly" as const, dueDay: 12, vary: 0.18, notes: "Consumer no. LA-0977-102" },
+    { name: "Electricity — Gulshan Campus", payee: "K-Electric", category: "Utilities", campusId: gulshanCampus.id, amount: 20000, frequency: "monthly" as const, dueDay: 14, vary: 0.18, notes: "" },
+    { name: "Gas — Main Campus", payee: "SSGC", category: "Utilities", campusId: mainCampus.id, amount: 4500, frequency: "monthly" as const, dueDay: 9, vary: 0.25, notes: "" },
+    { name: "Internet — All Campuses", payee: "Nayatel", category: "IT & Internet", campusId: null, amount: 12000, frequency: "monthly" as const, dueDay: 2, vary: 0, notes: "Account 88-21045, 3 connections" },
+    { name: "Clifton Campus Rent", payee: "Mr. Saleem Akhtar (landlord)", category: "Rent", campusId: cliftonCampus.id, amount: 75000, frequency: "monthly" as const, dueDay: 1, vary: 0, notes: "Paid by bank transfer; agreement renews every July" },
+    { name: "Security Guards", payee: "Shield Security Services", category: "Cleaning & Security", campusId: null, amount: 40000, frequency: "monthly" as const, dueDay: 7, vary: 0, notes: "4 guards across the three campuses" },
+    { name: "Water Supply", payee: "KW&SC", category: "Utilities", campusId: null, amount: 9000, frequency: "quarterly" as const, dueDay: 20, vary: 0, notes: "" },
+  ];
+  // The internet bill is left unpaid this month, so it shows as overdue.
+  const overdueDemoBill = "Internet — All Campuses";
+
+  const expenseValues: (typeof expenses.$inferInsert)[] = [];
+  const billNextDue = new Map<string, string>();
+  for (const bill of billPlan) {
+    // Pay every period from the session's first month up to today, then the next unpaid one is the bill's due date.
+    let due = dueOn(financeMonths[0], bill.dueDay);
+    while (due < iso(TODAY) && !(bill.name === overdueDemoBill && due.startsWith(thisMonthKey))) {
+      const byTransfer = bill.name.includes("Rent") || bill.name.includes("Security");
+      expenseValues.push({
+        schoolId: school.id,
+        campusId: bill.campusId,
+        categoryId: expenseCategory(bill.category),
+        billId: bill.name, // replaced with the real bill id below
+        // Paid on the due date or up to two days before it, never before the bill's own month.
+        date: iso(addDays(new Date(`${due}T00:00:00Z`), -Math.min(Number(due.slice(8, 10)) - 1, Math.floor(fBetween(0, 3))))),
+        amount: roundTo(bill.amount * (1 + fBetween(-bill.vary, bill.vary)), 10),
+        payee: bill.payee,
+        description: `${bill.name} — ${bill.frequency === "monthly" ? monthLabel(new Date(`${due.slice(0, 7)}-01T00:00:00Z`)) : `quarter from ${monthLabel(new Date(`${due.slice(0, 7)}-01T00:00:00Z`))}`}`,
+        method: byTransfer ? ("bank_transfer" as const) : ("cash" as const),
+        reference: byTransfer ? `IBFT-${Math.floor(fBetween(100000, 999999))}` : null,
+        status: "approved",
+        submittedBy: accountantUser.id,
+        reviewedBy: adminUser.id,
+      });
+      due = nextBillDueDate(due, bill.frequency);
+    }
+    billNextDue.set(bill.name, due);
+  }
+  const billRows = await db
+    .insert(recurringBills)
+    .values(
+      billPlan.map((b) => ({
+        schoolId: school.id,
+        campusId: b.campusId,
+        categoryId: expenseCategory(b.category),
+        name: b.name,
+        payee: b.payee,
+        amount: b.amount,
+        frequency: b.frequency,
+        nextDueDate: billNextDue.get(b.name)!,
+        notes: b.notes,
+      })),
+    )
+    .returning();
+  for (const e of expenseValues) e.billId = billRows.find((b) => b.name === e.billId)!.id;
+  // The most recent rent payment was recorded by the accountant and is still waiting for approval.
+  const latestRent = [...expenseValues].filter((e) => e.payee?.startsWith("Mr. Saleem")).sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+  if (latestRent && latestRent.date >= iso(daysAgo(10))) Object.assign(latestRent, { status: "pending", reviewedBy: null });
+
+  // Everyday spending, a few entries per month.
+  const everyday = [
+    { category: "Stationery & Supplies", payee: "Al-Noor Stationers", description: "Chalk, markers and attendance registers", min: 6000, max: 14000 },
+    { category: "Maintenance & Repairs", payee: "Cool Breeze AC Services", description: "AC servicing", min: 6000, max: 12000 },
+    { category: "Maintenance & Repairs", payee: "Rashid Plumbing Works", description: "Washroom plumbing repair", min: 2500, max: 7000 },
+    { category: "Cleaning & Security", payee: "Hygiene Plus", description: "Cleaning supplies", min: 3500, max: 7500 },
+    { category: "Transport", payee: "PSO Shahrah-e-Faisal", description: "School van fuel", min: 14000, max: 21000 },
+    { category: "Miscellaneous", payee: "", description: "Staff room tea and refreshments", min: 2000, max: 4000 },
+  ];
+  const campusChoices = [mainCampus.id, cliftonCampus.id, gulshanCampus.id];
+  financeMonths.forEach((month, monthIndex) => {
+    const lastDay = month === thisMonthKey ? Number(iso(TODAY).slice(8, 10)) : new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0)).getUTCDate();
+    everyday.forEach((item, i) => {
+      if ((i + monthIndex) % 5 === 4) return; // not every item every month
+      // Spread through the month — or, for the current month, through the days so far (some items just haven't come up yet).
+      const day = 1 + Math.floor(fBetween(0, month === thisMonthKey ? 28 : lastDay));
+      if (day > lastDay) return;
+      const campusId = item.category === "Transport" ? mainCampus.id : campusChoices[(i + monthIndex) % 3];
+      const recordedByCampusAdmin = campusId === cliftonCampus.id && i % 2 === 0;
+      expenseValues.push({
+        schoolId: school.id,
+        campusId,
+        categoryId: expenseCategory(item.category),
+        date: dueOn(month, day),
+        amount: roundTo(fBetween(item.min, item.max), 50),
+        payee: item.payee,
+        description: item.description,
+        method: "cash",
+        status: "approved",
+        submittedBy: recordedByCampusAdmin ? campusAdminUser.id : accountantUser.id,
+        reviewedBy: adminUser.id,
+      });
+    });
+  });
+
+  // One-off items: start-of-session costs, events, and a few still being reviewed.
+  const firstMonth = financeMonths[0];
+  const lastFullMonth = financeMonths.length > 1 ? financeMonths[financeMonths.length - 2] : firstMonth;
+  const oneOffs: (Omit<typeof expenses.$inferInsert, "schoolId" | "categoryId"> & { category: string })[] = [
+    { category: "Stationery & Supplies", campusId: null, date: dueOn(firstMonth, 3), amount: 38500, payee: "Paramount Printers", description: "Exam papers, answer sheets and report card printing for the year", method: "bank_transfer", reference: "IBFT-551204", status: "approved", submittedBy: adminUser.id, reviewedBy: adminUser.id },
+    { category: "Maintenance & Repairs", campusId: mainCampus.id, date: dueOn(firstMonth, 5), amount: 46000, payee: "Shah Builders", description: "Classroom painting before the new session", method: "cheque", reference: "CHQ-30418", status: "approved", submittedBy: adminUser.id, reviewedBy: adminUser.id },
+    { category: "Events & Activities", campusId: null, date: dueOn(firstMonth, 8), amount: 15000, payee: "Party Planners Karachi", description: "Orientation day decorations", method: "cash", status: "approved", submittedBy: accountantUser.id, reviewedBy: adminUser.id },
+    { category: "Marketing", campusId: null, date: dueOn(firstMonth, 10), amount: 18000, payee: "Meta (Facebook ads)", description: "Admissions campaign", method: "card", status: "approved", submittedBy: adminUser.id, reviewedBy: adminUser.id },
+    { category: "IT & Internet", campusId: mainCampus.id, date: dueOn(lastFullMonth, 6), amount: 9500, payee: "Hafeez Centre — Computer Zone", description: "Printer toner cartridges (office)", method: "cash", status: "approved", submittedBy: accountantUser.id, reviewedBy: adminUser.id },
+    { category: "Events & Activities", campusId: null, date: dueOn(lastFullMonth, 18), amount: 26000, payee: "Sports World", description: "Inter-house sports day: medals, trophies and equipment", method: "cash", status: "approved", submittedBy: accountantUser.id, reviewedBy: adminUser.id },
+    // Rejected: sent back for a receipt.
+    { category: "Miscellaneous", campusId: cliftonCampus.id, date: dueOn(lastFullMonth, 24), amount: 12000, payee: "Student Biryani", description: "Staff lunch after the parent-teacher meeting", method: "cash", status: "rejected", submittedBy: campusAdminUser.id, reviewedBy: adminUser.id, reviewNote: "Please attach the receipt and confirm the number of staff." },
+    // Waiting for approval.
+    { category: "Maintenance & Repairs", campusId: mainCampus.id, date: iso(daysAgo(1)), amount: 4500, payee: "Printer Care Services", description: "Office printer repair", method: "cash", status: "pending", submittedBy: accountantUser.id, reviewedBy: null },
+    { category: "Events & Activities", campusId: cliftonCampus.id, date: iso(daysAgo(0)), amount: 7800, payee: "Science Hub", description: "Science fair materials (Grades 2 and 5)", method: "cash", status: "pending", submittedBy: campusAdminUser.id, reviewedBy: null },
+  ];
+  for (const { category, ...e } of oneOffs) expenseValues.push({ ...e, schoolId: school.id, categoryId: expenseCategory(category) });
+  for (const e of expenseValues) {
+    if (e.status !== "pending" && e.reviewedBy) e.reviewedAt = new Date(`${e.date}T15:30:00+05:00`);
+    e.createdAt = new Date(`${e.date}T11:00:00+05:00`);
+  }
+  const expenseRows = await db.insert(expenses).values(expenseValues).returning();
+
+  // Salaries: every teacher, plus non-teaching staff.
+  const staffPlan = [
+    { name: "Sana Malik", designation: "Accountant", campusId: null, basicSalary: 35000, allowances: 3000 },
+    { name: "Ghulam Rasool", designation: "Van Driver", campusId: mainCampus.id, basicSalary: 22000, allowances: 2000 },
+    { name: "Shabana Bibi", designation: "Aya / Cleaner", campusId: mainCampus.id, basicSalary: 18000, allowances: 0 },
+    { name: "Javed Iqbal", designation: "Office Assistant", campusId: cliftonCampus.id, basicSalary: 20000, allowances: 1500 },
+  ];
+  const seniorTeachers = new Set(["Ayesha Khan", "Bilal Ahmed", "Mariam Saeed"]);
+  const salaryProfileRows = await db
+    .insert(salaryProfiles)
+    .values([
+      ...teacherRows.map((t, i) => ({
+        schoolId: school.id,
+        campusId: t.campusId,
+        teacherId: t.id,
+        name: t.name,
+        designation: seniorTeachers.has(t.name) ? "Senior Teacher" : "Teacher",
+        basicSalary: seniorTeachers.has(t.name) ? 34000 : 26000 + ((i * 1500) % 5000),
+        allowances: seniorTeachers.has(t.name) ? 4000 : 2500,
+        deductions: 500, // EOBI contribution
+        bankAccount: `Meezan Bank 0102-${String(4471000 + i * 137).padStart(7, "0")}`,
+      })),
+      ...staffPlan.map((s, i) => ({ schoolId: school.id, ...s, deductions: 500, bankAccount: i === 3 ? "" : `HBL 1290-${String(7740100 + i * 91)}` })),
+      // Left the school last term — kept for history, not on new payrolls.
+      { schoolId: school.id, campusId: gulshanCampus.id, name: "Tariq Mehmood", designation: "Van Driver", basicSalary: 21000, allowances: 2000, deductions: 500, status: "archived" as const },
+    ])
+    .returning();
+  const activeSalaryProfiles = salaryProfileRows.filter((p) => p.status === "active");
+
+  // One approved unpaid leave last month (deducted on that month's payslip).
+  const unpaidLeaveTeacher = teacherByName("Omar Farooq");
+  let unpaidLeaveStart: Date | null = null;
+  if (financeMonths.length > 1) {
+    let d = new Date(`${lastFullMonth}-10T00:00:00Z`);
+    while (!isWeekday(d) || !isWeekday(addDays(d, 1))) d = addDays(d, 1);
+    unpaidLeaveStart = d;
+    await db.insert(staffLeaveRequests).values({
+      teacherId: unpaidLeaveTeacher.id,
+      type: "unpaid",
+      startDate: iso(d),
+      endDate: iso(addDays(d, 1)),
+      reason: "Family emergency in Hyderabad",
+      status: "approved",
+      requestedAt: addDays(d, -3),
+      reviewedBy: adminUser.id,
+      reviewNote: "Approved as unpaid — casual leave already used.",
+    });
+  }
+
+  // Payroll: every month before this one, finalized at month end and paid on the 1st–3rd of the next month.
+  // Last month's is still partly unpaid (two salaries held), so the dashboard shows a reminder.
+  const payrollMonths = financeMonths.filter((m) => m !== thisMonthKey);
+  const payrollRunRows: (typeof payrollRuns.$inferSelect)[] = [];
+  const payslipValues: (typeof payslips.$inferInsert)[] = [];
+  for (const month of payrollMonths) {
+    const isLatest = month === payrollMonths[payrollMonths.length - 1];
+    const nextMonthStart = new Date(Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 1));
+    const [run] = await db
+      .insert(payrollRuns)
+      .values({ schoolId: school.id, month, status: "finalized", createdBy: accountantUser.id, finalizedBy: ownerUserForPayroll.id, finalizedAt: new Date(`${iso(addDays(nextMonthStart, -2))}T17:00:00+05:00`), createdAt: new Date(`${iso(addDays(nextMonthStart, -4))}T10:00:00+05:00`) })
+      .returning();
+    payrollRunRows.push(run);
+    const { from, to } = monthRange(month);
+    const workingDaysInMonth = countWorkingDays(from, to, [...WORKING_DAYS]);
+    for (const profile of activeSalaryProfiles) {
+      const unpaidDays = isLatest && unpaidLeaveStart && profile.teacherId === unpaidLeaveTeacher.id ? 2 : 0;
+      const bonus = isLatest && profile.name === "Kiran Javed" ? 5000 : 0;
+      const otherDeduction = isLatest && profile.name === "Usman Tariq" ? 10000 : 0;
+      const leaveDeduction = leaveDeductionFor(profile.basicSalary, profile.allowances, unpaidDays, workingDaysInMonth);
+      const amounts = { basicSalary: profile.basicSalary, allowances: profile.allowances, fixedDeductions: profile.deductions, leaveDeduction, bonus, otherDeduction };
+      const held = isLatest && (profile.name === "Javed Iqbal" || profile.name === "Hina Aslam");
+      const paidDate = iso(addDays(nextMonthStart, Math.min(2, Math.max(0, Math.floor((TODAY.getTime() - nextMonthStart.getTime()) / DAY_MS)))));
+      payslipValues.push({
+        runId: run.id,
+        profileId: profile.id,
+        campusId: profile.campusId,
+        name: profile.name,
+        designation: profile.designation,
+        ...amounts,
+        unpaidLeaveDays: unpaidDays,
+        netPay: payslipTotals(amounts).net,
+        note: bonus ? "Science fair coordination bonus" : otherDeduction ? "Salary advance recovered" : held ? "Held — waiting for updated bank details" : "",
+        status: held ? "unpaid" : "paid",
+        paidDate: held ? null : paidDate,
+        method: held ? null : profile.bankAccount ? "bank_transfer" : "cash",
+        reference: held ? null : profile.bankAccount ? `SAL-${month.replace("-", "")}` : null,
+        paidBy: held ? null : accountantUser.id,
+      });
+    }
+  }
+  if (payslipValues.length) await db.insert(payslips).values(payslipValues);
+
   // -- Announcements --------------------------------------------------------
   await db.insert(announcements).values([
     { schoolId: school.id, campusId: null, title: "Mid-Term Examination Schedule", body: "Mid-term examinations begin next month. Date sheets will be shared through class teachers this week.", audience: "all", priority: "important", author: adminUser.name, publishedAt: daysAgo(2) },
@@ -976,6 +1217,27 @@ async function main() {
     if (action) log(event.recordedBy, action, "Student", event.studentId, at(event.date, "11:00"), { reason: event.reason });
   }
 
+  // Finance: salaries set up at the start of the session, bill payments, expense reviews, payroll.
+  for (const profile of salaryProfileRows.filter((p) => !p.teacherId)) {
+    log(adminUser.id, "salary_profile.created", "SalaryProfile", profile.id, at(addDays(sessionStart, -3), "12:00"), { name: profile.name, basicSalary: profile.basicSalary });
+  }
+  for (const e of expenseRows) {
+    const recordedAt = e.createdAt;
+    if (e.billId) log(e.submittedBy, "bill.paid", "RecurringBill", e.billId, recordedAt, { name: billRows.find((b) => b.id === e.billId)?.name, amount: e.amount, expenseId: e.id });
+    else log(e.submittedBy, "expense.created", "Expense", e.id, recordedAt, { amount: e.amount, status: e.submittedBy === adminUser.id ? "approved" : "pending" });
+    if (e.reviewedBy && e.submittedBy !== e.reviewedBy && e.reviewedAt) {
+      log(e.reviewedBy, e.status === "rejected" ? "expense.rejected" : "expense.approved", "Expense", e.id, e.reviewedAt, { amount: e.amount, note: e.reviewNote ?? undefined });
+    }
+  }
+  log(adminUser.id, "expense_category.archived", "ExpenseCategory", expenseCategory("Marketing"), at(daysAgo(15), "10:40"), { name: "Marketing" });
+  for (const run of payrollRunRows) {
+    const slips = payslipValues.filter((p) => p.runId === run.id);
+    const paid = slips.filter((p) => p.status === "paid");
+    log(run.createdBy, "payroll.created", "PayrollRun", run.id, run.createdAt, { month: run.month, staff: slips.length });
+    log(run.finalizedBy, "payroll.finalized", "PayrollRun", run.id, run.finalizedAt!, { month: run.month, total: slips.reduce((sum, p) => sum + p.netPay, 0) });
+    if (paid.length) log(accountantUser.id, "payslip.paid", "PayrollRun", run.id, at(paid[0].paidDate!, "12:15"), { month: run.month, count: paid.length, total: paid.reduce((sum, p) => sum + p.netPay, 0), method: "bank_transfer" });
+  }
+
   await db.insert(auditLogs).values(auditValues);
 
   const outstanding = await db.select({ status: feeInvoices.status }).from(feeInvoices);
@@ -986,6 +1248,7 @@ async function main() {
       `  ${outstanding.length} invoices across ${invoiceMonths.map(monthLabel).join(", ")} (${outstanding.filter((i) => i.status !== "paid").length} not fully paid), ${paymentsCount} payments\n` +
       `  ${examPlan.length * campusRows.length} exams, ${marksCount} marks entries, ${slotValues.length} timetable slots\n` +
       `  ${topicValues.length} syllabus topics, ${classworkValues.length} classwork entries, ${homeworkCount} homework, ${submissionCount} submissions\n` +
+      `  ${expenseRows.length} expenses (${expenseRows.filter((e) => e.status === "pending").length} awaiting approval), ${billRows.length} recurring bills, ${activeSalaryProfiles.length} staff on payroll, ${payrollRunRows.length} payroll months\n` +
       `  ${userRows.length} logins (one per role: 7 default + 3 custom roles); ${auditValues.length} audit log entries`,
   );
   console.log("\nDev login credentials — one per role, same password for every account:", DEV_PASSWORD);

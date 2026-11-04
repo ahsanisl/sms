@@ -13,6 +13,10 @@ import * as schoolService from "@/services/school.service";
 import * as leaveService from "@/services/leave.service";
 import * as admissionService from "@/services/admission.service";
 import * as homeworkService from "@/services/homework.service";
+import * as expenseService from "@/services/expense.service";
+import * as payrollService from "@/services/payroll.service";
+import * as financeService from "@/services/finance.service";
+import { addMonthsToKey, billDueState, currentMonthKey, monthKeyLabel, monthRange, todayIso } from "@/lib/finance";
 import { requireSession, type AuthSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
 import { moduleForPath } from "@/lib/permissions";
@@ -66,7 +70,7 @@ function currentMonth() {
   return new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-const LEAVE_TYPE_LABEL: Record<string, string> = { sick: "Sick leave", casual: "Casual leave", annual: "Annual leave", other: "Leave" };
+const LEAVE_TYPE_LABEL: Record<string, string> = { sick: "Sick leave", casual: "Casual leave", annual: "Annual leave", other: "Leave", unpaid: "Unpaid leave" };
 
 /** Quick actions the role can actually complete — each filtered by the permission module its route belongs to. */
 async function allowedQuickActions(session: AuthSession): Promise<NavItem[]> {
@@ -82,6 +86,73 @@ async function permissionFlags(session: AuthSession) {
   const keys = ["students", "teachers", "attendance", "attendanceMark", "fees", "exams", "examsMarks", "leave", "admissions", "homework", "classes", "settingsCampuses"] as const;
   const values = await Promise.all(keys.map((k) => can(session, k)));
   return Object.fromEntries(keys.map((k, i) => [k, values[i]])) as Record<(typeof keys)[number], boolean>;
+}
+
+interface FinanceSnapshot {
+  /** This month so far: fee income − approved expenses − salaries paid. Only for roles with the Income & Expenses report. */
+  month: { income: number; expenses: number; salaries: number; net: number } | null;
+  tasks: DashboardTask[];
+}
+
+/** Expenses, bills and payroll items for "Needs your attention", plus this month's net — each part only for roles holding its permission. */
+async function financeSnapshot(session: AuthSession): Promise<FinanceSnapshot> {
+  const [canExpenses, canApprove, canPayroll, canReport] = await Promise.all([
+    can(session, "expenses"),
+    can(session, "expensesApprove"),
+    can(session, "payroll"),
+    can(session, "financeReport"),
+  ]);
+  const today = todayIso();
+  const thisMonth = currentMonthKey();
+  const [bills, expenses, runs, report] = await Promise.all([
+    canExpenses ? expenseService.listBills(session, { inView: true }) : Promise.resolve([]),
+    canExpenses && canApprove ? expenseService.listExpenses(session, { inView: true }, { from: monthRange(addMonthsToKey(thisMonth, -11)).from }) : Promise.resolve([]),
+    canPayroll ? payrollService.listRuns(session) : Promise.resolve([]),
+    canReport ? financeService.getIncomeExpenseReport(session, thisMonth, 1, { inView: true }) : Promise.resolve(null),
+  ]);
+
+  const activeBills = bills.filter((b) => b.status === "active");
+  const overdueBills = activeBills.filter((b) => billDueState(b.nextDueDate, today) === "overdue");
+  const dueSoonBills = activeBills.filter((b) => billDueState(b.nextDueDate, today) === "due_soon");
+  const pending = expenses.filter((e) => e.status === "pending");
+  const finalizedUnpaid = runs.filter((r) => r.status === "finalized" && r.paidCount < r.staffCount);
+  const currentRun = runs.find((r) => r.month === thisMonth);
+  // From the 20th, nudge roles that can create this month's payroll if nobody has yet.
+  const payrollNotStarted = canPayroll && session.role !== "campus_admin" && !currentRun && Number(today.slice(8, 10)) >= 20;
+
+  const rupees = (n: number) => `Rs. ${n.toLocaleString("en-PK")}`;
+  const tasks: DashboardTask[] = [
+    { id: "bills-overdue", icon: "bolt", label: "Bills overdue", count: overdueBills.length, description: overdueBills.slice(0, 3).map((b) => b.name).join(", "), href: "/expenses?tab=bills", tone: "error" },
+    { id: "bills-due", icon: "bolt", label: "Bills due this week", count: dueSoonBills.length, description: dueSoonBills.slice(0, 3).map((b) => b.name).join(", "), href: "/expenses?tab=bills", tone: "warning" },
+    {
+      id: "expenses-pending",
+      icon: "receipt",
+      label: "Expenses awaiting approval",
+      count: pending.length,
+      description: pending.length ? `${rupees(pending.reduce((s, e) => s + e.amount, 0))} in total` : undefined,
+      href: "/expenses",
+      tone: "warning",
+    },
+    {
+      id: "salaries-unpaid",
+      icon: "badge_dollar",
+      label: "Salaries finalized but not paid",
+      count: finalizedUnpaid.reduce((s, r) => s + (r.staffCount - r.paidCount), 0),
+      description: finalizedUnpaid.map((r) => `${monthKeyLabel(r.month)}: ${rupees(r.totalNet - r.paidNet)}`).join(", "),
+      href: finalizedUnpaid.length === 1 ? `/payroll/${finalizedUnpaid[0].id}` : "/payroll",
+      tone: "warning",
+    },
+    { id: "payroll-not-run", icon: "badge_dollar", label: `Payroll for ${monthKeyLabel(thisMonth)} not created yet`, count: payrollNotStarted ? 1 : 0, href: "/payroll", tone: "info" },
+  ];
+
+  let month: FinanceSnapshot["month"] = null;
+  if (report) {
+    const income = report.income.reduce((s, r) => s + r.amount, 0);
+    const spent = report.expenses.reduce((s, r) => s + r.amount, 0);
+    const salaries = report.salaries.reduce((s, r) => s + r.amount, 0);
+    month = { income, expenses: spent, salaries, net: income - spent - salaries };
+  }
+  return { month, tasks };
 }
 
 export default async function DashboardPage() {
@@ -356,6 +427,7 @@ async function renderAccountantDashboard(session: AuthSession) {
     .slice(0, 6)
     .map((p) => ({ id: p.id, studentName: studentById.get(p.studentId)?.name ?? "—", method: p.method, amount: p.amount, date: p.date }));
 
+  const finance = await financeSnapshot(session);
   const tasks: DashboardTask[] = [
     {
       id: "overdue",
@@ -382,10 +454,12 @@ async function renderAccountantDashboard(session: AuthSession) {
       href: "/fees",
       tone: "info",
     },
+    ...finance.tasks,
   ];
 
   return (
     <AccountantDashboard
+      financeMonth={finance.month}
       userName={session.name}
       isAllCampuses={!viewCampusId}
       billed={billed}
@@ -496,11 +570,12 @@ async function renderAdminDashboard(session: AuthSession) {
   const absentToday = todayRecords.filter((r) => r.status === "absent").length;
 
   // Pending work — each source only queried when the role holds its permission.
-  const [exams, leaveRequests, corrections, inquiries] = await Promise.all([
+  const [exams, leaveRequests, corrections, inquiries, finance] = await Promise.all([
     perms.exams ? examService.listExams(session, { inView: true }) : Promise.resolve([]),
     perms.leave ? leaveService.listLeaveRequests(session, { inView: true }) : Promise.resolve([]),
     perms.attendance ? attendanceService.listCorrections(session, { inView: true }) : Promise.resolve([]),
     perms.admissions ? admissionService.listInquiries(session, { inView: true }) : Promise.resolve([]),
+    financeSnapshot(session),
   ]);
   const unmarkedClasses = isWorkingDay ? activeClasses.filter((c) => !markedClassIds.has(c.id)) : [];
   const openInquiries = inquiries.filter((i) => i.stage !== "admitted" && i.stage !== "rejected");
@@ -539,6 +614,7 @@ async function renderAdminDashboard(session: AuthSession) {
       tone: "error",
     },
     { id: "results", icon: "quiz", label: "Exam results awaiting publication", count: unpublishedExams.length, description: unpublishedExams.map((e) => e.name).join(", "), href: "/exams", tone: "info" },
+    ...finance.tasks,
   ];
 
   const horizon = addDays(today, 30);
@@ -566,6 +642,7 @@ async function renderAdminDashboard(session: AuthSession) {
 
   return (
     <AdminDashboard
+      financeMonth={finance.month}
       userName={session.name}
       campusLabel={
         session.role === "campus_admin"

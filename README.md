@@ -20,7 +20,7 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with one of the 
 
 ## Demo data
 
-`npm run db:seed` loads one school ("EduFlow Academy") with three campuses, 14 teachers, 11 classes and ~100 students, plus activity behind every screen: about 8 weeks of attendance, a few months of fee invoices and payments (paid, partial and overdue), exams with marks, a published timetable, homework with submissions, classwork, syllabus, admission inquiries, leave requests and announcements.
+`npm run db:seed` loads one school ("EduFlow Academy") with three campuses, 14 teachers, 11 classes and ~100 students, plus activity behind every screen: about 8 weeks of attendance, a few months of fee invoices and payments (paid, partial and overdue), exams with marks, a published timetable, homework with submissions, classwork, syllabus, admission inquiries, leave requests and announcements. Finance also has expenses (a few awaiting approval, one rejected), recurring bills (one overdue, two due this week), salaries for every teacher and four support staff, and three months of payroll (the latest with an unpaid-leave deduction and two salaries still to pay).
 
 - It produces the same data every time, but dates are counted back from the day you run it, so dashboards always show "today" and "this month".
 - It refuses to run on a database that already has data. To wipe **every table** and start fresh, run `npm run db:reset`. Development databases only.
@@ -71,6 +71,8 @@ src/
     storage/       — file storage for attachments (local disk by default)
   proxy.ts         — redirects signed-out requests to /login
 ```
+
+**Finance.** Fees (money in), Expenses and recurring bills (money out, with an approval step: entries by someone without "Approve Expenses" wait for an approver), Salaries (monthly payroll that copies each person's salary into a payslip, deducts approved *unpaid* leave, can be adjusted while a draft, then is finalized and marked paid), and Income & Expenses (fee income against approved expenses and paid salaries, by month and campus, counted when money is received or paid).
 
 **Access control.** Every service call checks who is signed in, whether their role has the permission (the `role_permissions` table, editable in Settings → Users & Roles), and which campuses they can touch (`services/scope.ts`). A Campus Admin only ever sees their own campus. The top bar's campus switcher only narrows the overview lists; it never widens what a role can access.
 

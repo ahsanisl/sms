@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { attachments, type NewAttachment } from "@/db/schema";
 
@@ -8,6 +8,15 @@ export async function listAttachments(module: string, entityId: string) {
     .select()
     .from(attachments)
     .where(and(eq(attachments.module, module), eq(attachments.entityId, entityId)));
+}
+
+/** Attachments for many records of one module at once (e.g. every receipt on the Expenses list). */
+export async function listAttachmentsForEntities(module: string, entityIds: string[]) {
+  if (entityIds.length === 0) return [];
+  return db
+    .select()
+    .from(attachments)
+    .where(and(eq(attachments.module, module), inArray(attachments.entityId, entityIds)));
 }
 
 export async function getAttachment(attachmentId: string) {

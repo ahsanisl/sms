@@ -30,7 +30,7 @@ Work through the sections in order. **Blockers** were code changes required befo
 
 - [ ] **Commit and deploy** the blocker fixes (currently uncommitted on `main`).
 - [ ] **Database:** restore the Supabase project (it was unreachable as of 2026-10-26: "tenant/user not found"), or provision a new Postgres database.
-- [ ] **Back up**, then run `npm run db:migrate`. Pending migrations on the existing database: `0004` student profile fields, `0005` per-school roles, `0006` password changes, `0007` sign-in lockout. All tested as upgrades with existing data preserved.
+- [ ] **Back up**, then run `npm run db:migrate`. Pending migrations on the existing database: `0004` student profile fields, `0005` per-school roles, `0006` password changes, `0007` sign-in lockout, `0008` expenses, bills and payroll (adds default expense categories and the four new finance permissions to every existing role; custom roles get them switched off). All tested as upgrades with existing data preserved.
 - [ ] **Never run `npm run db:seed` or `db:reset` on production** (now blocked, but don't override the guard).
 - [ ] **Automatic backups:** enable Supabase point-in-time recovery or daily backups, and test one restore.
 - [ ] **Environment variables:** set a fresh random `AUTH_SECRET` (`openssl rand -base64 33`) and `DATABASE_URL` in the hosting environment — never in a committed file. Set `NODE_ENV=production`.
@@ -50,6 +50,7 @@ Work through the sections in order. **Blockers** were code changes required befo
 - [ ] **Lockout message:** enter a wrong password 5 times and check the "too many attempts" message on the login screen (server side tested).
 - [ ] **Realistic data volume** (e.g. 1,000+ students). The Students page makes 2 database queries per student (~2,000 per page load), so it may be slow.
 - [ ] **Privacy review.** EduFlow now stores children's medical notes, religion and B-Form numbers, visible to any staff member who can open a student's profile. Confirm that's intended, consider a privacy notice for parents, and check local data-protection requirements.
+- [ ] **Finance setup per school:** check the expense categories, add recurring bills, and enter every staff salary (Salaries → Staff Salaries) before running the first payroll. Decide who approves expenses ("Approve Expenses" is on for Owner and School Admin only).
 - [ ] **Staff briefing on passwords:** there is no email, so the school office resets passwords from Users & Roles — which also unlocks a locked account.
 
 ## 🔵 Soon after launch

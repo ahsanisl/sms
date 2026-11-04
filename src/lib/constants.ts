@@ -101,3 +101,37 @@ export const EMPTY_STUDENT_EXTRA_FIELDS = {
 
 /** Suggestions for the free-text relationship fields — offered via <datalist>, not enforced. */
 export const RELATION_SUGGESTIONS = ["Father", "Mother", "Grandfather", "Grandmother", "Uncle", "Aunt", "Brother", "Sister", "Guardian"];
+
+// -- Finance: expenses, bills, payroll --------------------------------------------------------
+
+/** Every new school starts with these expense categories (migration 0008 gave existing schools the same list). Schools can add, rename and archive their own. */
+export const DEFAULT_EXPENSE_CATEGORIES = [
+  "Rent",
+  "Utilities",
+  "Maintenance & Repairs",
+  "Stationery & Supplies",
+  "Transport",
+  "IT & Internet",
+  "Cleaning & Security",
+  "Events & Activities",
+  "Marketing",
+  "Miscellaneous",
+];
+
+export type PaymentMethod = "cash" | "bank_transfer" | "card" | "cheque";
+export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  cash: "Cash",
+  bank_transfer: "Bank Transfer",
+  card: "Card",
+  cheque: "Cheque",
+};
+
+export type ExpenseStatus = "pending" | "approved" | "rejected";
+export const EXPENSE_STATUS_LABEL: Record<ExpenseStatus, string> = { pending: "Pending approval", approved: "Approved", rejected: "Rejected" };
+export const EXPENSE_STATUS_TONE: Record<ExpenseStatus, "warning" | "success" | "error"> = { pending: "warning", approved: "success", rejected: "error" };
+
+export type BillFrequency = "monthly" | "quarterly" | "annual";
+export const BILL_FREQUENCY_LABEL: Record<BillFrequency, string> = { monthly: "Monthly", quarterly: "Every 3 months", annual: "Yearly" };
+export const BILL_FREQUENCY_MONTHS: Record<BillFrequency, number> = { monthly: 1, quarterly: 3, annual: 12 };
+/** A bill counts as "due soon" this many days before its due date. */
+export const BILL_DUE_SOON_DAYS = 7;

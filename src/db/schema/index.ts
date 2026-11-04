@@ -22,3 +22,5 @@ export * from "@/db/schema/attachments";
 export * from "@/db/schema/syllabus";
 export * from "@/db/schema/classwork";
 export * from "@/db/schema/homework";
+export * from "@/db/schema/expenses";
+export * from "@/db/schema/payroll";
