@@ -4,10 +4,7 @@ import * as attendanceService from "@/services/attendance.service";
 import { requireSession } from "@/lib/tenancy";
 import { MarkAttendanceClient } from "@/app/(app)/attendance/mark/mark-attendance-client";
 import type { AttendanceStatus } from "@/lib/types";
-
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
+import { todayIso } from "@/lib/dates";
 
 export default async function MarkAttendancePage({ searchParams }: { searchParams: Promise<{ classId?: string; date?: string }> }) {
   const { classId: requestedClassId, date: requestedDate } = await searchParams;

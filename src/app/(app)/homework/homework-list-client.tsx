@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -19,7 +20,7 @@ interface HomeworkRow {
 }
 
 export function HomeworkListClient({ rows, classes, canManage }: { rows: HomeworkRow[]; classes: { id: string; label: string }[]; canManage: boolean }) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIso();
 
   const columns: Column<HomeworkRow>[] = [
     {

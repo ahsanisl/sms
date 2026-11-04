@@ -1,3 +1,4 @@
+import { currentMonthLabel as getCurrentMonthLabel } from "@/lib/dates";
 import * as classService from "@/services/class.service";
 import * as studentService from "@/services/student.service";
 import * as feeService from "@/services/fee.service";
@@ -21,7 +22,7 @@ export default async function FeesPage() {
     feeService.listPaymentsForStudents(session, studentIds),
   ]);
 
-  const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const currentMonthLabel = getCurrentMonthLabel();
   const currentMonth = invoices.filter((i) => i.month === currentMonthLabel);
 
   const totalRevenue = invoices.reduce((s, i) => s + i.paidAmount, 0);

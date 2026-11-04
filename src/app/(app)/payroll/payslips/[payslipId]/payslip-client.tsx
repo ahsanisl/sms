@@ -25,6 +25,7 @@ interface PayslipClientProps {
     unpaidLeaveDays: number;
     leaveDeduction: number;
     otherDeduction: number;
+    incomeTax: number;
     netPay: number;
     note: string;
     status: "unpaid" | "paid";
@@ -119,6 +120,7 @@ export function PayslipClient({ school, month, runId, runStatus, campusName, ban
           </section>
           <section>
             <h2 className="mb-1 text-label-md font-semibold uppercase tracking-wide text-on-surface-variant">Deductions</h2>
+            <Line label="Income tax" amount={payslip.incomeTax} sign="−" />
             <Line label="Fixed deductions" amount={payslip.fixedDeductions} sign="−" />
             <Line label={`Unpaid leave (${payslip.unpaidLeaveDays} day${payslip.unpaidLeaveDays === 1 ? "" : "s"})`} amount={payslip.leaveDeduction} sign="−" />
             <Line label="Other deductions" amount={payslip.otherDeduction} sign="−" />

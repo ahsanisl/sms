@@ -33,15 +33,8 @@ export default async function PromoteStudentsPage({ searchParams }: { searchPara
   const targetOptions = activeClasses.filter((c) => c.campusId === sourceClass.campusId && c.id !== classId);
 
   const roster = allStudents.filter((s) => s.classId === classId && s.status === "active");
-  const rosterWithAttendance = await Promise.all(
-    roster.map(async (s) => {
-      const attendance = await attendanceService.listByStudent(session, s.id);
-      const rate = attendance.length
-        ? Math.round((attendance.filter((a) => a.status === "present" || a.status === "late").length / attendance.length) * 100)
-        : 0;
-      return { id: s.id, name: s.name, rollNumber: s.rollNumber, attendanceRate: rate };
-    }),
-  );
+  const rates = await attendanceService.ratesForStudents(session, roster.map((s) => s.id));
+  const rosterWithAttendance = roster.map((s) => ({ id: s.id, name: s.name, rollNumber: s.rollNumber, attendanceRate: rates.get(s.id) ?? 0 }));
 
   return (
     <PromoteClient

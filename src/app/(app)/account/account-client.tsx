@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff, KeyRound, Loader2, ShieldAlert } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Loader2, MonitorSmartphone, ShieldAlert } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Avatar } from "@/components/shared/avatar";
 import { FormField } from "@/components/shared/form-field";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { changeOwnPasswordAction } from "@/app/(app)/account/actions";
+import { changeOwnPasswordAction, signOutOtherDevicesAction } from "@/app/(app)/account/actions";
+import { formatDateTime, timeAgo } from "@/lib/format";
 
 /** Rough strength hint — the server only enforces the 8-character minimum. */
 function strength(password: string): { label: string; tone: string; width: string } {
@@ -25,7 +26,39 @@ function strength(password: string): { label: string; tone: string; width: strin
   return { label: "Strong", tone: "bg-success", width: "w-full" };
 }
 
-export function AccountClient({ name, email, roleName, campusName, mustChangePassword }: { name: string; email: string; roleName: string; campusName: string | null; mustChangePassword: boolean }) {
+export interface DeviceRow {
+  id: string;
+  current: boolean;
+  signedInAt: string;
+  lastActiveAt: string;
+  userAgent: string;
+  ipAddress: string;
+}
+
+/** "Chrome on Windows", "EduFlow app on Android"… from a user-agent string. */
+function describeDevice(userAgent: string): string {
+  if (!userAgent) return "Unknown device";
+  if (/dart|flutter/i.test(userAgent)) return `EduFlow app${/android/i.test(userAgent) ? " on Android" : /ios|iphone|ipad/i.test(userAgent) ? " on iPhone/iPad" : ""}`;
+  const browser = /edg\//i.test(userAgent) ? "Edge" : /chrome\//i.test(userAgent) ? "Chrome" : /firefox\//i.test(userAgent) ? "Firefox" : /safari\//i.test(userAgent) ? "Safari" : "Browser";
+  const os = /android/i.test(userAgent) ? "Android" : /iphone|ipad|ios/i.test(userAgent) ? "iPhone/iPad" : /windows/i.test(userAgent) ? "Windows" : /mac os/i.test(userAgent) ? "Mac" : /linux/i.test(userAgent) ? "Linux" : "";
+  return os ? `${browser} on ${os}` : browser;
+}
+
+export function AccountClient({ name, email, roleName, campusName, mustChangePassword, devices }: { name: string; email: string; roleName: string; campusName: string | null; mustChangePassword: boolean; devices: DeviceRow[] }) {
+  const [signingOut, setSigningOut] = useState(false);
+  const otherDevices = devices.filter((d) => !d.current).length;
+
+  async function signOutOthers() {
+    setSigningOut(true);
+    const result = await signOutOtherDevicesAction();
+    setSigningOut(false);
+    if (!result.success) {
+      toast.error(result.error);
+      return;
+    }
+    toast.success(result.count ? `Signed out of ${result.count} other device${result.count === 1 ? "" : "s"}.` : "No other devices were signed in.");
+    window.location.reload();
+  }
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -121,6 +154,37 @@ export function AccountClient({ name, email, roleName, campusName, mustChangePas
               </Button>
             </div>
           </form>
+        </Card>
+
+        <Card>
+          <CardHeader
+            icon={<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-fixed text-secondary"><MonitorSmartphone className="h-4 w-4" aria-hidden /></span>}
+            title="Signed-in Devices"
+            description="Browsers and phones where you're signed in. Changing your password signs out all the others."
+            action={
+              otherDevices > 0 ? (
+                <Button size="sm" variant="secondary" onClick={signOutOthers} disabled={signingOut}>
+                  {signingOut ? "Signing out…" : "Sign Out Other Devices"}
+                </Button>
+              ) : undefined
+            }
+          />
+          <ul className="divide-y divide-outline-variant/40 p-lg pt-md">
+            {devices.map((d) => (
+              <li key={d.id} className="flex items-center justify-between gap-3 py-2">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-on-surface">
+                    {describeDevice(d.userAgent)}
+                    {d.current && <span className="ml-2 rounded-full bg-success-container px-2 py-0.5 text-label-sm font-semibold text-on-success-container">This device</span>}
+                  </p>
+                  <p className="text-label-sm text-on-surface-variant" title={`Signed in ${formatDateTime(d.signedInAt)}`}>
+                    Active {timeAgo(d.lastActiveAt)}
+                    {d.ipAddress ? ` · ${d.ipAddress}` : ""}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </Card>
       </div>
     </div>

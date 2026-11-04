@@ -17,6 +17,16 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong.";
 }
 
+export async function signOutOtherDevicesAction(): Promise<ActionResult & { count?: number }> {
+  try {
+    const session = await requireSession();
+    const count = await accountService.signOutOtherDevices(session);
+    return { success: true, count };
+  } catch (error) {
+    return { success: false, error: errorMessage(error) };
+  }
+}
+
 export async function changeOwnPasswordAction(input: unknown): Promise<ActionResult> {
   try {
     const session = await requireSession();

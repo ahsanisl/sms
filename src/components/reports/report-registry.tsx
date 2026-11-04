@@ -1,5 +1,6 @@
 "use client";
 
+import { currentMonthLabel as getCurrentMonthLabel, todayIso } from "@/lib/dates";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import type { Student, AttendanceRecord, FeeInvoice, MarksEntry, Exam, Campus, ClassSection, Teacher, Subject } from "@/lib/types";
@@ -115,7 +116,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     title: "Daily Attendance Log",
     category: "Attendance Reports",
     render: (d) => {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayIso();
       return (
         <SimpleTable
           headers={["Class", "Present", "Absent", "Leave", "Rate"]}
@@ -184,7 +185,7 @@ export const REPORTS: Record<string, { title: string; category: string; render: 
     title: "Collection Summary",
     category: "Fee Reports",
     render: (d) => {
-      const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+      const currentMonthLabel = getCurrentMonthLabel();
       return (
         <SimpleTable
           headers={["Campus", "Collected", "Outstanding"]}

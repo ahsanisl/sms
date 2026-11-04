@@ -1,3 +1,4 @@
+import { todayIso } from "@/lib/dates";
 import * as admissionService from "@/services/admission.service";
 import * as campusService from "@/services/campus.service";
 import * as classService from "@/services/class.service";
@@ -51,7 +52,7 @@ export default async function InquiryDetailPage({ params }: { params: Promise<{ 
     parentPhone: inquiry.parentPhone,
     parentEmail: inquiry.parentEmail,
     address: "",
-    admissionDate: new Date().toISOString().slice(0, 10),
+    admissionDate: todayIso(),
     status: "active",
   };
 

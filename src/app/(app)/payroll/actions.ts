@@ -62,3 +62,15 @@ export async function deleteRunAction(runId: string) {
 export async function markPaidAction(runId: string, input: unknown) {
   return run((session) => payrollService.markPaid(session, runId, input));
 }
+
+export async function setTaxSlabsAction(slabs: { from: number; ratePercent: number }[]) {
+  return run((session) => payrollService.setTaxSlabs(session, slabs));
+}
+
+export async function recordUnpaidLeaveAction(input: { profileId: string; startDate: string; endDate: string; note: string }) {
+  return run((session) => payrollService.recordStaffUnpaidLeave(session, input));
+}
+
+export async function deleteUnpaidLeaveAction(leaveId: string) {
+  return run((session) => payrollService.deleteStaffUnpaidLeave(session, leaveId));
+}

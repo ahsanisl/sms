@@ -50,6 +50,11 @@ export async function logAudit(
   void maybePruneInBackground(session?.schoolId);
 }
 
+/** For events with no signed-in session (e.g. a password reset by email): recorded as that user, in their school's log. */
+export async function logAuditForUser(user: { id: string; schoolId: string | null }, action: string, entity: string, entityId?: string, metadata?: Record<string, unknown>) {
+  await logAudit({ userId: user.id, schoolId: user.schoolId } as AuthSession, action, entity, entityId, metadata);
+}
+
 /** Every governable action, view + retention config alike — owner/school_admin only, see the plan's Scope decisions on why campus_admin doesn't get this. */
 export async function listAuditLogs(session: AuthSession, filters: AuditLogFilters, pageNumber: number) {
   await requirePermission(session, "auditLog");

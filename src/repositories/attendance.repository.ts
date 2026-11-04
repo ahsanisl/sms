@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { attendanceRecords, attendanceCorrections, type NewAttendanceRecord } from "@/db/schema";
 
@@ -13,6 +13,21 @@ export async function listByClassAndDate(classIds: string[], date: string) {
 
 export async function listByStudent(studentId: string) {
   return db.select().from(attendanceRecords).where(eq(attendanceRecords.studentId, studentId));
+}
+
+/** Attendance rate per student (present or late ÷ all marked days), summed in the database — one query for a whole list. */
+export async function ratesForStudents(studentIds: string[]) {
+  if (studentIds.length === 0) return [];
+  const rows = await db
+    .select({
+      studentId: attendanceRecords.studentId,
+      total: sql<number>`count(*)::int`,
+      attended: sql<number>`count(*) filter (where ${attendanceRecords.status} in ('present', 'late'))::int`,
+    })
+    .from(attendanceRecords)
+    .where(inArray(attendanceRecords.studentId, studentIds))
+    .groupBy(attendanceRecords.studentId);
+  return rows.map((r) => ({ studentId: r.studentId, rate: r.total ? Math.round((r.attended / r.total) * 100) : 0 }));
 }
 
 /** Every attendance record ever marked for a set of classes, no date filter — used by the dashboard/reports' cumulative aggregates. */

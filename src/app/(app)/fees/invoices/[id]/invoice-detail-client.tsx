@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
@@ -70,7 +71,7 @@ export function InvoiceDetailClient({
       amount: values.mode === "amount" ? values.amount : undefined,
       percentage: values.mode === "percentage" ? values.percentage : undefined,
       reason: values.reason,
-      effectiveDate: new Date().toISOString().slice(0, 10),
+      effectiveDate: todayIso(),
     });
     setBusy(false);
     if (!result.success) {
@@ -88,7 +89,7 @@ export function InvoiceDetailClient({
       return;
     }
     setBusy(true);
-    const result = await reversePaymentAction(invoice.id, reversing.id, reversing.amount, reversalReason, new Date().toISOString().slice(0, 10));
+    const result = await reversePaymentAction(invoice.id, reversing.id, reversing.amount, reversalReason, todayIso());
     setBusy(false);
     if (!result.success) {
       toast.error(result.error);

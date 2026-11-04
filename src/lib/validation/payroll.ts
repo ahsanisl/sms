@@ -19,7 +19,19 @@ export const SalaryProfileInputSchema = z.object({
   allowances: money("Allowances").default(0),
   deductions: money("Deductions").default(0),
   bankAccount: z.string().trim().max(80).default(""),
+  autoIncomeTax: z.boolean().default(false),
 });
+
+export const TaxSlabsInputSchema = z
+  .array(z.object({ from: z.coerce.number().int().min(0).max(1_000_000_000), ratePercent: z.coerce.number().min(0).max(100) }))
+  .max(20)
+  .refine((slabs) => slabs.length === 0 || slabs.some((s) => s.from === 0), "The first bracket must start at Rs. 0.")
+  .refine((slabs) => new Set(slabs.map((s) => s.from)).size === slabs.length, "Two brackets start at the same amount.");
+
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid date.");
+export const StaffUnpaidLeaveInputSchema = z
+  .object({ profileId: z.string().uuid(), startDate: isoDate, endDate: isoDate, note: z.string().trim().max(200).default("") })
+  .refine((d) => d.endDate >= d.startDate, { message: "The last day can't be before the first.", path: ["endDate"] });
 
 export const CreatePayrollRunInputSchema = z.object({
   month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Choose a month."),

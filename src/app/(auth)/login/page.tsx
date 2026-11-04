@@ -6,23 +6,33 @@ import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
 
-/** Mirrors src/db/seed.ts's seeded accounts (one per role) — every one uses the same dev-only password (also printed by the seed script). Convenience only; the password is still genuinely required and checked server-side. */
-const DEV_ACCOUNTS = [
-  { role: "Platform Admin", email: "platform@eduflow.dev" },
-  { role: "School Owner", email: "owner@eduflow.dev" },
-  { role: "School Admin", email: "admin@eduflow.dev" },
-  { role: "Campus Admin", email: "campus.admin@eduflow.dev" },
-  { role: "Accountant", email: "accountant@eduflow.dev" },
-  { role: "Teacher", email: "teacher@eduflow.dev" },
-  { role: "Parent", email: "parent@eduflow.dev" },
-];
+/** Demo logins are listed in development, and in production only when a demo site opts in — a real school's login page must never advertise them. */
+const SHOW_DEMO_ACCOUNTS = process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS === "true";
+
+/**
+ * Mirrors src/db/seed.ts's seeded accounts (one per role), all with the same dev-only password. Convenience only; the
+ * password is still checked server-side. Empty in a normal production build, so the emails aren't even in the JavaScript.
+ */
+const DEV_ACCOUNTS = SHOW_DEMO_ACCOUNTS
+  ? [
+      { role: "Platform Admin", email: "platform@eduflow.dev" },
+      { role: "School Owner", email: "owner@eduflow.dev" },
+      { role: "School Admin", email: "admin@eduflow.dev" },
+      { role: "Campus Admin", email: "campus.admin@eduflow.dev" },
+      { role: "Accountant", email: "accountant@eduflow.dev" },
+      { role: "Teacher", email: "teacher@eduflow.dev" },
+      { role: "Parent", email: "parent@eduflow.dev" },
+    ]
+  : [];
 /** The seed's example custom roles (Settings → Users & Roles). */
-const DEV_CUSTOM_ROLE_ACCOUNTS = [
-  { role: "Receptionist", email: "reception@eduflow.dev" },
-  { role: "Exam Coordinator", email: "exams@eduflow.dev" },
-  { role: "Clifton Front Desk", email: "frontdesk@eduflow.dev" },
-];
-const DEV_PASSWORD = "Password123!";
+const DEV_CUSTOM_ROLE_ACCOUNTS = SHOW_DEMO_ACCOUNTS
+  ? [
+      { role: "Receptionist", email: "reception@eduflow.dev" },
+      { role: "Exam Coordinator", email: "exams@eduflow.dev" },
+      { role: "Clifton Front Desk", email: "frontdesk@eduflow.dev" },
+    ]
+  : [];
+const DEV_PASSWORD = SHOW_DEMO_ACCOUNTS ? "Password123!" : "";
 
 export default function LoginPage() {
   const router = useLoadingRouter();
@@ -32,11 +42,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
   async function signIn(email: string, pwd: string) {
     setSubmitting(true);
     setError("");
-    const failure = await login(email, pwd);
+    const failure = await login(email, pwd, rememberMe);
     setSubmitting(false);
     if (failure) {
       setError(failure);
@@ -146,7 +157,8 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  defaultChecked
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 rounded border-outline-variant text-secondary focus:ring-secondary cursor-pointer"
                 />
                 <label className="ml-2 block text-body-md text-on-surface-variant cursor-pointer" htmlFor="remember-me">
@@ -172,35 +184,37 @@ export default function LoginPage() {
             </div>
           </form>
 
-          <div className="mt-8">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-1 text-center lg:text-left">
-              Demo accounts — click one to fill the form
-            </p>
-            <p className="text-body-md text-on-surface-variant mb-3 text-center lg:text-left">
-              Password for every account: <span className="font-mono font-semibold text-on-surface">{DEV_PASSWORD}</span>
-            </p>
-            {[
-              { title: "Default roles", accounts: DEV_ACCOUNTS },
-              { title: "Custom roles", accounts: DEV_CUSTOM_ROLE_ACCOUNTS },
-            ].map((group) => (
-              <div key={group.title} className="mb-4">
-                <p className="text-label-sm text-on-surface-variant mb-2">{group.title}</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {group.accounts.map((account) => (
-                    <button
-                      key={account.email}
-                      type="button"
-                      onClick={() => fillDevAccount(account.email)}
-                      className="rounded-lg border border-outline-variant px-3 py-2 text-left hover:bg-surface-container-low transition-colors"
-                    >
-                      <p className="text-label-md font-semibold text-primary">{account.role}</p>
-                      <p className="text-label-sm text-on-surface-variant truncate">{account.email}</p>
-                    </button>
-                  ))}
+          {SHOW_DEMO_ACCOUNTS && (
+            <div className="mt-8">
+              <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-1 text-center lg:text-left">
+                Demo accounts — click one to fill the form
+              </p>
+              <p className="text-body-md text-on-surface-variant mb-3 text-center lg:text-left">
+                Password for every account: <span className="font-mono font-semibold text-on-surface">{DEV_PASSWORD}</span>
+              </p>
+              {[
+                { title: "Default roles", accounts: DEV_ACCOUNTS },
+                { title: "Custom roles", accounts: DEV_CUSTOM_ROLE_ACCOUNTS },
+              ].map((group) => (
+                <div key={group.title} className="mb-4">
+                  <p className="text-label-sm text-on-surface-variant mb-2">{group.title}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {group.accounts.map((account) => (
+                      <button
+                        key={account.email}
+                        type="button"
+                        onClick={() => fillDevAccount(account.email)}
+                        className="rounded-lg border border-outline-variant px-3 py-2 text-left hover:bg-surface-container-low transition-colors"
+                      >
+                        <p className="text-label-md font-semibold text-primary">{account.role}</p>
+                        <p className="text-label-sm text-on-surface-variant truncate">{account.email}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

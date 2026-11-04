@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import type { LeaveType } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
@@ -29,7 +30,7 @@ interface LeaveRequestFormProps {
 }
 
 export function LeaveRequestForm({ onSubmit, onCancel }: LeaveRequestFormProps) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIso();
   const [type, setType] = useState<LeaveType>("casual");
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);

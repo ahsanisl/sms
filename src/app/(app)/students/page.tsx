@@ -1,3 +1,4 @@
+import { currentMonthLabel as getCurrentMonthLabel } from "@/lib/dates";
 import * as studentService from "@/services/student.service";
 import * as classService from "@/services/class.service";
 import * as campusService from "@/services/campus.service";
@@ -18,30 +19,28 @@ export default async function StudentsPage() {
 
   const classById = new Map(classes.map((c) => [c.id, c]));
   const campusById = new Map(campuses.map((c) => [c.id, c]));
-  const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const currentMonthLabel = getCurrentMonthLabel();
 
-  const rows = await Promise.all(
-    students.map(async (s) => {
-      const [attendance, invoices] = await Promise.all([
-        attendanceService.listByStudent(session, s.id),
-        feeService.listInvoicesForStudent(session, s.id),
-      ]);
-      const attendanceRate = attendance.length
-        ? Math.round((attendance.filter((a) => a.status === "present" || a.status === "late").length / attendance.length) * 100)
-        : 0;
-      const currentInvoice = invoices.find((i) => i.month === currentMonthLabel);
-      const cls = classById.get(s.classId);
-      return {
-        ...s,
-        dob: s.dob ?? "",
-        admissionDate: s.admissionDate ?? "",
-        classLabel: cls ? `${cls.grade}-${cls.section}` : "—",
-        campusName: campusById.get(s.campusId)?.name ?? "—",
-        attendanceRate,
-        feeStatus: currentInvoice?.status ?? ("unpaid" as const),
-      };
-    }),
-  );
+  // Two queries for the whole list (not two per student): the students above are already scoped to what this user may see.
+  const studentIds = students.map((s) => s.id);
+  const [attendanceRates, invoices] = await Promise.all([
+    attendanceService.ratesForStudents(session, studentIds),
+    feeService.listInvoicesForStudents(session, studentIds),
+  ]);
+  const currentInvoiceByStudent = new Map(invoices.filter((i) => i.month === currentMonthLabel).map((i) => [i.studentId, i]));
+
+  const rows = students.map((s) => {
+    const cls = classById.get(s.classId);
+    return {
+      ...s,
+      dob: s.dob ?? "",
+      admissionDate: s.admissionDate ?? "",
+      classLabel: cls ? `${cls.grade}-${cls.section}` : "—",
+      campusName: campusById.get(s.campusId)?.name ?? "—",
+      attendanceRate: attendanceRates.get(s.id) ?? 0,
+      feeStatus: currentInvoiceByStudent.get(s.id)?.status ?? ("unpaid" as const),
+    };
+  });
 
   return <StudentsClient students={rows} classes={classes} campuses={campuses.filter((c) => c.status === "active")} canManage={canManage} />;
 }

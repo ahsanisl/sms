@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { findUserById } from "@/repositories/users.repository";
 import type { Role } from "@/lib/types";
@@ -40,14 +41,19 @@ export class NotFoundError extends Error {
   }
 }
 
-/** Reads the real Auth.js session server-side. Throws if not signed in — every service should call this first, never accept schoolId/campusId as a plain function argument from the caller. */
+/**
+ * The signed-in user for this request — from the session cookie (web) or an
+ * `Authorization: Bearer <token>` header (mobile app), checked against the
+ * database's session table, so a revoked or expired session is refused.
+ * Throws if not signed in. Every service should call this first, and never
+ * accept a schoolId/campusId from the caller instead.
+ */
 export async function requireSession(): Promise<AuthSession> {
-  const session = await auth();
+  const session = await loadSession();
   if (!session?.user) throw new UnauthenticatedError();
-  // The sign-in token only proves who this is. Role, school, campus and
-  // linked teacher are re-read from the database (once per request), so a
-  // role change or a removed account takes effect immediately instead of at
-  // the user's next login.
+  // The session only proves who this is. Role, school, campus and linked
+  // teacher are re-read from the database (once per request), so a role
+  // change or a removed account takes effect immediately.
   const user = await loadUser(session.user.id);
   if (!user) throw new UnauthenticatedError();
   return {
@@ -63,8 +69,14 @@ export async function requireSession(): Promise<AuthSession> {
   };
 }
 
-/** Per-request cache — requireSession runs many times while rendering one page. */
+/** Per-request caches — requireSession runs many times while rendering one page. */
+const loadSession = cache(async () => auth.api.getSession({ headers: await headers() }));
 const loadUser = cache((userId: string) => findUserById(userId));
+
+/** The current session's token (to keep this device signed in when revoking the others). */
+export async function currentSessionToken(): Promise<string | null> {
+  return (await loadSession())?.session.token ?? null;
+}
 
 /** For platform_admin-only actions where no school context should exist. Throws NotFoundError-shaped errors are handled by callers; this just asserts the shape callers actually need. */
 export function requireSchoolId(session: AuthSession): string {

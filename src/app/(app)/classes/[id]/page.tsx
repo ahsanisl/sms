@@ -9,12 +9,6 @@ import Link from "next/link";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ClassDetailClient } from "@/app/(app)/classes/[id]/class-detail-client";
 
-function attendanceRate(records: { status: string }[]): number {
-  if (records.length === 0) return 0;
-  const present = records.filter((r) => r.status === "present" || r.status === "late").length;
-  return Math.round((present / records.length) * 100);
-}
-
 export default async function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requireSession();
@@ -48,14 +42,8 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
   const classTeacher = teachers.find((t) => t.id === cls.classTeacherId);
   const roster = allStudents.filter((s) => s.classId === id);
 
-  const rosterWithAttendance = await Promise.all(
-    roster.map(async (s) => ({
-      ...s,
-      dob: s.dob ?? "",
-      admissionDate: s.admissionDate ?? "",
-      attendanceRate: attendanceRate(await attendanceService.listByStudent(session, s.id)),
-    })),
-  );
+  const rates = await attendanceService.ratesForStudents(session, roster.map((s) => s.id));
+  const rosterWithAttendance = roster.map((s) => ({ ...s, dob: s.dob ?? "", admissionDate: s.admissionDate ?? "", attendanceRate: rates.get(s.id) ?? 0 }));
   const avgAttendance = rosterWithAttendance.length
     ? Math.round(rosterWithAttendance.reduce((sum, s) => sum + s.attendanceRate, 0) / rosterWithAttendance.length)
     : 0;

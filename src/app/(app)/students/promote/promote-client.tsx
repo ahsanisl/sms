@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
@@ -43,7 +44,7 @@ export function PromoteClient({
   const [outcome, setOutcome] = useState<"class" | "alumni">(suggestedTargetClassId === "alumni" ? "alumni" : "class");
   const [targetClassId, setTargetClassId] = useState(suggestedTargetClassId === "alumni" ? "" : suggestedTargetClassId);
   const [excluded, setExcluded] = useState<Set<string>>(new Set());
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(todayIso());
   const [submitting, setSubmitting] = useState(false);
 
   function toggleStudent(id: string) {

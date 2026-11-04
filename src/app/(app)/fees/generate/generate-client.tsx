@@ -1,5 +1,6 @@
 "use client";
 
+import { addDaysIso, monthLabelOf, todayIso } from "@/lib/dates";
 import { useMemo, useState } from "react";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import { toast } from "sonner";
@@ -36,12 +37,10 @@ export function GenerateInvoicesClient({
   const classById = new Map(classes.map((c) => [c.id, c]));
   const campusById = new Map(campuses.map((c) => [c.id, c]));
 
-  const today = new Date();
-  const defaultLabel = today.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
-  const [monthLabel, setMonthLabel] = useState(defaultLabel);
-  const [issueDate, setIssueDate] = useState(today.toISOString().slice(0, 10));
-  const [dueDate, setDueDate] = useState(new Date(today.getTime() + 9 * 86400000).toISOString().slice(0, 10));
+  const today = todayIso();
+  const [monthLabel, setMonthLabel] = useState(monthLabelOf(today));
+  const [issueDate, setIssueDate] = useState(today);
+  const [dueDate, setDueDate] = useState(addDaysIso(today, 9));
   const [campusFilter, setCampusFilter] = useState(defaultCampusId ?? "");
   const [generating, setGenerating] = useState(false);
 

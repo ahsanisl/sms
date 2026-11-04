@@ -1,8 +1,7 @@
 import "server-only";
-import { CredentialsSignin } from "next-auth";
 
 /**
- * Sign-in brute-force protection, used by authorize() in src/auth.ts.
+ * Sign-in brute-force protection, used by the sign-in endpoint in src/auth.ts.
  *
  * 1. Per account (database — survives restarts, shared by every server):
  *    MAX_ACCOUNT_FAILURES wrong passwords in a row lock the account for
@@ -21,12 +20,9 @@ const IP_WINDOW_MS = 15 * 60 * 1000;
 
 /**
  * Shown for both a locked account and a blocked IP. Deliberately one generic
- * message: it doesn't confirm which emails have accounts. The code travels
- * to the browser (see lib/auth/session-context.tsx), so it must stay vague.
+ * message: it doesn't confirm which emails have accounts.
  */
-export class TooManyAttemptsError extends CredentialsSignin {
-  code = "too_many_attempts";
-}
+export const TOO_MANY_ATTEMPTS = "Too many sign-in attempts. Please wait 15 minutes and try again, or ask your school to reset your password.";
 
 const ipFailures = new Map<string, { count: number; windowStart: number }>();
 
@@ -37,9 +33,9 @@ const ipFailures = new Map<string, { count: number; windowStart: number }>();
  * proxy in front of the app; with none, X-Forwarded-For is absent or fully
  * client-controlled — the per-account lockout still applies either way.
  */
-export function clientIp(request: Request | undefined): string {
-  const forwarded = request?.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim();
-  return forwarded || request?.headers.get("x-real-ip") || "unknown";
+export function clientIp(headers: Headers | undefined): string {
+  const forwarded = headers?.get("x-forwarded-for")?.split(",").at(-1)?.trim();
+  return forwarded || headers?.get("x-real-ip") || "unknown";
 }
 
 export function isIpBlocked(ip: string): boolean {

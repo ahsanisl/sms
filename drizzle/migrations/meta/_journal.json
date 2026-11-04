@@ -64,6 +64,27 @@
       "when": 1793782838684,
       "tag": "0008_finance_expenses_payroll",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793794177633,
+      "tag": "0009_better_auth_sessions",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793794704106,
+      "tag": "0010_payroll_tax_and_staff_leave",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793796096409,
+      "tag": "0011_password_hash_default",
+      "breakpoints": true
     }
   ]
 }

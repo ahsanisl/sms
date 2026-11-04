@@ -1,3 +1,4 @@
+import { todayIso } from "@/lib/dates";
 import "server-only";
 import * as syllabusRepo from "@/repositories/syllabus.repository";
 import * as classRepo from "@/repositories/classes.repository";
@@ -77,7 +78,7 @@ export async function updateTopicStatus(session: AuthSession, topicId: string, s
   if (!topic) throw new NotFoundError("Syllabus topic");
   await assertClassInScope(session, topic.classId);
   await assertTeacherTeachesClassSubject(session, topic.classId, topic.subjectId);
-  const completedDate = parsedStatus === "completed" ? new Date().toISOString().slice(0, 10) : null;
+  const completedDate = parsedStatus === "completed" ? todayIso() : null;
   const updated = await syllabusRepo.updateStatus(topicId, parsedStatus, completedDate);
   await logAudit(session, "syllabus_topic.status_updated", "SyllabusTopic", topicId, { status: parsedStatus });
   return updated;

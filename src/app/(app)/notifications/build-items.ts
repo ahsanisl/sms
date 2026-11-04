@@ -10,7 +10,6 @@ import * as expenseService from "@/services/expense.service";
 import { billDueState, daysBetween, todayIso } from "@/lib/finance";
 import type { AuthSession } from "@/lib/tenancy";
 import { can } from "@/lib/authorization";
-import { attendanceRate } from "@/lib/attendance";
 import { formatCompactPKR, formatDate, timeAgo } from "@/lib/format";
 import type { NotificationItem } from "@/app/(app)/notifications/notifications-client";
 
@@ -46,11 +45,10 @@ export async function buildNotificationItems(session: AuthSession): Promise<Noti
 
   // -- Attendance alerts --------------------------------------------------------
   if (isParent || canAttendance) {
-    const records = isParent
-      ? (await Promise.all(activeStudents.map((s) => attendanceService.listByStudent(session, s.id)))).flat()
-      : await attendanceService.listByClasses(session, [...new Set(activeStudents.map((s) => s.classId))]);
+    // One aggregate query for every student in view, not their full attendance history.
+    const rates = await attendanceService.ratesForStudents(session, activeStudents.map((s) => s.id));
     activeStudents
-      .map((s) => ({ s, rate: attendanceRate(records.filter((r) => r.studentId === s.id)) }))
+      .map((s) => ({ s, rate: rates.get(s.id) ?? 0 }))
       .filter(({ rate }) => rate > 0 && rate < LOW_ATTENDANCE_THRESHOLD)
       .sort((a, b) => a.rate - b.rate)
       .slice(0, 3)
@@ -69,7 +67,7 @@ export async function buildNotificationItems(session: AuthSession): Promise<Noti
   if (isParent || canFees) {
     const payments = isParent
       ? (await Promise.all(students.map((s) => feeService.listPaymentsForStudent(session, s.id)))).flat()
-      : await feeService.listPaymentsForStudents(session, students.map((s) => s.id));
+      : await feeService.recentPaymentsForStudents(session, students.map((s) => s.id), 3);
     [...payments]
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, 3)

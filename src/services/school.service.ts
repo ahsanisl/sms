@@ -1,3 +1,4 @@
+import { currentMonthLabel as getCurrentMonthLabel } from "@/lib/dates";
 import "server-only";
 import bcrypt from "bcryptjs";
 import * as schoolRepo from "@/repositories/schools.repository";
@@ -44,7 +45,7 @@ export async function listAllSchools(session: AuthSession) {
 export async function listAllSchoolsWithStats(session: AuthSession) {
   await requirePermission(session, "settingsSchools");
   const allSchools = await schoolRepo.listSchools();
-  const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const currentMonthLabel = getCurrentMonthLabel();
   return Promise.all(
     allSchools.map(async (school) => {
       const campuses = await campusRepo.listCampuses(school.id);

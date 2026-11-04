@@ -1,5 +1,6 @@
 "use client";
 
+import { currentMonthLabel, todayIso } from "@/lib/dates";
 import Link from "next/link";
 import { BarChart, Bar, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { StatCard } from "@/components/shared/stat-card";
@@ -51,7 +52,7 @@ export function AccountantDashboard({
   quickActions,
   financeMonth,
 }: AccountantDashboardProps) {
-  const monthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = currentMonthLabel();
   const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
   const canCollect = quickActions.some((a) => a.href === "/fees/collect");
 
@@ -60,7 +61,7 @@ export function AccountantDashboard({
       <DashboardHeader
         name={userName}
         subtitle={isAllCampuses ? "Here's the fee collection picture across all campuses." : "Here's the fee collection picture for this campus."}
-        chips={[{ icon: "calendar_today", label: formatDate(new Date().toISOString().slice(0, 10)) }]}
+        chips={[{ icon: "calendar_today", label: formatDate(todayIso()) }]}
         actions={
           <>
             <Button variant="secondary" asChild>

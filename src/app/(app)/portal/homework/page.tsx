@@ -1,3 +1,4 @@
+import { todayIso } from "@/lib/dates";
 import * as studentService from "@/services/student.service";
 import * as classService from "@/services/class.service";
 import * as subjectService from "@/services/subject.service";
@@ -16,7 +17,7 @@ export default async function ParentHomeworkPage() {
 
   const classById = new Map(classes.map((c) => [c.id, c]));
   const subjectById = new Map(subjects.map((s) => [s.id, s.name]));
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIso();
 
   const childRows = await Promise.all(
     children.map(async (child) => {

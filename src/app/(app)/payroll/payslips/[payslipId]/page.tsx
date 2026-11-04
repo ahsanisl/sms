@@ -30,6 +30,7 @@ export default async function PayslipPage({ params }: { params: Promise<{ paysli
         unpaidLeaveDays: payslip.unpaidLeaveDays,
         leaveDeduction: payslip.leaveDeduction,
         otherDeduction: payslip.otherDeduction,
+        incomeTax: payslip.incomeTax,
         netPay: payslip.netPay,
         note: payslip.note,
         status: payslip.status,

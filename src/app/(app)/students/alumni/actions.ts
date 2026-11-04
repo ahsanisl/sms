@@ -1,5 +1,6 @@
 "use server";
 
+import { todayIso } from "@/lib/dates";
 import { revalidatePath } from "next/cache";
 import * as studentService from "@/services/student.service";
 import { requireSession } from "@/lib/tenancy";
@@ -16,7 +17,7 @@ function errorMessage(error: unknown): string {
 export async function reactivateStudentAction(studentId: string): Promise<ActionResult> {
   try {
     const session = await requireSession();
-    await studentService.reactivateStudent(session, studentId, new Date().toISOString().slice(0, 10), "Reactivated from Alumni Directory");
+    await studentService.reactivateStudent(session, studentId, todayIso(), "Reactivated from Alumni Directory");
     revalidatePath("/students/alumni");
     revalidatePath("/students");
     return { success: true };

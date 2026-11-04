@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
@@ -43,7 +44,7 @@ export function HomeworkForm({ classes, subjects, teachers, isTeacher, initialVa
   const [teacherId, setTeacherId] = useState(initialValues?.teacherId ?? "");
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIso();
   const [assignedDate, setAssignedDate] = useState(initialValues?.assignedDate ?? today);
   const [dueDate, setDueDate] = useState(initialValues?.dueDate ?? today);
   const [file, setFile] = useState<File | null>(null);

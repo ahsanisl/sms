@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import type { Campus, Subject, Teacher, TeacherStatus } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
@@ -25,7 +26,7 @@ function emptyValues(campuses: { id: string }[]): TeacherFormValues {
     phone: "",
     email: "",
     qualification: "",
-    joinDate: new Date().toISOString().slice(0, 10),
+    joinDate: todayIso(),
     status: "active",
   };
 }

@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   },
   // Don't advertise the framework in an `X-Powered-By` header.
   poweredByHeader: false,
+  // Always defined at build time, so it's inlined: with "false", the demo
+  // logins on the login page are compiled out of the production bundle.
+  env: {
+    NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS: process.env.NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS ?? "false",
+    NEXT_PUBLIC_SCHOOL_TIME_ZONE: process.env.NEXT_PUBLIC_SCHOOL_TIME_ZONE ?? "Asia/Karachi",
+  },
   // Security headers on every response. HSTS deliberately omits
   // includeSubDomains/preload — opt into those once every subdomain is HTTPS.
   // The CSP only sets frame-ancestors (clickjacking); a script-src policy

@@ -1,11 +1,9 @@
 import * as classService from "@/services/class.service";
 import * as attendanceService from "@/services/attendance.service";
 import { requireSession } from "@/lib/tenancy";
+import { daysAgoIso, todayIso } from "@/lib/dates";
 import { AttendanceDashboardClient } from "@/app/(app)/attendance/attendance-dashboard-client";
 
-function isoDate(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
 
 export default async function AttendancePage() {
   const session = await requireSession();
@@ -18,7 +16,7 @@ export default async function AttendancePage() {
 
   const attendance = await attendanceService.listByClasses(session, scopedClasses.map((c) => c.id));
 
-  const today = isoDate(new Date());
+  const today = todayIso();
   const todayRecords = attendance.filter((a) => a.date === today);
 
   const present = todayRecords.filter((r) => r.status === "present").length;
@@ -28,12 +26,7 @@ export default async function AttendancePage() {
     ? Math.round(((present + todayRecords.filter((r) => r.status === "late").length) / todayRecords.length) * 100)
     : 0;
 
-  const last7Days: string[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    last7Days.push(isoDate(d));
-  }
+  const last7Days = [6, 5, 4, 3, 2, 1, 0].map((i) => daysAgoIso(i));
   const trend = last7Days.map((date) => {
     const records = attendance.filter((a) => a.date === date);
     const p = records.filter((r) => r.status === "present" || r.status === "late").length;

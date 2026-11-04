@@ -1,3 +1,4 @@
+import { currentMonthLabel, daysAgoIso, weekdayCode } from "@/lib/dates";
 import { redirect } from "next/navigation";
 import * as studentService from "@/services/student.service";
 import * as teacherService from "@/services/teacher.service";
@@ -41,13 +42,7 @@ function addDays(iso: string, days: number) {
 }
 
 function last7Days(): string[] {
-  const days: string[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push(isoDate(d));
-  }
-  return days;
+  return [6, 5, 4, 3, 2, 1, 0].map((i) => daysAgoIso(i));
 }
 
 function formatShort(iso: string) {
@@ -61,13 +56,13 @@ function attendanceRate(records: { status: string }[]) {
 const DAY_CODES: TimetableDay[] = ["Mon", "Tue", "Wed", "Thu", "Fri"];
 
 function todayDayCode(): TimetableDay | null {
-  const code = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][new Date().getDay()];
+  const code = weekdayCode(todayIso());
   return (DAY_CODES as string[]).includes(code) ? (code as TimetableDay) : null;
 }
 
 /** e.g. "November 2026" — matches invoice.month. A function, not a module constant: a module constant is evaluated once at server start and would go stale after the month changes. */
 function currentMonth() {
-  return new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  return currentMonthLabel();
 }
 
 const LEAVE_TYPE_LABEL: Record<string, string> = { sick: "Sick leave", casual: "Casual leave", annual: "Annual leave", other: "Leave", unpaid: "Unpaid leave" };

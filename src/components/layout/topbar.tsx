@@ -176,6 +176,8 @@ function NotificationBell({ userId }: { userId: string }) {
     let cancelled = false;
     let lastFetch = 0;
     function load() {
+      // Don't poll from a hidden tab; it catches up when the tab is shown again.
+      if (document.visibilityState === "hidden") return;
       if (Date.now() - lastFetch < NOTIFICATION_REFRESH_MS) return;
       lastFetch = Date.now();
       notificationIdsAction()
@@ -187,10 +189,12 @@ function NotificationBell({ userId }: { userId: string }) {
     load();
     const timer = window.setInterval(load, NOTIFICATION_REFRESH_MS);
     window.addEventListener("focus", load);
+    document.addEventListener("visibilitychange", load);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
       window.removeEventListener("focus", load);
+      document.removeEventListener("visibilitychange", load);
     };
   }, [userId]);
 

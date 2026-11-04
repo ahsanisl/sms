@@ -118,6 +118,12 @@ export async function listPaymentsForStudents(session: AuthSession, studentIds: 
   return feeRepo.listPaymentsForStudents(studentIds);
 }
 
+/** Newest payments for already-scoped studentIds (same trust rule as listPaymentsForStudents). */
+export async function recentPaymentsForStudents(session: AuthSession, studentIds: string[], limit: number) {
+  await requirePermission(session, "fees");
+  return feeRepo.recentPaymentsForStudents(studentIds, limit);
+}
+
 export async function listReversalsForStudents(session: AuthSession, studentIds: string[]) {
   await requirePermission(session, "fees");
   return feeRepo.listReversalsForStudents(studentIds);

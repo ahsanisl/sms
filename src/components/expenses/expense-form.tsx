@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { prepareUpload } from "@/lib/compress-image";
 import { PAYMENT_METHOD_LABEL, type PaymentMethod } from "@/lib/constants";
 import { todayIso } from "@/lib/finance";
 
@@ -137,8 +139,20 @@ export function ExpenseForm({
         <FormField label="Reference (optional)" htmlFor="expense-reference" hint="Cheque, transaction or bill number.">
           <Input id="expense-reference" value={values.reference} onChange={(e) => set("reference", e.target.value)} />
         </FormField>
-        <FormField label="Receipt (optional)" htmlFor="expense-receipt" hint="Photo or PDF, up to 15MB.">
-          <Input id="expense-receipt" type="file" accept="image/*,application/pdf" onChange={(e) => setReceipt(e.target.files?.[0] ?? null)} />
+        <FormField label="Receipt (optional)" htmlFor="expense-receipt" hint="Photo or PDF. Large photos are shrunk automatically.">
+          <Input id="expense-receipt" type="file" accept="image/*,application/pdf" onChange={async (e) => {
+            const picked = e.target.files?.[0];
+            if (!picked) return setReceipt(null);
+            // Large phone photos are shrunk before upload (lib/compress-image.ts).
+            const prepared = await prepareUpload(picked);
+            if ("error" in prepared) {
+              e.target.value = "";
+              setReceipt(null);
+              toast.error(prepared.error);
+              return;
+            }
+            setReceipt(prepared.file);
+          }} />
         </FormField>
       </div>
       {existingReceipts.length > 0 && (

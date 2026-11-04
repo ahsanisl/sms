@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Download, FileUp, Loader2, XCircle } from "lucide-react";
@@ -92,7 +93,7 @@ export function ImportStudentsDialog({
       emergencyContactRelation: "Uncle",
       emergencyContactPhone: "0302-1112223",
       address: "House 1, Street 2",
-      admissionDate: new Date().toISOString().slice(0, 10),
+      admissionDate: todayIso(),
       status: "active",
     };
     downloadCsv("student-import-template", [...STUDENT_CSV_HEADERS], [studentCsvRow(example, sample ? `${sample.grade}-${sample.section}` : "1-A", campus?.name ?? "")]);

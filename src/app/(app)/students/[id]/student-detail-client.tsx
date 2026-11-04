@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import Link from "next/link";
 import { useLoadingRouter } from "@/components/layout/global-loader";
@@ -154,7 +155,7 @@ export function StudentDetailClient({
 
   async function handleReactivate() {
     setBusy(true);
-    const result = await reactivateStudentAction(student.id, new Date().toISOString().slice(0, 10), "Reactivated by admin");
+    const result = await reactivateStudentAction(student.id, todayIso(), "Reactivated by admin");
     setBusy(false);
     if (!result.success) {
       toast.error(result.error);

@@ -4,9 +4,9 @@ import * as teacherRepo from "@/repositories/teachers.repository";
 import * as timetableRepo from "@/repositories/timetable.repository";
 import { requirePermission } from "@/lib/authorization";
 import { NotFoundError, requireSchoolId, type AuthSession } from "@/lib/tenancy";
-import { CreatePayrollRunInputSchema, MarkPayslipsPaidInputSchema, PayslipAdjustmentInputSchema, SalaryProfileInputSchema } from "@/lib/validation/payroll";
+import { CreatePayrollRunInputSchema, MarkPayslipsPaidInputSchema, PayslipAdjustmentInputSchema, SalaryProfileInputSchema, StaffUnpaidLeaveInputSchema, TaxSlabsInputSchema } from "@/lib/validation/payroll";
 import { DEFAULT_WORKING_DAYS } from "@/lib/constants";
-import { countWorkingDays, leaveDeductionFor, monthKeyLabel, monthRange, payslipTotals } from "@/lib/finance";
+import { countWorkingDays, leaveDeductionFor, monthKeyLabel, monthlyIncomeTax, monthRange, payslipTotals, type TaxSlab } from "@/lib/finance";
 import { logAudit } from "@/services/audit.service";
 import { assertCampusInScope, scopedCampusIds } from "@/services/scope";
 import type { Payslip, SalaryProfile } from "@/db/schema";
@@ -126,20 +126,27 @@ export async function getRun(session: AuthSession, runId: string) {
   return { run, payslips: slips };
 }
 
-/** Unpaid leave working-days for each teacher within the month. */
-async function unpaidLeaveDays(teacherIds: string[], month: string, workingDays: string[]) {
+/**
+ * Unpaid-leave working days per salary profile within the month: a teacher's
+ * approved "Unpaid Leave" requests (Leave Requests) plus any unpaid leave
+ * recorded for the person on the Salaries page (mainly non-teaching staff).
+ */
+async function unpaidLeaveDays(profiles: SalaryProfile[], month: string, workingDays: string[]) {
   const { from, to } = monthRange(month);
-  const leaves = await payrollRepo.listUnpaidLeave(teacherIds, from, to);
+  const clip = (start: string, end: string) => countWorkingDays(start < from ? from : start, end > to ? to : end, workingDays);
+  const profileByTeacher = new Map(profiles.filter((p) => p.teacherId).map((p) => [p.teacherId!, p.id]));
+  const [teacherLeave, staffLeave] = await Promise.all([
+    payrollRepo.listUnpaidLeave([...profileByTeacher.keys()], from, to),
+    payrollRepo.listStaffUnpaidLeaveInRange(profiles.map((p) => p.id), from, to),
+  ]);
   const days = new Map<string, number>();
-  for (const leave of leaves) {
-    const start = leave.startDate < from ? from : leave.startDate;
-    const end = leave.endDate > to ? to : leave.endDate;
-    days.set(leave.teacherId, (days.get(leave.teacherId) ?? 0) + countWorkingDays(start, end, workingDays));
-  }
+  const add = (profileId: string | undefined, n: number) => profileId && days.set(profileId, (days.get(profileId) ?? 0) + n);
+  for (const leave of teacherLeave) add(profileByTeacher.get(leave.teacherId), clip(leave.startDate, leave.endDate));
+  for (const leave of staffLeave) add(leave.profileId, clip(leave.startDate, leave.endDate));
   return days;
 }
 
-function payslipFor(profile: SalaryProfile, unpaidDays: number, workingDaysInMonth: number) {
+function payslipFor(profile: SalaryProfile, unpaidDays: number, workingDaysInMonth: number, taxSlabs: TaxSlab[] | null) {
   const leaveDeduction = leaveDeductionFor(profile.basicSalary, profile.allowances, unpaidDays, workingDaysInMonth);
   const amounts = {
     basicSalary: profile.basicSalary,
@@ -148,6 +155,7 @@ function payslipFor(profile: SalaryProfile, unpaidDays: number, workingDaysInMon
     leaveDeduction,
     bonus: 0,
     otherDeduction: 0,
+    incomeTax: profile.autoIncomeTax ? monthlyIncomeTax(profile.basicSalary, profile.allowances, taxSlabs) : 0,
   };
   return {
     profileId: profile.id,
@@ -173,13 +181,13 @@ export async function createRun(session: AuthSession, input: unknown) {
   const workingDays = await workingDaysFor(schoolId);
   const { from, to } = monthRange(month);
   const workingDaysInMonth = countWorkingDays(from, to, workingDays);
-  const leaveDays = await unpaidLeaveDays(profiles.map((p) => p.teacherId).filter((id): id is string => !!id), month, workingDays);
+  const [leaveDays, taxSlabs] = await Promise.all([unpaidLeaveDays(profiles, month, workingDays), payrollRepo.getTaxSlabs(schoolId)]);
 
   const run = await payrollRepo.createRunWithPayslips(
     schoolId,
     month,
     session.userId,
-    profiles.map((p) => payslipFor(p, p.teacherId ? (leaveDays.get(p.teacherId) ?? 0) : 0, workingDaysInMonth)),
+    profiles.map((p) => payslipFor(p, leaveDays.get(p.id) ?? 0, workingDaysInMonth, taxSlabs)),
   );
   await logAudit(session, "payroll.created", "PayrollRun", run.id, { month, staff: profiles.length });
   return run;
@@ -213,6 +221,49 @@ export async function adjustPayslip(session: AuthSession, payslipId: string, inp
   });
   await logAudit(session, "payslip.updated", "Payslip", payslipId, { name: payslip.name, month: run.month, netPay: updated?.netPay });
   return updated;
+}
+
+// -- Tax brackets --------------------------------------------------------
+export async function getTaxSlabs(session: AuthSession) {
+  await requirePermission(session, "payroll");
+  return payrollRepo.getTaxSlabs(requireSchoolId(session));
+}
+
+/** Replaces the school's income-tax brackets (an empty list turns automatic tax off). Applies to payrolls created afterwards. */
+export async function setTaxSlabs(session: AuthSession, input: unknown) {
+  await requirePermission(session, "payroll");
+  assertWholeSchool(session);
+  const slabs = TaxSlabsInputSchema.parse(input).sort((a, b) => a.from - b.from);
+  await payrollRepo.setTaxSlabs(requireSchoolId(session), slabs.length ? slabs : null);
+  await logAudit(session, "payroll.tax_slabs_updated", "School", requireSchoolId(session), { brackets: slabs.length });
+}
+
+// -- Unpaid leave recorded on the Salaries page --------------------------------------------------------
+export async function listStaffUnpaidLeave(session: AuthSession) {
+  await requirePermission(session, "payroll");
+  const schoolId = requireSchoolId(session);
+  const visible = new Set((await listProfiles(session)).map((p) => p.id));
+  return (await payrollRepo.listStaffUnpaidLeave(schoolId)).filter((l) => visible.has(l.profileId));
+}
+
+export async function recordStaffUnpaidLeave(session: AuthSession, input: unknown) {
+  await requirePermission(session, "payroll");
+  assertWholeSchool(session);
+  const schoolId = requireSchoolId(session);
+  const data = StaffUnpaidLeaveInputSchema.parse(input);
+  const profile = await payrollRepo.getProfile(schoolId, data.profileId);
+  if (!profile) throw new NotFoundError("Staff member");
+  const leave = await payrollRepo.createStaffUnpaidLeave({ ...data, schoolId, recordedBy: session.userId });
+  await logAudit(session, "payroll.unpaid_leave_recorded", "SalaryProfile", profile.id, { name: profile.name, from: data.startDate, to: data.endDate });
+  return leave;
+}
+
+export async function deleteStaffUnpaidLeave(session: AuthSession, leaveId: string) {
+  await requirePermission(session, "payroll");
+  assertWholeSchool(session);
+  const deleted = await payrollRepo.deleteStaffUnpaidLeave(requireSchoolId(session), leaveId);
+  if (!deleted) throw new NotFoundError("Unpaid leave");
+  await logAudit(session, "payroll.unpaid_leave_deleted", "SalaryProfile", deleted.profileId, { from: deleted.startDate, to: deleted.endDate });
 }
 
 export async function finalizeRun(session: AuthSession, runId: string) {

@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ interface WithdrawFormProps {
 
 export function WithdrawForm({ studentName, onSubmit, onCancel }: WithdrawFormProps) {
   const [resultingStatus, setResultingStatus] = useState<"withdrawn" | "alumni">("withdrawn");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(todayIso());
   const [reason, setReason] = useState("");
   const [leavingCertificateIssued, setLeavingCertificateIssued] = useState(false);
   const [error, setError] = useState("");

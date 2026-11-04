@@ -1,9 +1,40 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
+import "server-only";
 import bcrypt from "bcryptjs";
-import { authConfig } from "@/auth.config";
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError, createAuthEndpoint } from "better-auth/api";
+import { setSessionCookie } from "better-auth/cookies";
+import { nextCookies } from "better-auth/next-js";
+import { bearer } from "better-auth/plugins";
+import type { BetterAuthPlugin } from "better-auth";
+import * as z from "zod";
+import { db } from "@/db";
+import { authAccounts, authSessions, authVerifications, users } from "@/db/schema";
 import { findUserByEmail, recordFailedLogin, recordSuccessfulLogin } from "@/repositories/users.repository";
-import { clientIp, isIpBlocked, LOCK_MINUTES, MAX_ACCOUNT_FAILURES, recordIpFailure, TooManyAttemptsError } from "@/lib/login-throttle";
+import { clientIp, isIpBlocked, LOCK_MINUTES, MAX_ACCOUNT_FAILURES, recordIpFailure, TOO_MANY_ATTEMPTS } from "@/lib/login-throttle";
+
+/**
+ * Authentication — Better Auth.
+ *
+ * Sessions live in the database (auth_sessions): every signed-in browser or
+ * device is a row that can be listed and revoked, so "sign out everywhere"
+ * and "a reset password logs out old devices" are real. The web app keeps
+ * the session token in an httpOnly cookie; the mobile app sends the same
+ * token as `Authorization: Bearer <token>` (the bearer plugin).
+ *
+ * Sign-in is our own endpoint, POST /api/auth/sign-in/password, rather than
+ * Better Auth's built-in email/password flow, because it keeps EduFlow's
+ * existing rules: bcrypt hashes on users.password_hash, per-account lockout
+ * and per-IP limits (lib/login-throttle.ts), and no self sign-up — accounts
+ * are only created by staff. Request body: { email, password, rememberMe? }.
+ * Response: { token, user } plus the session cookie (and a
+ * `set-auth-token` header for mobile clients).
+ *
+ * Who the user is and what they may do is still decided per request by
+ * lib/tenancy.ts (requireSession re-reads the user) and lib/authorization.ts.
+ */
+
+const SESSION_DAYS = 30;
 
 /**
  * Compared against when the email has no account, so a wrong email takes as
@@ -16,63 +47,96 @@ function getDummyHash() {
   return dummyHash;
 }
 
-// The full config — DB-backed authorize(), so Node-only. Used everywhere
-// except proxy.ts (Server Components, Server Actions, the API route
-// handler). See auth.config.ts for why the Credentials provider isn't
-// shared with the Edge-safe proxy config.
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
-  ...authConfig,
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+const INVALID = "Invalid email or password.";
+
+const passwordSignIn = {
+  id: "eduflow-password-sign-in",
+  endpoints: {
+    signInPassword: createAuthEndpoint(
+      "/sign-in/password",
+      {
+        method: "POST",
+        body: z.object({
+          email: z.string().trim().min(1).max(254),
+          password: z.string().min(1).max(200),
+          rememberMe: z.boolean().optional(),
+        }),
       },
-      async authorize(credentials, request) {
-        const email = typeof credentials?.email === "string" ? credentials.email : undefined;
-        const password = typeof credentials?.password === "string" ? credentials.password : undefined;
-        if (!email || !password) return null;
+      async (ctx) => {
+        const ip = clientIp(ctx.request?.headers ?? ctx.headers);
+        if (isIpBlocked(ip)) throw new APIError("TOO_MANY_REQUESTS", { message: TOO_MANY_ATTEMPTS, code: "TOO_MANY_ATTEMPTS" });
 
-        // Brute-force protection — see src/lib/login-throttle.ts.
-        const ip = clientIp(request);
-        if (isIpBlocked(ip)) throw new TooManyAttemptsError();
-
-        const user = await findUserByEmail(email);
+        const user = await findUserByEmail(ctx.body.email);
         if (!user) {
-          await bcrypt.compare(password, await getDummyHash());
+          await bcrypt.compare(ctx.body.password, await getDummyHash());
           recordIpFailure(ip);
-          return null;
+          throw new APIError("UNAUTHORIZED", { message: INVALID, code: "INVALID_EMAIL_OR_PASSWORD" });
         }
         // While locked, even the right password is refused (otherwise guessing could simply continue).
         if (user.lockedUntil && user.lockedUntil.getTime() > Date.now()) {
           recordIpFailure(ip);
-          throw new TooManyAttemptsError();
+          throw new APIError("TOO_MANY_REQUESTS", { message: TOO_MANY_ATTEMPTS, code: "TOO_MANY_ATTEMPTS" });
         }
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) {
+        if (!user.passwordHash || !(await bcrypt.compare(ctx.body.password, user.passwordHash))) {
           recordIpFailure(ip);
-          if (await recordFailedLogin(user.id, MAX_ACCOUNT_FAILURES, LOCK_MINUTES)) throw new TooManyAttemptsError();
-          return null;
+          if (await recordFailedLogin(user.id, MAX_ACCOUNT_FAILURES, LOCK_MINUTES)) {
+            throw new APIError("TOO_MANY_REQUESTS", { message: TOO_MANY_ATTEMPTS, code: "TOO_MANY_ATTEMPTS" });
+          }
+          throw new APIError("UNAUTHORIZED", { message: INVALID, code: "INVALID_EMAIL_OR_PASSWORD" });
         }
         if (user.failedLoginCount > 0 || user.lockedUntil) await recordSuccessfulLogin(user.id);
 
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          schoolId: user.schoolId,
-          campusId: user.campusId,
-          teacherId: user.teacherId,
-          avatarSeed: user.avatarSeed,
-        };
+        const dontRemember = ctx.body.rememberMe === false;
+        const session = await ctx.context.internalAdapter.createSession(user.id, dontRemember);
+        if (!session) throw new APIError("INTERNAL_SERVER_ERROR", { message: "Couldn't start a session. Please try again." });
+        const authUser = await ctx.context.internalAdapter.findUserById(user.id);
+        if (!authUser) throw new APIError("UNAUTHORIZED", { message: INVALID });
+        await setSessionCookie(ctx, { session, user: authUser }, dontRemember);
+        return ctx.json({
+          token: session.token,
+          user: { id: user.id, name: user.name, email: user.email, role: user.role, mustChangePassword: user.mustChangePassword },
+        });
       },
-    }),
-  ],
+    ),
+  },
+} satisfies BetterAuthPlugin;
+
+export const auth = betterAuth({
+  appName: "EduFlow",
+  // AUTH_SECRET / AUTH_URL are accepted too, so existing deployments keep working without renaming env vars.
+  secret: process.env.BETTER_AUTH_SECRET ?? process.env.AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL ?? process.env.AUTH_URL,
+  database: drizzleAdapter(db, {
+    provider: "pg",
+    schema: { user: users, session: authSessions, account: authAccounts, verification: authVerifications },
+  }),
+  user: {
+    // Read-only extras on the session's user (accounts are created and edited through EduFlow's own services).
+    additionalFields: {
+      role: { type: "string", input: false },
+      schoolId: { type: "string", required: false, input: false },
+      campusId: { type: "string", required: false, input: false },
+      teacherId: { type: "string", required: false, input: false },
+      avatarSeed: { type: "string", required: false, input: false },
+      mustChangePassword: { type: "boolean", required: false, input: false },
+    },
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * SESSION_DAYS,
+    updateAge: 60 * 60 * 24, // extend an active session at most once a day
+  },
+  // Built-in email/password sign-up and sign-in stay off — see passwordSignIn above.
+  emailAndPassword: { enabled: false },
+  advanced: {
+    database: { generateId: "uuid" },
+    // Behind a reverse proxy the last X-Forwarded-For entry is the real client (lib/login-throttle.ts explains why).
+    ipAddress: { ipAddressHeaders: ["x-forwarded-for", "x-real-ip"] },
+  },
+  rateLimit: {
+    // Better Auth's own limiter (per IP, in memory) on top of our per-account lockout.
+    customRules: { "/sign-in/password": { window: 60, max: 20 } },
+  },
+  plugins: [passwordSignIn, bearer(), nextCookies()],
 });
+
+export type Auth = typeof auth;

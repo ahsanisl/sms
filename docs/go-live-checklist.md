@@ -28,12 +28,18 @@ Work through the sections in order. **Blockers** were code changes required befo
 
 ## 🟠 Launch-day setup
 
-- [ ] **Commit and deploy** the blocker fixes (currently uncommitted on `main`).
+- [ ] **Commit and deploy.** The Better Auth switch, the improvements and migrations 0009–0011 are uncommitted on `main`.
 - [ ] **Database:** restore the Supabase project (it was unreachable as of 2026-10-26: "tenant/user not found"), or provision a new Postgres database.
-- [ ] **Back up**, then run `npm run db:migrate`. Pending migrations on the existing database: `0004` student profile fields, `0005` per-school roles, `0006` password changes, `0007` sign-in lockout, `0008` expenses, bills and payroll (adds default expense categories and the four new finance permissions to every existing role; custom roles get them switched off). All tested as upgrades with existing data preserved.
+- [ ] **Back up**, then run `npm run db:migrate`. Pending migrations on the existing database: `0004` student profile fields, `0005` per-school roles, `0006` password changes, `0007` sign-in lockout, `0008` expenses, bills and payroll (adds default expense categories and the four new finance permissions to every existing role; custom roles get them switched off), `0009` Better Auth sessions (everyone signs in again once after the upgrade), `0010` payroll income tax and staff unpaid leave. All tested as upgrades with existing data preserved.
 - [ ] **Never run `npm run db:seed` or `db:reset` on production** (now blocked, but don't override the guard).
 - [ ] **Automatic backups:** enable Supabase point-in-time recovery or daily backups, and test one restore.
-- [ ] **Environment variables:** set a fresh random `AUTH_SECRET` (`openssl rand -base64 33`) and `DATABASE_URL` in the hosting environment — never in a committed file. Set `NODE_ENV=production`.
+- [ ] **Environment variables** (see `.env.example`), set in the hosting environment, never in a committed file:
+  - `DATABASE_URL`, and a fresh random `BETTER_AUTH_SECRET` (`openssl rand -base64 33`).
+  - `BETTER_AUTH_URL`: the public `https://` address. Used for cookies and password-reset links.
+  - `NODE_ENV=production`.
+  - For emailed password resets: `RESEND_API_KEY` and `EMAIL_FROM`, with the sender's domain verified in Resend.
+  - Leave `NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS` unset; demo logins are hidden in production.
+  - `NEXT_PUBLIC_SCHOOL_TIME_ZONE` only if the school isn't in Pakistan.
 - [ ] **Hosting — decide with uploads in mind.** Homework/classwork attachments are saved to the server's own disk (`storage/uploads`).
   - VPS / always-on server: works as-is. Include `storage/uploads` in backups. Put it behind one reverse proxy (e.g. nginx) that sets `X-Forwarded-For`, so the per-IP sign-in limit sees real addresses.
   - Vercel or other serverless: uploads would be lost and files over ~4.5 MB would fail. Needs an S3-compatible storage driver first.
@@ -47,18 +53,20 @@ Work through the sections in order. **Blockers** were code changes required befo
 
 - [ ] **Browser walkthrough** of every screen. No visual testing has been done yet: desktop, collapsed sidebar, mobile drawer, and each role's dashboard and menu.
 - [ ] **Forced password change:** sign in with a temporary password and confirm you're sent to My Account (server side tested; browser redirect not yet).
-- [ ] **Lockout message:** enter a wrong password 5 times and check the "too many attempts" message on the login screen (server side tested).
-- [ ] **Realistic data volume** (e.g. 1,000+ students). The Students page makes 2 database queries per student (~2,000 per page load), so it may be slow.
+- [ ] **Lockout message:** the lockout and its message are tested through the API; check once that the login screen shows the "too many attempts" text.
+- [ ] **Realistic data volume** (e.g. 1,000+ students): the per-student queries are fixed (2 queries per page now), but nothing has been tried at that size yet.
 - [ ] **Privacy review.** EduFlow now stores children's medical notes, religion and B-Form numbers, visible to any staff member who can open a student's profile. Confirm that's intended, consider a privacy notice for parents, and check local data-protection requirements.
 - [ ] **Finance setup per school:** check the expense categories, add recurring bills, and enter every staff salary (Salaries → Staff Salaries) before running the first payroll. Decide who approves expenses ("Approve Expenses" is on for Owner and School Admin only).
-- [ ] **Staff briefing on passwords:** there is no email, so the school office resets passwords from Users & Roles — which also unlocks a locked account.
+- [ ] **Staff briefing on passwords:** with `RESEND_API_KEY` set, people reset their own password by email; otherwise the school office resets it from Users & Roles (which also unlocks a locked account).
 
 ## 🔵 Soon after launch
 
 - [ ] **Error monitoring** (e.g. Sentry) — none today.
 - [ ] **Automated tests** — the project has none; all testing so far used throwaway scripts.
-- [ ] **Performance:** batch the Students page's per-student queries; notifications are recomputed every 5 minutes for each signed-in user.
-- [ ] **Emailed password resets** — needs an email provider (e.g. Resend or SMTP).
-- [ ] **next-auth is a beta** (`5.0.0-beta.32`) — track releases.
-- [ ] **Development-only advisories** (18 moderate) — upgrade drizzle-kit and friends when convenient.
-- [ ] **Time zone:** "today" is calculated in UTC, so between midnight and 5 a.m. Pakistan time default dates show yesterday. Harmless during school hours.
+- [x] **Performance:** Students, class roster and Promote pages load attendance and fees in 2 queries instead of 2 per student. Notifications use database totals, aren't polled from hidden tabs, and the bell reuses results for 4 minutes.
+- [x] **Emailed password resets** — "Forgot password?" sends a one-time link that expires in 1 hour. It needs `RESEND_API_KEY`; until that is set, staff reset passwords from Users & Roles.
+- [ ] **Development-only advisories** (14 moderate, all `minimatch` inside ESLint and its plugins). The only fix is minimatch v11, which those plugins can't load yet. They affect only linting on a developer's machine, never the deployed app. Re-check when ESLint plugins update.
+- [x] **Time zone:** "today" and "this month" now use the school's time zone (`NEXT_PUBLIC_SCHOOL_TIME_ZONE`, default Asia/Karachi).
+- [x] **Replaced next-auth (beta) with Better Auth:** sessions are stored in the database, there's a signed-in devices list, and the mobile app uses bearer tokens (`docs/mobile-api.md`). **Existing sessions end on upgrade, so everyone signs in again once.**
+- [x] **Demo accounts hidden on the production login page** (unless `NEXT_PUBLIC_SHOW_DEMO_ACCOUNTS=true` for a demo site).
+- [x] **Payroll:** income tax calculated from editable tax brackets (Pakistan preset), unpaid leave recorded for non-teaching staff, and large receipt photos shrunk before upload.

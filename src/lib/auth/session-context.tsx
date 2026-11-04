@@ -1,64 +1,62 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import {
-  SessionProvider as NextAuthSessionProvider,
-  useSession as useNextAuthSession,
-  signIn as nextAuthSignIn,
-  signOut as nextAuthSignOut,
-} from "next-auth/react";
-import type { AppUser } from "@/lib/types";
+import { createAuthClient } from "better-auth/react";
+import { inferAdditionalFields } from "better-auth/client/plugins";
+import type { Auth } from "@/auth";
+import type { AppUser, Role } from "@/lib/types";
+
+/** Better Auth's browser client — same-origin, so the session cookie is sent automatically. */
+const authClient = createAuthClient({ plugins: [inferAdditionalFields<Auth>()] });
 
 interface SessionContextValue {
   user: AppUser | null;
   isLoading: boolean;
   /** Real credential check against the database — returns an error message on failure instead of throwing, so the login form can show it inline. */
-  login: (email: string, password: string) => Promise<string | null>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<string | null>;
   logout: () => void;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
-/** Translates next-auth's session shape into the AppUser shape every existing screen already reads — so nothing downstream of useSession() needs to change. */
-function SessionBridge({ children }: { children: ReactNode }) {
-  const { data, status } = useNextAuthSession();
+/** Translates Better Auth's session into the AppUser shape every screen already reads — nothing downstream of useSession() needs to know which auth library is underneath. */
+export function SessionProvider({ children }: { children: ReactNode }) {
+  const { data, isPending, refetch } = authClient.useSession();
   const user: AppUser | null = data?.user
     ? {
         id: data.user.id,
         name: data.user.name,
-        role: data.user.role,
+        role: data.user.role as Role,
         email: data.user.email,
         schoolId: data.user.schoolId ?? undefined,
         campusId: data.user.campusId ?? undefined,
-        avatarSeed: data.user.avatarSeed,
+        avatarSeed: data.user.avatarSeed ?? data.user.name,
       }
     : null;
 
-  async function login(email: string, password: string): Promise<string | null> {
-    const result = await nextAuthSignIn("credentials", { email, password, redirect: false });
-    // "too_many_attempts": account locked or IP blocked — see src/lib/login-throttle.ts.
-    if (result?.code === "too_many_attempts") return "Too many sign-in attempts. Please wait 15 minutes and try again, or ask your school to reset your password.";
-    if (result?.error) return "Invalid email or password.";
+  async function login(email: string, password: string, rememberMe = true): Promise<string | null> {
+    const response = await fetch("/api/auth/sign-in/password", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, password, rememberMe }),
+    });
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { message?: string } | null;
+      return response.status === 429 || response.status === 401 ? (body?.message ?? "Invalid email or password.") : "Couldn't sign in right now. Please try again.";
+    }
+    await refetch();
     return null;
   }
 
   function logout() {
-    void nextAuthSignOut({ redirectTo: "/login" });
+    void authClient.signOut().finally(() => {
+      // Full page load (not a client navigation) so no signed-in state survives in memory.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- deliberate hard reload on sign-out
+      window.location.assign("/login");
+    });
   }
 
-  return (
-    <SessionContext.Provider value={{ user, isLoading: status === "loading", login, logout }}>
-      {children}
-    </SessionContext.Provider>
-  );
-}
-
-export function SessionProvider({ children }: { children: ReactNode }) {
-  return (
-    <NextAuthSessionProvider>
-      <SessionBridge>{children}</SessionBridge>
-    </NextAuthSessionProvider>
-  );
+  return <SessionContext.Provider value={{ user, isLoading: isPending, login, logout }}>{children}</SessionContext.Provider>;
 }
 
 export function useSession() {

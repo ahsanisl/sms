@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import type { Campus, ClassSection, Student } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
@@ -32,7 +33,7 @@ export function TransferForm({ student, onSubmit, onCancel, campuses, classes }:
   };
   const activeCampuses = campuses.filter((c) => c.status === "active");
 
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(todayIso());
   const [reason, setReason] = useState("");
   const [toCampusId, setToCampusId] = useState(student.campusId);
   const classesAtTarget: ClassSection[] = GRADE_ORDER.flatMap((grade) =>

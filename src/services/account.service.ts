@@ -2,7 +2,8 @@ import "server-only";
 import { randomInt } from "node:crypto";
 import bcrypt from "bcryptjs";
 import * as userRepo from "@/repositories/users.repository";
-import { NotFoundError, requireSchoolId, type AuthSession } from "@/lib/tenancy";
+import * as authRepo from "@/repositories/auth.repository";
+import { currentSessionToken, NotFoundError, requireSchoolId, type AuthSession } from "@/lib/tenancy";
 import { ChangePasswordSchema, LinkParentSchema, ParentAccountSchema } from "@/lib/validation/account";
 import { logAudit } from "@/services/audit.service";
 import { requireRoleManager } from "@/services/permission.service";
@@ -16,14 +17,15 @@ export function generateTemporaryPassword(): string {
   return Array.from({ length: 12 }, () => TEMP_PASSWORD_CHARS[randomInt(TEMP_PASSWORD_CHARS.length)]).join("");
 }
 
-/** My Account → Change Password. Any signed-in user, their own account only, current password required. Clears the must-change flag. */
+/** My Account → Change Password. Any signed-in user, their own account only, current password required. Clears the must-change flag and signs out every other device. */
 export async function changeOwnPassword(session: AuthSession, input: unknown) {
   const data = ChangePasswordSchema.parse(input);
   const user = await userRepo.findUserById(session.userId);
   if (!user) throw new NotFoundError("Account");
   if (!(await bcrypt.compare(data.currentPassword, user.passwordHash))) throw new Error("Your current password is incorrect.");
   await userRepo.setPassword(user.id, await bcrypt.hash(data.newPassword, BCRYPT_ROUNDS), false);
-  await logAudit(session, "user.password_changed", "User", user.id);
+  const signedOut = await authRepo.deleteSessionsForUser(user.id, await currentSessionToken());
+  await logAudit(session, "user.password_changed", "User", user.id, signedOut ? { otherDevicesSignedOut: signedOut } : undefined);
 }
 
 /**
@@ -40,8 +42,25 @@ export async function resetUserPassword(session: AuthSession, userId: string) {
   if (user.role === "school_owner" && session.role !== "school_owner") throw new Error("Only a School Owner can reset an Owner's password.");
   const temporaryPassword = generateTemporaryPassword();
   await userRepo.setPassword(user.id, await bcrypt.hash(temporaryPassword, BCRYPT_ROUNDS), true);
+  // Whoever had the old password (or a stolen session) is signed out everywhere.
+  await authRepo.deleteSessionsForUser(user.id);
   await logAudit(session, "user.password_reset", "User", user.id);
   return { temporaryPassword };
+}
+
+// -- Signed-in devices (My Account) ---------------------------------------------
+
+/** This user's active sessions, newest first, with the current one marked. */
+export async function listMyDevices(session: AuthSession) {
+  const current = await currentSessionToken();
+  const rows = await authRepo.listActiveSessions(session.userId);
+  return rows.map(({ id, token, createdAt, updatedAt, userAgent, ipAddress }) => ({ id, current: token === current, signedInAt: createdAt.toISOString(), lastActiveAt: updatedAt.toISOString(), userAgent: userAgent ?? "", ipAddress: ipAddress ?? "" }));
+}
+
+export async function signOutOtherDevices(session: AuthSession) {
+  const count = await authRepo.deleteSessionsForUser(session.userId, await currentSessionToken());
+  await logAudit(session, "user.signed_out_other_devices", "User", session.userId, { count });
+  return count;
 }
 
 // -- Parent accounts (managed from a student's profile) ---------------------------------------------

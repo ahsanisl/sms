@@ -31,6 +31,7 @@ export default async function PayrollRunPage({ params }: { params: Promise<{ run
         leaveDeduction: p.leaveDeduction,
         bonus: p.bonus,
         otherDeduction: p.otherDeduction,
+        incomeTax: p.incomeTax,
         netPay: p.netPay,
         note: p.note,
         status: p.status,

@@ -24,3 +24,4 @@ export * from "@/db/schema/classwork";
 export * from "@/db/schema/homework";
 export * from "@/db/schema/expenses";
 export * from "@/db/schema/payroll";
+export * from "@/db/schema/auth";

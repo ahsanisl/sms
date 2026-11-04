@@ -121,13 +121,28 @@ export async function globalSearchAction(rawQuery: string): Promise<SearchResult
   }
 }
 
+/**
+ * The bell's ids, remembered for a few minutes per user and campus view, so
+ * several open tabs (or quick page reloads) don't each rebuild every
+ * notification. The Notifications page itself always builds fresh. Lives in
+ * this server's memory: each server process keeps its own, which is fine —
+ * it only saves work.
+ */
+const BELL_CACHE_MS = 4 * 60 * 1000;
+const bellCache = new Map<string, { at: number; ids: string[] }>();
+
 /** Ids of the viewer's current derived notifications — backs the top bar's unread badge (read state itself is kept per browser; see lib/notification-read-state.ts). */
 export async function notificationIdsAction(): Promise<string[]> {
   try {
     const session = await requireSession();
     if (!session.schoolId) return [];
-    const items = await buildNotificationItems(session);
-    return items.map((i) => i.id);
+    const key = `${session.userId}:${(await cookies()).get(VIEW_CAMPUS_COOKIE)?.value ?? "all"}`;
+    const cached = bellCache.get(key);
+    if (cached && Date.now() - cached.at < BELL_CACHE_MS) return cached.ids;
+    const ids = (await buildNotificationItems(session)).map((i) => i.id);
+    bellCache.set(key, { at: Date.now(), ids });
+    if (bellCache.size > 5000) for (const [k, v] of bellCache) if (Date.now() - v.at >= BELL_CACHE_MS) bellCache.delete(k);
+    return ids;
   } catch {
     return [];
   }

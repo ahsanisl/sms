@@ -61,12 +61,13 @@ import {
   expenses,
   recurringBills,
   salaryProfiles,
+  staffUnpaidLeave,
   payrollRuns,
   payslips,
 } from "@/db/schema";
 import { SCHOOL_ROLE_MODULES, systemRoleRows } from "@/lib/school-roles";
 import { DEFAULT_EXPENSE_CATEGORIES } from "@/lib/constants";
-import { countWorkingDays, leaveDeductionFor, monthRange, nextBillDueDate, payslipTotals } from "@/lib/finance";
+import { countWorkingDays, leaveDeductionFor, monthlyIncomeTax, monthRange, nextBillDueDate, PAKISTAN_SALARIED_SLABS_2026, payslipTotals } from "@/lib/finance";
 import type { PermissionModule, Role } from "@/lib/types";
 
 /**
@@ -234,7 +235,7 @@ const GRADE_SUBJECTS: Record<string, string[]> = {
   "O-Level": ["ENG", "URD", "MATH", "SCI", "SST", "ISL", "CS"],
 };
 const GRADE_AGE: Record<string, number> = { "Grade 1": 6, "Grade 2": 7, "Grade 5": 10, "Grade 8": 13, "O-Level": 15 };
-const GRADE_TUITION: Record<string, number> = { "Grade 1": 8000, "Grade 2": 8500, "Grade 5": 10000, "Grade 8": 12000, "O-Level": 15000 };
+const GRADE_TUITION: Record<string, number> = { "Grade 1": 9500, "Grade 2": 10000, "Grade 5": 11500, "Grade 8": 13500, "O-Level": 17000 };
 
 const TOPICS: Record<string, string[]> = {
   ENG: ["Reading Comprehension", "Nouns and Pronouns", "Verbs and Tenses", "Creative Writing", "Poetry Appreciation"],
@@ -294,6 +295,8 @@ async function main() {
       showSignatureLines: true,
       status: "active",
       onboardingComplete: true,
+      // Salary tax brackets (Salaries → Tax & Unpaid Leave) — the Pakistan 2025–26 preset.
+      incomeTaxSlabs: PAKISTAN_SALARIED_SLABS_2026,
     })
     .returning();
 
@@ -1058,6 +1061,8 @@ async function main() {
     { name: "Ghulam Rasool", designation: "Van Driver", campusId: mainCampus.id, basicSalary: 22000, allowances: 2000 },
     { name: "Shabana Bibi", designation: "Aya / Cleaner", campusId: mainCampus.id, basicSalary: 18000, allowances: 0 },
     { name: "Javed Iqbal", designation: "Office Assistant", campusId: cliftonCampus.id, basicSalary: 20000, allowances: 1500 },
+    // Earns enough for income tax to apply (most staff are below the Rs. 600,000/year threshold).
+    { name: "Dr. Nasreen Akhtar", designation: "Principal", campusId: null, basicSalary: 90000, allowances: 15000 },
   ];
   const seniorTeachers = new Set(["Ayesha Khan", "Bilal Ahmed", "Mariam Saeed"]);
   const salaryProfileRows = await db
@@ -1072,9 +1077,10 @@ async function main() {
         basicSalary: seniorTeachers.has(t.name) ? 34000 : 26000 + ((i * 1500) % 5000),
         allowances: seniorTeachers.has(t.name) ? 4000 : 2500,
         deductions: 500, // EOBI contribution
+        autoIncomeTax: true,
         bankAccount: `Meezan Bank 0102-${String(4471000 + i * 137).padStart(7, "0")}`,
       })),
-      ...staffPlan.map((s, i) => ({ schoolId: school.id, ...s, deductions: 500, bankAccount: i === 3 ? "" : `HBL 1290-${String(7740100 + i * 91)}` })),
+      ...staffPlan.map((s, i) => ({ schoolId: school.id, ...s, deductions: 500, autoIncomeTax: true, bankAccount: i === 3 ? "" : `HBL 1290-${String(7740100 + i * 91)}` })),
       // Left the school last term — kept for history, not on new payrolls.
       { schoolId: school.id, campusId: gulshanCampus.id, name: "Tariq Mehmood", designation: "Van Driver", basicSalary: 21000, allowances: 2000, deductions: 500, status: "archived" as const },
     ])
@@ -1101,6 +1107,16 @@ async function main() {
     });
   }
 
+  // Non-teaching staff don't use Leave Requests — their unpaid leave is recorded on the Salaries page.
+  const unpaidStaff = salaryProfileRows.find((p) => p.name === "Shabana Bibi")!;
+  let staffLeaveDay: Date | null = null;
+  if (financeMonths.length > 1) {
+    let d = new Date(`${lastFullMonth}-21T00:00:00Z`);
+    while (!isWeekday(d)) d = addDays(d, 1);
+    staffLeaveDay = d;
+    await db.insert(staffUnpaidLeave).values({ schoolId: school.id, profileId: unpaidStaff.id, startDate: iso(d), endDate: iso(d), note: "Absent without leave", recordedBy: adminUser.id });
+  }
+
   // Payroll: every month before this one, finalized at month end and paid on the 1st–3rd of the next month.
   // Last month's is still partly unpaid (two salaries held), so the dashboard shows a reminder.
   const payrollMonths = financeMonths.filter((m) => m !== thisMonthKey);
@@ -1117,11 +1133,12 @@ async function main() {
     const { from, to } = monthRange(month);
     const workingDaysInMonth = countWorkingDays(from, to, [...WORKING_DAYS]);
     for (const profile of activeSalaryProfiles) {
-      const unpaidDays = isLatest && unpaidLeaveStart && profile.teacherId === unpaidLeaveTeacher.id ? 2 : 0;
+      const unpaidDays = isLatest && unpaidLeaveStart && profile.teacherId === unpaidLeaveTeacher.id ? 2 : isLatest && staffLeaveDay && profile.id === unpaidStaff.id ? 1 : 0;
       const bonus = isLatest && profile.name === "Kiran Javed" ? 5000 : 0;
       const otherDeduction = isLatest && profile.name === "Usman Tariq" ? 10000 : 0;
       const leaveDeduction = leaveDeductionFor(profile.basicSalary, profile.allowances, unpaidDays, workingDaysInMonth);
-      const amounts = { basicSalary: profile.basicSalary, allowances: profile.allowances, fixedDeductions: profile.deductions, leaveDeduction, bonus, otherDeduction };
+      const incomeTax = profile.autoIncomeTax ? monthlyIncomeTax(profile.basicSalary, profile.allowances, PAKISTAN_SALARIED_SLABS_2026) : 0;
+      const amounts = { basicSalary: profile.basicSalary, allowances: profile.allowances, fixedDeductions: profile.deductions, leaveDeduction, bonus, otherDeduction, incomeTax };
       const held = isLatest && (profile.name === "Javed Iqbal" || profile.name === "Hina Aslam");
       const paidDate = iso(addDays(nextMonthStart, Math.min(2, Math.max(0, Math.floor((TODAY.getTime() - nextMonthStart.getTime()) / DAY_MS)))));
       payslipValues.push({

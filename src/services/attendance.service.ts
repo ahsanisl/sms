@@ -35,6 +35,17 @@ export async function listByStudent(session: AuthSession, studentId: string) {
   return attendanceRepo.listByStudent(studentId);
 }
 
+/**
+ * Attendance rate for each of a list of students the caller already loaded
+ * through a scoped call (e.g. studentService.listStudents) — one query
+ * instead of one per student. Same visibility as listByStudent: a student
+ * the caller can list, they can see the rate of.
+ */
+export async function ratesForStudents(session: AuthSession, studentIds: string[]) {
+  void session;
+  return new Map((await attendanceRepo.ratesForStudents(studentIds)).map((r) => [r.studentId, r.rate]));
+}
+
 /** Every record for a set of already-scoped classIds — used by the dashboard/reports' cumulative aggregates. */
 export async function listByClasses(session: AuthSession, classIds: string[]) {
   await requirePermission(session, "attendance");

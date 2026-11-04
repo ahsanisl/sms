@@ -19,7 +19,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { createProfileAction, createRunAction, setProfileArchivedAction, updateProfileAction } from "@/app/(app)/payroll/actions";
-import { addMonthsToKey, currentMonthKey, monthKeyLabel } from "@/lib/finance";
+import { addMonthsToKey, currentMonthKey, monthKeyLabel, monthlyIncomeTax, type TaxSlab } from "@/lib/finance";
+import { TaxAndLeave, type UnpaidLeaveRow } from "@/app/(app)/payroll/tax-and-leave";
 import { formatCompactPKR, formatPKR } from "@/lib/format";
 
 export interface RunRow {
@@ -43,6 +44,7 @@ export interface ProfileRow {
   allowances: number;
   deductions: number;
   bankAccount: string;
+  autoIncomeTax: boolean;
   status: "active" | "archived";
 }
 
@@ -54,7 +56,9 @@ interface TeacherOption {
 }
 
 interface PayrollClientProps {
-  initialTab: "runs" | "staff";
+  initialTab: "runs" | "staff" | "tax";
+  taxSlabs: TaxSlab[] | null;
+  unpaidLeave: UnpaidLeaveRow[];
   runs: RunRow[];
   profiles: ProfileRow[];
   teachers: TeacherOption[];
@@ -70,7 +74,9 @@ export function runStatus(run: Pick<RunRow, "status" | "paidCount" | "staffCount
   return { label: "Finalized · unpaid", tone: "warning" };
 }
 
-export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, canManage }: PayrollClientProps) {
+export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, canManage, taxSlabs, unpaidLeave }: PayrollClientProps) {
+  /** Monthly take-home before leave and bonuses: basic + allowances − fixed deductions − income tax (when withheld). */
+  const monthlyNet = (p: ProfileRow) => Math.max(0, p.basicSalary + p.allowances - p.deductions - (p.autoIncomeTax ? monthlyIncomeTax(p.basicSalary, p.allowances, taxSlabs) : 0));
   const router = useLoadingRouter();
   const [tab, setTab] = useState(initialTab);
   const [isPending, startTransition] = useTransition();
@@ -84,7 +90,7 @@ export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, 
   const [showArchived, setShowArchived] = useState(false);
 
   const activeProfiles = profiles.filter((p) => p.status === "active");
-  const monthlyBill = activeProfiles.reduce((s, p) => s + Math.max(0, p.basicSalary + p.allowances - p.deductions), 0);
+  const monthlyBill = activeProfiles.reduce((s, p) => s + monthlyNet(p), 0);
   const teachersWithoutSalary = teachers.filter((t) => !t.hasSalary);
   const currentRun = runs.find((r) => r.month === thisMonth);
   const owed = runs.filter((r) => r.status === "finalized").reduce((s, r) => s + (r.totalNet - r.paidNet), 0);
@@ -126,9 +132,13 @@ export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, 
       key: "net",
       header: "Monthly net",
       sortable: true,
-      accessor: (p) => p.basicSalary + p.allowances - p.deductions,
+      accessor: (p) => monthlyNet(p),
       className: "text-right",
-      render: (p) => <span className="font-semibold tabular-nums text-on-surface">{formatPKR(Math.max(0, p.basicSalary + p.allowances - p.deductions))}</span>,
+      render: (p) => (
+        <span className="font-semibold tabular-nums text-on-surface" title={p.autoIncomeTax ? `After ${formatPKR(monthlyIncomeTax(p.basicSalary, p.allowances, taxSlabs))} income tax` : undefined}>
+          {formatPKR(monthlyNet(p))}
+        </span>
+      ),
     },
   ];
 
@@ -168,6 +178,7 @@ export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, 
         <TabsList>
           <TabsTrigger value="runs">Monthly Payroll ({runs.length})</TabsTrigger>
           <TabsTrigger value="staff">Staff Salaries ({activeProfiles.length})</TabsTrigger>
+          <TabsTrigger value="tax">Tax &amp; Unpaid Leave</TabsTrigger>
         </TabsList>
 
         <TabsContent value="runs" className="pt-4">
@@ -263,6 +274,15 @@ export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, 
             />
           </Card>
         </TabsContent>
+
+        <TabsContent value="tax" className="pt-4">
+          <TaxAndLeave
+            slabs={taxSlabs}
+            leave={unpaidLeave}
+            staff={activeProfiles.map((p) => ({ id: p.id, name: p.name, isTeacher: !!p.teacherId }))}
+            canManage={canManage}
+          />
+        </TabsContent>
       </Tabs>
 
       <Modal open={runOpen} onOpenChange={setRunOpen} title="Run Payroll" description="Creates a draft payslip for everyone on the payroll. You can adjust bonuses and deductions before finalizing." className="max-w-[28rem]">
@@ -309,6 +329,7 @@ export function PayrollClient({ initialTab, runs, profiles, teachers, campuses, 
             initial={profileDialog.mode === "edit" ? profileDialog.profile : undefined}
             teachers={teachers}
             campuses={campuses}
+            taxSlabs={taxSlabs}
             submitting={isPending}
             onCancel={() => setProfileDialog(null)}
             onSubmit={(values) =>
@@ -332,12 +353,14 @@ interface ProfileValues {
   allowances: string;
   deductions: string;
   bankAccount: string;
+  autoIncomeTax: boolean;
 }
 
 function ProfileForm({
   initial,
   teachers,
   campuses,
+  taxSlabs,
   submitting,
   onSubmit,
   onCancel,
@@ -345,6 +368,7 @@ function ProfileForm({
   initial?: ProfileRow;
   teachers: TeacherOption[];
   campuses: { id: string; name: string }[];
+  taxSlabs: TaxSlab[] | null;
   submitting: boolean;
   onSubmit: (values: ProfileValues) => void;
   onCancel: () => void;
@@ -359,12 +383,14 @@ function ProfileForm({
     allowances: initial ? String(initial.allowances) : "0",
     deductions: initial ? String(initial.deductions) : "0",
     bankAccount: initial?.bankAccount ?? "",
+    autoIncomeTax: initial?.autoIncomeTax ?? !!taxSlabs?.length,
   });
   const [error, setError] = useState("");
   const set = <K extends keyof ProfileValues>(key: K, value: ProfileValues[K]) => setValues((v) => ({ ...v, [key]: value }));
   const teacherChoices = teachers.filter((t) => !t.hasSalary || t.id === initial?.teacherId);
   const money = (v: string) => Number(v || 0);
-  const net = Math.max(0, money(values.basicSalary) + money(values.allowances) - money(values.deductions));
+  const tax = values.autoIncomeTax ? monthlyIncomeTax(money(values.basicSalary), money(values.allowances), taxSlabs) : 0;
+  const net = Math.max(0, money(values.basicSalary) + money(values.allowances) - money(values.deductions) - tax);
 
   function pickTeacher(id: string) {
     const teacher = teachers.find((t) => t.id === id);
@@ -433,15 +459,25 @@ function ProfileForm({
         <FormField label="Allowances" htmlFor="profile-allowances" hint="House rent, conveyance…">
           <Input id="profile-allowances" inputMode="numeric" value={values.allowances} onChange={(e) => set("allowances", e.target.value.replace(/[^\d]/g, ""))} />
         </FormField>
-        <FormField label="Fixed deductions" htmlFor="profile-deductions" hint="Tax, provident fund, loan…">
+        <FormField label="Fixed deductions" htmlFor="profile-deductions" hint="Provident fund, EOBI, loan…">
           <Input id="profile-deductions" inputMode="numeric" value={values.deductions} onChange={(e) => set("deductions", e.target.value.replace(/[^\d]/g, ""))} />
         </FormField>
       </div>
       <FormField label="Bank account (optional)" htmlFor="profile-bank" hint="Printed on the payslip and the bank transfer sheet.">
         <Input id="profile-bank" value={values.bankAccount} onChange={(e) => set("bankAccount", e.target.value)} placeholder="e.g. Meezan Bank 0123-4567890" />
       </FormField>
+      <label className="flex items-start gap-2 text-body-md">
+        <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[var(--color-secondary)]" checked={values.autoIncomeTax} onChange={(e) => set("autoIncomeTax", e.target.checked)} />
+        <span>
+          Withhold income tax automatically
+          <span className="block text-label-sm text-on-surface-variant">
+            {taxSlabs?.length ? "Calculated each month from the school's tax brackets (Tax & Unpaid Leave tab)." : "Set up the tax brackets first (Tax & Unpaid Leave tab) — until then no tax is calculated."}
+          </span>
+        </span>
+      </label>
       <p className="rounded-lg bg-surface-container-low px-3 py-2 text-body-md">
         Monthly net pay: <span className="font-semibold tabular-nums">{formatPKR(net)}</span>
+        {tax > 0 && <span className="text-label-sm text-on-surface-variant"> · after {formatPKR(tax)} income tax</span>}
       </p>
       {error && <p className="text-label-md text-error">{error}</p>}
       <div className="flex justify-end gap-3 border-t border-outline-variant/40 pt-4">

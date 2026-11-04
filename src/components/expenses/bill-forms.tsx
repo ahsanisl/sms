@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { prepareUpload } from "@/lib/compress-image";
 import { BILL_FREQUENCY_LABEL, PAYMENT_METHOD_LABEL, type BillFrequency, type PaymentMethod } from "@/lib/constants";
 import { formatPKR } from "@/lib/format";
 import { todayIso } from "@/lib/finance";
@@ -170,8 +172,20 @@ export function PayBillForm({
           <Input id="pay-reference" value={reference} onChange={(e) => setReference(e.target.value)} placeholder="Transaction or cheque no." />
         </FormField>
       </div>
-      <FormField label="Receipt (optional)" htmlFor="pay-receipt" hint="Photo or PDF of the paid bill, up to 15MB.">
-        <Input id="pay-receipt" type="file" accept="image/*,application/pdf" onChange={(e) => setReceipt(e.target.files?.[0] ?? null)} />
+      <FormField label="Receipt (optional)" htmlFor="pay-receipt" hint="Photo or PDF of the paid bill. Large photos are shrunk automatically.">
+        <Input id="pay-receipt" type="file" accept="image/*,application/pdf" onChange={async (e) => {
+            const picked = e.target.files?.[0];
+            if (!picked) return setReceipt(null);
+            // Large phone photos are shrunk before upload (lib/compress-image.ts).
+            const prepared = await prepareUpload(picked);
+            if ("error" in prepared) {
+              e.target.value = "";
+              setReceipt(null);
+              toast.error(prepared.error);
+              return;
+            }
+            setReceipt(prepared.file);
+          }} />
       </FormField>
       {approvalNote && <p className="rounded-lg bg-warning-container/60 px-3 py-2 text-label-md text-on-warning-container">{approvalNote}</p>}
       <div className="flex items-center justify-end gap-3 border-t border-outline-variant/40 pt-4">

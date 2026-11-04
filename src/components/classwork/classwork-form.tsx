@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { FormField } from "@/components/shared/form-field";
 import { Input } from "@/components/ui/input";
@@ -39,7 +40,7 @@ export function ClassworkForm({ classes, subjects, teachers, classCampusById, is
   const [classId, setClassId] = useState(initialValues?.classId ?? classes[0]?.id ?? "");
   const [subjectId, setSubjectId] = useState(initialValues?.subjectId ?? "");
   const [teacherId, setTeacherId] = useState(initialValues?.teacherId ?? "");
-  const [date, setDate] = useState(initialValues?.date ?? new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(initialValues?.date ?? todayIso());
   const [title, setTitle] = useState(initialValues?.title ?? "");
   const [description, setDescription] = useState(initialValues?.description ?? "");
   const [file, setFile] = useState<File | null>(null);

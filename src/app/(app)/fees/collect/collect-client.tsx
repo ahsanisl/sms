@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLoadingRouter } from "@/components/layout/global-loader";
@@ -34,7 +35,7 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
     const initialInvoice = invoices.find((i) => i.id === params.get("invoiceId"));
     return initialInvoice ? initialInvoice.totalAmount - initialInvoice.paidAmount : 0;
   });
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(todayIso());
   const [method, setMethod] = useState<PaymentMethod>("bank_transfer");
   const [reference, setReference] = useState("");
   const [submitting, setSubmitting] = useState(false);

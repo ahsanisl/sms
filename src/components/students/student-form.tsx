@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import type { Campus, ClassSection, Student, StudentStatus } from "@/lib/types";
 import { FormField } from "@/components/shared/form-field";
@@ -32,7 +33,7 @@ function emptyValues(classes: { id: string; campusId: string }[]): StudentFormVa
     parentPhone: "",
     parentEmail: "",
     address: "",
-    admissionDate: new Date().toISOString().slice(0, 10),
+    admissionDate: todayIso(),
     status: "active",
     ...EMPTY_STUDENT_EXTRA_FIELDS,
   };

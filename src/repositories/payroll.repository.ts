@@ -1,7 +1,8 @@
 import "server-only";
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm";
 import { db } from "@/db";
-import { payrollRuns, payslips, salaryProfiles, staffLeaveRequests, type NewPayslip, type NewSalaryProfile, type Payslip } from "@/db/schema";
+import { payrollRuns, payslips, salaryProfiles, schools, staffLeaveRequests, staffUnpaidLeave, type NewPayslip, type NewSalaryProfile, type Payslip } from "@/db/schema";
+import type { TaxSlab } from "@/lib/finance";
 
 // -- Salary profiles --------------------------------------------------------
 export async function listProfiles(schoolId: string) {
@@ -104,6 +105,40 @@ export async function markPaid(runId: string, payslipIds: string[], paid: { paid
     .set({ status: "paid", ...paid })
     .where(and(eq(payslips.runId, runId), inArray(payslips.id, payslipIds), eq(payslips.status, "unpaid")))
     .returning();
+}
+
+// -- Tax brackets (stored on the school) --------------------------------------------------------
+export async function getTaxSlabs(schoolId: string): Promise<TaxSlab[] | null> {
+  const [row] = await db.select({ slabs: schools.incomeTaxSlabs }).from(schools).where(eq(schools.id, schoolId)).limit(1);
+  return row?.slabs ?? null;
+}
+
+export async function setTaxSlabs(schoolId: string, slabs: TaxSlab[] | null) {
+  await db.update(schools).set({ incomeTaxSlabs: slabs }).where(eq(schools.id, schoolId));
+}
+
+// -- Staff unpaid leave (recorded on the Salaries page) --------------------------------------------------------
+export async function listStaffUnpaidLeave(schoolId: string) {
+  return db.select().from(staffUnpaidLeave).where(eq(staffUnpaidLeave.schoolId, schoolId)).orderBy(desc(staffUnpaidLeave.startDate));
+}
+
+export async function createStaffUnpaidLeave(input: typeof staffUnpaidLeave.$inferInsert) {
+  const [row] = await db.insert(staffUnpaidLeave).values(input).returning();
+  return row;
+}
+
+export async function deleteStaffUnpaidLeave(schoolId: string, id: string) {
+  const [row] = await db.delete(staffUnpaidLeave).where(and(eq(staffUnpaidLeave.id, id), eq(staffUnpaidLeave.schoolId, schoolId))).returning();
+  return row ?? null;
+}
+
+/** Recorded unpaid leave overlapping [from, to] for these salary profiles. */
+export async function listStaffUnpaidLeaveInRange(profileIds: string[], from: string, to: string) {
+  if (profileIds.length === 0) return [];
+  return db
+    .select()
+    .from(staffUnpaidLeave)
+    .where(and(inArray(staffUnpaidLeave.profileId, profileIds), lte(staffUnpaidLeave.startDate, to), gte(staffUnpaidLeave.endDate, from)));
 }
 
 // -- Unpaid leave --------------------------------------------------------

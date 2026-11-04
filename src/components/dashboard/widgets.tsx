@@ -26,7 +26,7 @@ export function Greeting({ name }: { name: string }) {
   const greeting = useSyncExternalStore(noopSubscribe, partOfDay, () => "Welcome back");
   return (
     <>
-      {greeting}, {name.split(" ")[0]}
+      {greeting}, {name.replace(/^(Mr|Mrs|Ms|Miss|Dr|Prof)\.?\s+/i, "").split(" ")[0]}
     </>
   );
 }

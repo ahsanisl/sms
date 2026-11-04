@@ -28,7 +28,12 @@ export const users = pgTable(
     schoolRoleId: uuid("school_role_id").references(() => schoolRoles.id, { onDelete: "set null" }),
     name: text("name").notNull(),
     email: text("email").notNull(),
-    passwordHash: text("password_hash").notNull(),
+    /** Required by Better Auth. Accounts are created by staff, not self sign-up, so they start verified. */
+    emailVerified: boolean("email_verified").notNull().default(true),
+    /** Profile picture URL (Better Auth's "image"); unused today — avatars are generated from avatarSeed. */
+    image: text("image"),
+    /** bcrypt hash. Empty for an account with no password (e.g. a future "Sign in with Google" user) — an empty hash never matches. */
+    passwordHash: text("password_hash").notNull().default(""),
     /** Set when an admin creates the account or resets its password — the user must choose their own password at next sign-in. */
     mustChangePassword: boolean("must_change_password").notNull().default(false),
     /** Consecutive wrong-password sign-ins; reset on success. See src/lib/login-throttle.ts. */

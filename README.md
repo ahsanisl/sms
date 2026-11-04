@@ -1,6 +1,6 @@
 # EduFlow — School Management SaaS
 
-A multi-school management platform for private school groups: students, teachers, classes, attendance, fees, exams, timetable, homework, admissions and more. Built with Next.js, Postgres (via Drizzle ORM) and Auth.js email/password login.
+A multi-school management platform for private school groups: students, teachers, classes, attendance, fees, exams, timetable, homework, admissions and more. Built with Next.js, Postgres (via Drizzle ORM) and Better Auth sign-in (web and mobile).
 
 The UI started as a Google Stitch design export (kept for reference in [`stitch_eduflow_design_system_shell/`](./stitch_eduflow_design_system_shell)).
 
@@ -10,7 +10,7 @@ You need Node.js and a Postgres database (Supabase or any other Postgres works).
 
 ```bash
 npm install
-cp .env.example .env.local     # then set DATABASE_URL and AUTH_SECRET
+cp .env.example .env.local     # then set DATABASE_URL and BETTER_AUTH_SECRET
 npm run db:migrate             # create the tables
 npm run db:seed                # load the demo data
 npm run dev
@@ -46,7 +46,7 @@ The seed also fills in recent features: student religion, B-Form, medical notes 
 
 - **Next.js 16** (App Router, Turbopack) + **TypeScript**
 - **Postgres** + **Drizzle ORM** (migrations in `drizzle/migrations`)
-- **Auth.js** (next-auth v5) credentials login, JWT sessions
+- **Better Auth** — database sessions (revocable, per device), cookie for the web app, bearer token for the mobile app (see [docs/mobile-api.md](docs/mobile-api.md))
 - **Tailwind CSS v4** — design tokens ported from the Stitch export (`src/app/globals.css`)
 - **Radix UI primitives**, **Lucide icons**, **Recharts**
 
@@ -59,7 +59,7 @@ src/
     (onboarding)/  — first-run setup wizard for a new school's owner
     (app)/...      — every signed-in route; each page.tsx loads data on the server,
                      each *-client.tsx renders it, each actions.ts handles form submits
-    api/           — Auth.js handler, authenticated file downloads, permissions for the client
+    api/           — Better Auth endpoints (/api/auth/*), mobile API (/api/v1/*), authenticated file downloads
   services/        — business logic + authorization (every function takes the session)
   repositories/    — database queries (the only code that talks to Drizzle)
   db/              — schema, migration runner, seed script
@@ -74,7 +74,9 @@ src/
 
 **Finance.** Fees (money in), Expenses and recurring bills (money out, with an approval step: entries by someone without "Approve Expenses" wait for an approver), Salaries (monthly payroll that copies each person's salary into a payslip, deducts approved *unpaid* leave, can be adjusted while a draft, then is finalized and marked paid), and Income & Expenses (fee income against approved expenses and paid salaries, by month and campus, counted when money is received or paid).
 
-**Access control.** Every service call checks who is signed in, whether their role has the permission (the `role_permissions` table, editable in Settings → Users & Roles), and which campuses they can touch (`services/scope.ts`). A Campus Admin only ever sees their own campus. The top bar's campus switcher only narrows the overview lists; it never widens what a role can access.
+**Sign-in.** `src/auth.ts` (Better Auth). Passwords are bcrypt hashes on `users`; our own sign-in endpoint (`POST /api/auth/sign-in/password`) applies the per-account lockout and per-IP limits (`lib/login-throttle.ts`). Each signed-in browser or phone is a row in `auth_sessions`, so My Account can list and sign out devices, and changing or resetting a password signs out the others. "Forgot password?" emails a one-time link (needs `RESEND_API_KEY`; see `.env.example`).
+
+**Access control.** Every service call checks who is signed in, whether their role has the permission (per-school roles in `school_roles` / `school_role_permissions`, editable in Settings → Users & Roles; see `lib/authorization.ts`), and which campuses they can touch (`services/scope.ts`). A Campus Admin only ever sees their own campus. The top bar's campus switcher only narrows the overview lists; it never widens what a role can access.
 
 ## Scripts
 

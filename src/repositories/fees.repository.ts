@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, inArray, like } from "drizzle-orm";
+import { and, desc, eq, inArray, like } from "drizzle-orm";
 import { db } from "@/db";
 import {
   feeCategories,
@@ -157,6 +157,12 @@ export async function listReversalsForInvoice(invoiceId: string) {
 export async function listPaymentsForStudents(studentIds: string[]) {
   if (studentIds.length === 0) return [];
   return db.select().from(feePayments).where(inArray(feePayments.studentId, studentIds));
+}
+
+/** The most recent payments for a set of students (newest first) — for "latest activity" lists that don't need the full history. */
+export async function recentPaymentsForStudents(studentIds: string[], limit: number) {
+  if (studentIds.length === 0) return [];
+  return db.select().from(feePayments).where(inArray(feePayments.studentId, studentIds)).orderBy(desc(feePayments.date), desc(feePayments.createdAt)).limit(limit);
 }
 
 export async function listReversalsForStudents(studentIds: string[]) {

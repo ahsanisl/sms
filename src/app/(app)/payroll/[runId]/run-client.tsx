@@ -35,6 +35,7 @@ export interface PayslipRow {
   leaveDeduction: number;
   bonus: number;
   otherDeduction: number;
+  incomeTax: number;
   netPay: number;
   note: string;
   status: "unpaid" | "paid";
@@ -95,8 +96,8 @@ export function RunClient({ run, payslips, canManage }: RunClientProps) {
   function exportCsv() {
     downloadCsv(
       `payroll-${run.month}.csv`,
-      ["Name", "Designation", "Campus", "Bank account", "Basic", "Allowances", "Bonus", "Fixed deductions", "Unpaid leave days", "Leave deduction", "Other deductions", "Net pay", "Status", "Paid on"],
-      payslips.map((p) => [p.name, p.designation, p.campusName, p.bankAccount, p.basicSalary, p.allowances, p.bonus, p.fixedDeductions, p.unpaidLeaveDays, p.leaveDeduction, p.otherDeduction, p.netPay, p.status === "paid" ? "Paid" : "Unpaid", p.paidDate ?? ""]),
+      ["Name", "Designation", "Campus", "Bank account", "Basic", "Allowances", "Bonus", "Fixed deductions", "Income tax", "Unpaid leave days", "Leave deduction", "Other deductions", "Net pay", "Status", "Paid on"],
+      payslips.map((p) => [p.name, p.designation, p.campusName, p.bankAccount, p.basicSalary, p.allowances, p.bonus, p.fixedDeductions, p.incomeTax, p.unpaidLeaveDays, p.leaveDeduction, p.otherDeduction, p.netPay, p.status === "paid" ? "Paid" : "Unpaid", p.paidDate ?? ""]),
     );
   }
 
@@ -193,6 +194,7 @@ export function RunClient({ run, payslips, canManage }: RunClientProps) {
                     <td className="px-3 py-2 text-right tabular-nums text-on-surface-variant">{p.bonus ? `+ ${formatPKR(p.bonus)}` : "—"}</td>
                     <td className="px-3 py-2 text-right tabular-nums text-on-surface-variant">
                       {t.deductions ? `− ${formatPKR(t.deductions)}` : "—"}
+                      {p.incomeTax > 0 && <p className="text-label-sm">incl. {formatPKR(p.incomeTax)} tax</p>}
                       {p.unpaidLeaveDays > 0 && <p className="text-label-sm text-warning">incl. {p.unpaidLeaveDays} unpaid leave day{p.unpaidLeaveDays === 1 ? "" : "s"}</p>}
                     </td>
                     <td className="px-3 py-2 text-right font-semibold tabular-nums text-on-surface">{formatPKR(p.netPay)}</td>

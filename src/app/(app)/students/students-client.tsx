@@ -1,5 +1,6 @@
 "use client";
 
+import { todayIso } from "@/lib/dates";
 import { useState } from "react";
 import { useLoadingRouter } from "@/components/layout/global-loader";
 import Link from "next/link";
@@ -80,7 +81,7 @@ export function StudentsClient({
   function handleExport() {
     // Same columns as the import template (lib/student-csv.ts), so this file can be edited and imported back; the last two columns are informational.
     downloadCsv(
-      `students-${new Date().toISOString().slice(0, 10)}`,
+      `students-${todayIso()}`,
       [...STUDENT_CSV_HEADERS, ...STUDENT_EXPORT_EXTRA_HEADERS],
       students.map((s) => [...studentCsvRow(s, s.classLabel, s.campusName), s.attendanceRate, STUDENT_STATUS_LABEL[s.status]]),
     );
