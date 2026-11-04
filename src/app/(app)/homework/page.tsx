@@ -13,7 +13,7 @@ export default async function HomeworkPage() {
     classService.listClasses(session),
     subjectService.listSubjects(session),
     teacherService.listTeachers(session),
-    can(session.role, "homeworkCreate"),
+    can(session, "homeworkCreate"),
   ]);
 
   const classById = new Map(classes.map((c) => [c.id, c]));

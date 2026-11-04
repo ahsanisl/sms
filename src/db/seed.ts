@@ -41,7 +41,8 @@ import {
   marksEntries,
   parentChildren,
   periods,
-  rolePermissions,
+  schoolRoles,
+  schoolRolePermissions,
   rooms,
   schools,
   staffLeaveRequests,
@@ -56,7 +57,7 @@ import {
   timetableStatus,
   users,
 } from "@/db/schema";
-import { DEFAULT_ROLE_PERMISSIONS, PERMISSION_MODULE_LABEL } from "@/lib/permissions";
+import { SCHOOL_ROLE_MODULES, systemRoleRows } from "@/lib/school-roles";
 import type { PermissionModule, Role } from "@/lib/types";
 
 /**
@@ -227,14 +228,6 @@ async function main() {
   console.log("Seeding...");
   const passwordHash = await bcrypt.hash(DEV_PASSWORD, 10);
 
-  // -- Role permissions (mirrors the frontend's DEFAULT_ROLE_PERMISSIONS) --------------------------------------------------------
-  const roles = Object.keys(DEFAULT_ROLE_PERMISSIONS) as Role[];
-  const modules = Object.keys(PERMISSION_MODULE_LABEL) as PermissionModule[];
-  await db
-    .insert(rolePermissions)
-    .values(roles.flatMap((role) => modules.map((module) => ({ role, module, allowed: DEFAULT_ROLE_PERMISSIONS[role][module] }))))
-    .onConflictDoNothing();
-
   // -- School + academic session --------------------------------------------------------
   const [school] = await db
     .insert(schools)
@@ -251,6 +244,17 @@ async function main() {
       onboardingComplete: true,
     })
     .returning();
+
+  // -- School roles: the six defaults, plus one example custom role --------------------------------------------------------
+  const { roles: defaultRoles, permissions: defaultRolePermissions } = systemRoleRows(school.id);
+  await db.insert(schoolRoles).values(defaultRoles);
+  await db.insert(schoolRolePermissions).values(defaultRolePermissions);
+  const RECEPTIONIST_MODULES: PermissionModule[] = ["dashboard", "admissions", "students", "announcements"];
+  const [receptionistRole] = await db
+    .insert(schoolRoles)
+    .values({ schoolId: school.id, name: "Receptionist", description: "Front desk: admission inquiries and looking up students.", baseRole: "school_admin", isSystem: false })
+    .returning();
+  await db.insert(schoolRolePermissions).values(SCHOOL_ROLE_MODULES.map((module) => ({ roleId: receptionistRole.id, module, allowed: RECEPTIONIST_MODULES.includes(module) })));
 
   // The academic year runs August → June; pick the one today falls in.
   const sessionStartYear = TODAY.getUTCMonth() >= 7 ? TODAY.getUTCFullYear() : TODAY.getUTCFullYear() - 1;
@@ -477,10 +481,11 @@ async function main() {
       { schoolId: school.id, role: "accountant", name: "Sana Malik", email: "accountant@eduflow.dev", passwordHash, avatarSeed: "Sana Malik" },
       { schoolId: school.id, campusId: mainCampus.id, teacherId: teacherUserTeacher.id, role: "teacher", name: teacherUserTeacher.name, email: "teacher@eduflow.dev", passwordHash, avatarSeed: teacherUserTeacher.name },
       { schoolId: school.id, campusId: mainCampus.id, role: "parent", name: parentName, email: "parent@eduflow.dev", passwordHash, avatarSeed: parentName },
+      { schoolId: school.id, role: "school_admin", schoolRoleId: receptionistRole.id, name: "Rabia Aslam", email: "reception@eduflow.dev", passwordHash, avatarSeed: "Rabia Aslam" },
     ])
     .returning();
   const userByRole = (role: Role) => userRows.find((u) => u.role === role)!;
-  const adminUser = userByRole("school_admin");
+  const adminUser = userRows.find((u) => u.role === "school_admin" && !u.schoolRoleId)!;
   const accountantUser = userByRole("accountant");
   const teacherUser = userByRole("teacher");
   await db.insert(parentChildren).values([
@@ -868,6 +873,7 @@ async function main() {
   console.log("  accountant@eduflow.dev     — Accountant");
   console.log("  teacher@eduflow.dev        — Teacher (Ayesha Khan, class teacher of Grade 1-A, Main)");
   console.log("  parent@eduflow.dev         — Parent (Ahmed Raza, Grade 1-A, and Ayaan Raza, Grade 5-A)");
+  console.log("  reception@eduflow.dev      — Receptionist (custom role: Dashboard, Admissions, Students, Announcements)");
 }
 
 main()

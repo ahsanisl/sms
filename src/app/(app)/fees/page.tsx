@@ -11,7 +11,7 @@ export default async function FeesPage() {
   const [classes, students, canManageStructure] = await Promise.all([
     classService.listClasses(session),
     studentService.listStudents(session, { inView: true }),
-    can(session.role, "feesStructure"),
+    can(session, "feesStructure"),
   ]);
 
   const studentById = new Map(students.map((s) => [s.id, s]));

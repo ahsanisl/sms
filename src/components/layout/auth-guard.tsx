@@ -38,10 +38,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     fetch("/api/me/permissions")
       .then((res) => (res.ok ? (res.json() as Promise<PermissionsResponse>) : null))
       .then((data) => {
-        if (!cancelled) setPerms(data ?? { permissions: {}, onboardingComplete: null, schoolName: null });
+        if (!cancelled) setPerms(data ?? { permissions: {}, onboardingComplete: null, schoolName: null, roleName: null });
       })
       .catch(() => {
-        if (!cancelled) setPerms({ permissions: {}, onboardingComplete: null, schoolName: null });
+        if (!cancelled) setPerms({ permissions: {}, onboardingComplete: null, schoolName: null, roleName: null });
       });
     return () => {
       cancelled = true;
@@ -57,6 +57,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     // set (non-null) for a school_owner session.
     if (user.role === "school_owner" && perms.onboardingComplete === false) {
       router.replace("/onboarding");
+      return;
+    }
+
+    // Signed in with a temporary password (new account or admin reset): set their own before anything else.
+    if (perms.mustChangePassword && pathname !== "/account") {
+      router.replace("/account?required=1");
       return;
     }
 

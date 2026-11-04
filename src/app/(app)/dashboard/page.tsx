@@ -69,7 +69,7 @@ const LEAVE_TYPE_LABEL: Record<string, string> = { sick: "Sick leave", casual: "
 async function allowedQuickActions(session: AuthSession): Promise<NavItem[]> {
   const checks = await Promise.all(QUICK_ACTIONS.map(async (action) => {
     const routeModule = moduleForPath(action.href);
-    return !routeModule || (await can(session.role, routeModule));
+    return !routeModule || (await can(session, routeModule));
   }));
   return QUICK_ACTIONS.filter((_, i) => checks[i]);
 }
@@ -77,7 +77,7 @@ async function allowedQuickActions(session: AuthSession): Promise<NavItem[]> {
 /** Every permission module whose value decides whether a dashboard card links somewhere or a pending-task section is computed. */
 async function permissionFlags(session: AuthSession) {
   const keys = ["students", "teachers", "attendance", "attendanceMark", "fees", "exams", "examsMarks", "leave", "admissions", "homework", "classes", "settingsCampuses"] as const;
-  const values = await Promise.all(keys.map((k) => can(session.role, k)));
+  const values = await Promise.all(keys.map((k) => can(session, k)));
   return Object.fromEntries(keys.map((k, i) => [k, values[i]])) as Record<(typeof keys)[number], boolean>;
 }
 
@@ -201,7 +201,7 @@ async function renderTeacherDashboard(session: AuthSession) {
   const perms = await permissionFlags(session);
   const [allClasses, allStudents, allSubjects, slots, config] = await Promise.all([
     classService.listClasses(session),
-    studentService.listStudents(session),
+    perms.students ? studentService.listStudents(session) : Promise.resolve([]),
     subjectService.listSubjects(session),
     timetableService.listSlotsForTeacher(session, teacherId),
     timetableService.getConfig(session),
@@ -215,7 +215,7 @@ async function renderTeacherDashboard(session: AuthSession) {
     return cls ? `${cls.grade}-${cls.section}` : "—";
   };
 
-  const attendance = await attendanceService.listByClasses(session, [...myClassIds]);
+  const attendance = perms.attendance ? await attendanceService.listByClasses(session, [...myClassIds]) : [];
   const todayRecords = attendance.filter((a) => a.date === today);
   const rate = attendanceRate(todayRecords);
   const overallRate = attendanceRate(attendance);
@@ -315,16 +315,17 @@ async function renderTeacherDashboard(session: AuthSession) {
 }
 
 async function renderAccountantDashboard(session: AuthSession) {
+  const perms = await permissionFlags(session);
   const [campuses, students, viewCampusId, quickActions] = await Promise.all([
     campusService.listCampusesInView(session),
-    studentService.listStudents(session, { inView: true }),
+    perms.students ? studentService.listStudents(session, { inView: true }) : Promise.resolve([]),
     getViewCampusId(session),
     allowedQuickActions(session),
   ]);
   const studentIds = students.map((s) => s.id);
   const [invoices, payments] = await Promise.all([
-    feeService.listInvoicesForStudents(session, studentIds),
-    feeService.listPaymentsForStudents(session, studentIds),
+    perms.fees ? feeService.listInvoicesForStudents(session, studentIds) : Promise.resolve([]),
+    perms.fees ? feeService.listPaymentsForStudents(session, studentIds) : Promise.resolve([]),
   ]);
   const studentById = new Map(students.map((s) => [s.id, s]));
 
@@ -399,7 +400,8 @@ async function renderAdminDashboard(session: AuthSession) {
   const perms = await permissionFlags(session);
   const [campuses, students, teachers, classes, viewCampusId, quickActions, config] = await Promise.all([
     campusService.listCampusesInView(session),
-    studentService.listStudents(session, { inView: true }),
+    // Custom roles can lack any of these — each read is skipped (and its cards hidden) without the permission.
+    perms.students ? studentService.listStudents(session, { inView: true }) : Promise.resolve([]),
     teacherService.listTeachers(session, { inView: true }),
     classService.listClasses(session, { inView: true }),
     getViewCampusId(session),
@@ -413,7 +415,7 @@ async function renderAdminDashboard(session: AuthSession) {
   const studentById = new Map(students.map((s) => [s.id, s]));
   const teacherById = new Map(teachers.map((t) => [t.id, t]));
 
-  const attendance = await attendanceService.listByClasses(session, classIds);
+  const attendance = perms.attendance ? await attendanceService.listByClasses(session, classIds) : [];
   const days = last7Days();
   const today = days[days.length - 1];
   const yesterday = days[days.length - 2];
@@ -578,6 +580,9 @@ async function renderAdminDashboard(session: AuthSession) {
       collected={collected}
       outstanding={outstanding}
       showFees={perms.fees}
+      showStudents={perms.students}
+      showTeachers={perms.teachers}
+      showAttendance={perms.attendance}
       showCampusGlance={showCampusGlance}
       campusGlance={campusGlance}
       attendanceTrend={attendanceTrend}

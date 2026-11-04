@@ -16,7 +16,7 @@ export default async function HomeworkDetailPage({ params }: { params: Promise<{
     classService.listClasses(session),
     subjectService.listSubjects(session),
     teacherService.listTeachers(session),
-    can(session.role, "homeworkCreate"),
+    can(session, "homeworkCreate"),
   ]);
 
   const cls = classes.find((c) => c.id === homework.classId);

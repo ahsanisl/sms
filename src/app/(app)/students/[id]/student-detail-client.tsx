@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Avatar } from "@/components/shared/avatar";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { BackLink } from "@/components/shared/page-header";
+import { ParentLoginsCard, type ParentLogin } from "@/components/students/parent-logins-card";
 import { useSession } from "@/lib/auth/session-context";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -89,6 +90,7 @@ export function StudentDetailClient({
   gradeBands,
   canManage,
   canRequestCorrection,
+  parentLogins = null,
 }: {
   student: Student;
   classGrade: string;
@@ -104,6 +106,8 @@ export function StudentDetailClient({
   gradeBands: { grade: string; minPercentage: number }[];
   canManage: boolean;
   canRequestCorrection: boolean;
+  /** Linked parent portal logins — null when this viewer can't manage accounts (the card is then hidden). */
+  parentLogins?: ParentLogin[] | null;
 }) {
   const router = useLoadingRouter();
   const [editOpen, setEditOpen] = useState(false);
@@ -285,6 +289,10 @@ export function StudentDetailClient({
               <InfoRow label="Status" value={STUDENT_STATUS_LABEL[student.status]} />
               <InfoRow label="Previous School" value={student.previousSchool} span2 />
             </InfoCard>
+
+            {parentLogins && (
+              <ParentLoginsCard studentId={student.id} studentName={student.name} parentName={student.parentName} parentEmail={student.parentEmail} logins={parentLogins} />
+            )}
 
             <InfoCard icon={<HeartPulse size={18} />} title="Health">
               <InfoRow label="Blood Group" value={student.bloodGroup} />

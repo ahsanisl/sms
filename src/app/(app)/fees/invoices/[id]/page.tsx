@@ -37,7 +37,7 @@ export default async function InvoiceDetailPage({ params }: { params: Promise<{ 
     feeService.listPaymentsForInvoice(session, id),
     feeService.listReversalsForInvoice(session, id),
     userService.listUsersBySchool(session).catch(() => []),
-    can(session.role, "feesCollect"),
+    can(session, "feesCollect"),
   ]);
 
   const cls = student ? classes.find((c) => c.id === student.classId) : undefined;

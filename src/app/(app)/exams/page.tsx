@@ -12,7 +12,7 @@ export default async function ExamsPage() {
     examService.listExams(session, { inView: true }),
     classService.listClasses(session),
     studentService.listStudents(session),
-    can(session.role, "examsCreate"),
+    can(session, "examsCreate"),
   ]);
 
   const classLabelById = new Map(classes.map((c) => [c.id, `${c.grade}-${c.section}`]));

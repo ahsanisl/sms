@@ -13,7 +13,7 @@ export default async function ClassworkPage() {
     classService.listClasses(session),
     subjectService.listSubjects(session),
     teacherService.listTeachers(session),
-    can(session.role, "classworkCreate"),
+    can(session, "classworkCreate"),
   ]);
 
   const classById = new Map(classes.map((c) => [c.id, c]));

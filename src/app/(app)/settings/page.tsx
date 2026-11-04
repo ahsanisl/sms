@@ -18,10 +18,10 @@ export default async function SettingsPage() {
     subjectService.listSubjects(session),
     examService.listGradeBands(session),
     departmentService.listDepartments(session),
-    can(session.role, "settingsCampuses"),
-    can(session.role, "timetableBuilder"),
-    can(session.role, "feesStructure"),
-    can(session.role, "settingsUsers"),
+    can(session, "settingsCampuses"),
+    can(session, "timetableBuilder"),
+    can(session, "feesStructure"),
+    can(session, "settingsUsers"),
   ]);
 
   return (

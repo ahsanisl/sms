@@ -11,7 +11,7 @@ export default async function AlumniDirectoryPage() {
     studentService.listStudents(session, { inView: true }),
     classService.listClasses(session),
     campusService.listCampusesInView(session),
-    can(session.role, "studentsManage"),
+    can(session, "studentsManage"),
   ]);
 
   const classById = new Map(classes.map((c) => [c.id, c]));

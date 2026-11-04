@@ -8,6 +8,10 @@ export interface PermissionsResponse {
   permissions: Partial<Record<PermissionModule, boolean>>;
   onboardingComplete: boolean | null;
   schoolName: string | null;
+  /** The user's school role name — a custom role's own name, or the default role's. */
+  roleName: string | null;
+  /** Signed in with a temporary password — must set their own before using the app. */
+  mustChangePassword?: boolean;
 }
 
 /**

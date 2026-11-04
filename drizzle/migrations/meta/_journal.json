@@ -36,6 +36,20 @@
       "when": 1793015740376,
       "tag": "0004_add_student_profile_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793099687710,
+      "tag": "0005_per_school_roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793102178393,
+      "tag": "0006_password_reset_and_drop_old_permissions",
+      "breakpoints": true
     }
   ]
 }

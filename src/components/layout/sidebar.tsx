@@ -208,12 +208,12 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
       </nav>
 
       <div className={cn("border-t border-sidebar-border p-sm", collapsed && "flex justify-center")}>
-        <div className={cn("flex items-center gap-3 rounded-lg px-2 py-2", collapsed && "px-0")} title={collapsed ? `${user.name} · ${ROLE_LABEL[user.role]}` : undefined}>
+        <div className={cn("flex items-center gap-3 rounded-lg px-2 py-2", collapsed && "px-0")} title={collapsed ? `${user.name} · ${perms?.roleName ?? ROLE_LABEL[user.role]}` : undefined}>
           <Avatar name={user.name} />
           {!collapsed && (
             <div className="min-w-0">
               <p className="truncate text-label-md font-semibold text-on-primary">{user.name}</p>
-              <p className="truncate text-label-sm text-sidebar-muted">{ROLE_LABEL[user.role]}</p>
+              <p className="truncate text-label-sm text-sidebar-muted">{perms?.roleName ?? ROLE_LABEL[user.role]}</p>
             </div>
           )}
         </div>

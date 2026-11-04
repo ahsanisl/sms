@@ -23,10 +23,10 @@ const LOW_ATTENDANCE_THRESHOLD = 80;
 export async function buildNotificationItems(session: AuthSession): Promise<NotificationItem[]> {
   const isParent = session.role === "parent";
   const [canStudents, canAttendance, canFees, canExams] = await Promise.all([
-    can(session.role, "students"),
-    can(session.role, "attendance"),
-    can(session.role, "fees"),
-    can(session.role, "exams"),
+    can(session, "students"),
+    can(session, "attendance"),
+    can(session, "fees"),
+    can(session, "exams"),
   ]);
 
   const [students, classes] = await Promise.all([

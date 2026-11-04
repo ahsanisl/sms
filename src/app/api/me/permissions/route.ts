@@ -1,5 +1,5 @@
 import { requireSession, UnauthenticatedError } from "@/lib/tenancy";
-import { can } from "@/lib/authorization";
+import { effectiveRole } from "@/lib/authorization";
 import * as schoolService from "@/services/school.service";
 import { PERMISSION_MODULE_LABEL } from "@/lib/permissions";
 import type { PermissionModule } from "@/lib/types";
@@ -22,13 +22,13 @@ export async function GET() {
   try {
     session = await requireSession();
   } catch (error) {
-    if (error instanceof UnauthenticatedError) return Response.json({ permissions: {}, onboardingComplete: null, schoolName: null }, { status: 401 });
+    if (error instanceof UnauthenticatedError) return Response.json({ permissions: {}, onboardingComplete: null, schoolName: null, roleName: null, mustChangePassword: false }, { status: 401 });
     throw error;
   }
 
   const modules = Object.keys(PERMISSION_MODULE_LABEL) as PermissionModule[];
-  const entries = await Promise.all(modules.map(async (moduleKey) => [moduleKey, await can(session.role, moduleKey)] as const));
-  const permissions = Object.fromEntries(entries) as Record<PermissionModule, boolean>;
+  const role = await effectiveRole(session);
+  const permissions = Object.fromEntries(modules.map((moduleKey) => [moduleKey, role.permissions[moduleKey] === true])) as Record<PermissionModule, boolean>;
 
   let onboardingComplete: boolean | null = null;
   let schoolName: string | null = null;
@@ -38,5 +38,7 @@ export async function GET() {
     if (session.role === "school_owner") onboardingComplete = school.onboardingComplete;
   }
 
-  return Response.json({ permissions, onboardingComplete, schoolName });
+  // roleName: the school role's own name (e.g. a custom "Receptionist"), shown in the sidebar and top bar.
+  // mustChangePassword: signed in with an admin-issued temporary password — AuthGuard sends them to My Account first.
+  return Response.json({ permissions, onboardingComplete, schoolName, roleName: role.name, mustChangePassword: session.mustChangePassword });
 }

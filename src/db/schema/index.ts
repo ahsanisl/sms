@@ -16,7 +16,7 @@ export * from "@/db/schema/fees";
 export * from "@/db/schema/exams";
 export * from "@/db/schema/announcements";
 export * from "@/db/schema/leaves";
-export * from "@/db/schema/permissions";
+export * from "@/db/schema/school-roles";
 export * from "@/db/schema/audit";
 export * from "@/db/schema/attachments";
 export * from "@/db/schema/syllabus";

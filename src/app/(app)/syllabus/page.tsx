@@ -15,7 +15,7 @@ export default async function SyllabusPage({ searchParams }: { searchParams: Pro
     classService.listClasses(session),
     subjectService.listSubjects(session),
     sessionService.listSessions(session),
-    can(session.role, "syllabusManage"),
+    can(session, "syllabusManage"),
   ]);
 
   const activeClasses = classes.filter((c) => c.status === "active");

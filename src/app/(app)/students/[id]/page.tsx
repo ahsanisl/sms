@@ -10,6 +10,8 @@ import { can } from "@/lib/authorization";
 import { EmptyState } from "@/components/shared/empty-state";
 import Link from "next/link";
 import { StudentDetailClient } from "@/app/(app)/students/[id]/student-detail-client";
+import { isRoleManager } from "@/services/permission.service";
+import { listParentAccounts } from "@/services/account.service";
 
 export default async function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -41,9 +43,11 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
     examService.getResultCardData(session, student.id),
     studentService.listLifecycleEvents(session, student.id),
     examService.listGradeBands(session),
-    can(session.role, "studentsManage"),
-    can(session.role, "attendanceMark"),
+    can(session, "studentsManage"),
+    can(session, "attendanceMark"),
   ]);
+  // Parent portal logins are account management — Owners and the default School Admin only.
+  const parentLogins = (await isRoleManager(session)) ? await listParentAccounts(session, student.id) : null;
 
   const classById = new Map(classes.map((c) => [c.id, c]));
   const campusById = new Map(campuses.map((c) => [c.id, c]));
@@ -63,6 +67,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
 
   return (
     <StudentDetailClient
+      parentLogins={parentLogins}
       student={{ ...student, dob: student.dob ?? "", admissionDate: student.admissionDate ?? "" }}
       classGrade={cls?.grade ?? "—"}
       classSection={cls?.section ?? "—"}

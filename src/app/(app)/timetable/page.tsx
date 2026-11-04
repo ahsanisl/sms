@@ -20,7 +20,7 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
     roomService.listRooms(session),
     subjectService.listSubjects(session),
     timetableService.getConfig(session),
-    can(session.role, "timetableBuilder"),
+    can(session, "timetableBuilder"),
   ]);
   const teachers = teachersRaw.map((t) => ({ ...t, classIds: [], joinDate: t.joinDate ?? "" }));
 

@@ -63,7 +63,7 @@ export async function importStudentsAction(rows: unknown[]): Promise<{ success: 
   try {
     const session = await requireSession();
     // Refuse up front — before the duplicate check, which would otherwise answer row-by-row.
-    if (!(await can(session.role, "studentsManage"))) return { success: false, error: "Your role can't add students.", results: [] };
+    if (!(await can(session, "studentsManage"))) return { success: false, error: "Your role can't add students.", results: [] };
     if (!Array.isArray(rows) || rows.length === 0) return { success: false, error: "No rows to import.", results: [] };
     if (rows.length > MAX_IMPORT_ROWS) return { success: false, error: `Import at most ${MAX_IMPORT_ROWS} students at a time.`, results: [] };
     // Admission numbers aren't unique in the database, so re-importing an

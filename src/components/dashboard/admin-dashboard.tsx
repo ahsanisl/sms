@@ -47,6 +47,10 @@ interface AdminDashboardProps {
   collected: number;
   outstanding: number;
   showFees: boolean;
+  /** Custom roles may lack these — the matching cards are hidden rather than shown empty. Default true. */
+  showStudents?: boolean;
+  showTeachers?: boolean;
+  showAttendance?: boolean;
   showCampusGlance: boolean;
   campusGlance: CampusGlanceRow[];
   attendanceTrend: { date: string; rate: number }[];
@@ -79,6 +83,9 @@ export function AdminDashboard({
   collected,
   outstanding,
   showFees,
+  showStudents = true,
+  showTeachers = true,
+  showAttendance = true,
   showCampusGlance,
   campusGlance,
   attendanceTrend,
@@ -95,6 +102,11 @@ export function AdminDashboard({
   const collectionRate = billed > 0 ? Math.round((collected / billed) * 100) : 0;
   const rateDelta = todayRate - yesterdayRate;
   const hasAttendanceToday = classesMarked > 0;
+  const kpiCount = [showStudents, showTeachers, showAttendance, showFees, showFees].filter(Boolean).length;
+  const kpiCols = ({ 0: "", 1: "xl:grid-cols-1", 2: "xl:grid-cols-2", 3: "xl:grid-cols-3", 4: "xl:grid-cols-4", 5: "xl:grid-cols-5" } as Record<number, string>)[kpiCount];
+  const events = (
+    <EventList title="Upcoming events" description="Exams and staff leave, next 30 days" events={upcomingEvents} emptyText="Nothing scheduled in the next 30 days." className={showAttendance ? undefined : "lg:col-span-2"} />
+  );
 
   return (
     <div className="space-y-6">
@@ -107,10 +119,11 @@ export function AdminDashboard({
         ]}
       />
 
-      <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", showFees ? "xl:grid-cols-5" : "xl:grid-cols-3")}>
-        <StatCard label="Active Students" value={totalStudents.toLocaleString()} icon="group" href={links.students} />
-        <StatCard label="Active Teachers" value={totalTeachers.toLocaleString()} icon="school" href={links.teachers} />
-        <StatCard
+      {kpiCount > 0 && (
+      <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", kpiCols)}>
+        {showStudents && <StatCard label="Active Students" value={totalStudents.toLocaleString()} icon="group" href={links.students} />}
+        {showTeachers && <StatCard label="Active Teachers" value={totalTeachers.toLocaleString()} icon="school" href={links.teachers} />}
+        {showAttendance && <StatCard
           label="Today's Attendance"
           value={hasAttendanceToday ? `${todayRate}%` : "—"}
           icon="fact_check"
@@ -121,7 +134,7 @@ export function AdminDashboard({
               ? { direction: rateDelta > 0 ? "up" : rateDelta < 0 ? "down" : "flat", label: `${classesMarked}/${totalClasses} classes · ${rateDelta >= 0 ? "+" : ""}${rateDelta}% vs yesterday` }
               : { direction: "flat", label: `0/${totalClasses} classes marked yet` }
           }
-        />
+        />}
         {showFees && (
           <StatCard
             label="Collected This Month"
@@ -143,10 +156,12 @@ export function AdminDashboard({
           />
         )}
       </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <TaskList tasks={tasks} />
-        <ChartCard title="Attendance trend" description="School-wide attendance, last 7 days" className="lg:col-span-2">
+        {!showAttendance && events}
+        {showAttendance && <ChartCard title="Attendance trend" description="School-wide attendance, last 7 days" className="lg:col-span-2">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={attendanceTrend} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
               <defs>
@@ -162,18 +177,13 @@ export function AdminDashboard({
               <Area type="monotone" dataKey="rate" stroke="var(--color-secondary)" strokeWidth={2.5} fill="url(#attendanceFill)" />
             </AreaChart>
           </ResponsiveContainer>
-        </ChartCard>
+        </ChartCard>}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <EventList
-          title="Upcoming events"
-          description="Exams and staff leave, next 30 days"
-          events={upcomingEvents}
-          emptyText="Nothing scheduled in the next 30 days."
-        />
+        {showAttendance && events}
         {showFees ? (
-          <ChartCard title="Fee collection by campus" description={monthLabel} className="lg:col-span-2">
+          <ChartCard title="Fee collection by campus" description={monthLabel} className={showAttendance ? "lg:col-span-2" : "lg:col-span-3"}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={feeByCampus} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-outline-variant)" strokeOpacity={0.6} vertical={false} />
@@ -187,7 +197,7 @@ export function AdminDashboard({
             </ResponsiveContainer>
           </ChartCard>
         ) : (
-          <QuickActions actions={quickActions} className="lg:col-span-2" />
+          <QuickActions actions={quickActions} className={showAttendance ? "lg:col-span-2" : "lg:col-span-3"} />
         )}
       </div>
 
@@ -230,7 +240,7 @@ export function AdminDashboard({
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="flex flex-col">
+        {showAttendance && <Card className="flex flex-col">
           <CardHeader title="Lowest attendance today" description="Classes marked so far, lowest first" />
           <div className="flex-1 space-y-4 p-lg pt-md">
             {classAttendance.map(({ id, label, rate }) => (
@@ -249,9 +259,9 @@ export function AdminDashboard({
               <Link href={links.attendance ?? links.classes} className="text-label-md font-semibold text-secondary hover:underline">View attendance overview →</Link>
             </div>
           )}
-        </Card>
+        </Card>}
 
-        <Card className="lg:col-span-2">
+        <Card className={showAttendance ? "lg:col-span-2" : "lg:col-span-3"}>
           <CardHeader title="Recent activity" />
           <div className="space-y-1 p-sm pt-md">
             {latestStudentActivity && (

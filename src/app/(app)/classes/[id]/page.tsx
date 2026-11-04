@@ -40,8 +40,8 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
     campusService.listCampuses(session),
     teacherService.listTeachers(session),
     studentService.listStudents(session),
-    can(session.role, "studentsManage"),
-    can(session.role, "classesManage"),
+    can(session, "studentsManage"),
+    can(session, "classesManage"),
   ]);
 
   const campus = campuses.find((c) => c.id === cls.campusId);

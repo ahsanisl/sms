@@ -1,5 +1,7 @@
 import "server-only";
+import { cache } from "react";
 import { auth } from "@/auth";
+import { findUserById } from "@/repositories/users.repository";
 import type { Role } from "@/lib/types";
 
 /** The tenant-scoped identity every service call authorizes against — never trust a schoolId/campusId supplied by the client instead of this. */
@@ -9,6 +11,10 @@ export interface AuthSession {
   schoolId: string | null;
   campusId: string | null;
   teacherId: string | null;
+  /** The school role whose permissions apply (null = the school's default role for `role`) — see lib/authorization.ts. */
+  schoolRoleId: string | null;
+  /** Signed in with an admin-issued temporary password — must choose their own before using the app (see components/layout/auth-guard.tsx). */
+  mustChangePassword: boolean;
   name: string;
   email: string;
 }
@@ -38,16 +44,27 @@ export class NotFoundError extends Error {
 export async function requireSession(): Promise<AuthSession> {
   const session = await auth();
   if (!session?.user) throw new UnauthenticatedError();
+  // The sign-in token only proves who this is. Role, school, campus and
+  // linked teacher are re-read from the database (once per request), so a
+  // role change or a removed account takes effect immediately instead of at
+  // the user's next login.
+  const user = await loadUser(session.user.id);
+  if (!user) throw new UnauthenticatedError();
   return {
-    userId: session.user.id,
-    role: session.user.role,
-    schoolId: session.user.schoolId,
-    campusId: session.user.campusId,
-    teacherId: session.user.teacherId,
-    name: session.user.name,
-    email: session.user.email,
+    userId: user.id,
+    role: user.role,
+    schoolId: user.schoolId,
+    campusId: user.campusId,
+    teacherId: user.teacherId,
+    schoolRoleId: user.schoolRoleId,
+    mustChangePassword: user.mustChangePassword,
+    name: user.name,
+    email: user.email,
   };
 }
+
+/** Per-request cache — requireSession runs many times while rendering one page. */
+const loadUser = cache((userId: string) => findUserById(userId));
 
 /** For platform_admin-only actions where no school context should exist. Throws NotFoundError-shaped errors are handled by callers; this just asserts the shape callers actually need. */
 export function requireSchoolId(session: AuthSession): string {

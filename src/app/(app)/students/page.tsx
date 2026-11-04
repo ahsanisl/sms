@@ -13,7 +13,7 @@ export default async function StudentsPage() {
     studentService.listStudents(session, { inView: true }),
     classService.listClasses(session),
     campusService.listCampuses(session),
-    can(session.role, "studentsManage"),
+    can(session, "studentsManage"),
   ]);
 
   const classById = new Map(classes.map((c) => [c.id, c]));

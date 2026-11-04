@@ -79,9 +79,10 @@ export const MODULE_ROUTES: { module: PermissionModule; prefixes: string[] }[] =
  * (a printable bill, a result card) that both admin-side pages and the
  * parent portal link into; the pages themselves hide admin-only actions
  * (Record Payment, Apply Discount, Reverse) behind a `feesCollect`
- * permission check rather than being gated at the route level.
+ * permission check rather than being gated at the route level. /account is
+ * every user's own profile + password page, so no role can be locked out of it.
  */
-const ALWAYS_ALLOWED_PREFIXES = ["/notifications", "/fees/invoices", "/exams/results"];
+const ALWAYS_ALLOWED_PREFIXES = ["/notifications", "/fees/invoices", "/exams/results", "/account"];
 
 /** The Parent portal is a structurally separate, parent-only route tree (see lib/nav-config.ts). */
 const PARENT_ONLY_PREFIXES = ["/portal"];
@@ -102,10 +103,11 @@ export function isParentOnlyRoute(pathname: string): boolean {
 }
 
 /**
- * Default route-view permissions per role — the starting values src/db/seed.ts
- * writes into the role_permissions table. After seeding, the database is the
- * source of truth (Settings → Users & Roles edits it; lib/authorization.ts
- * enforces it server-side, components/layout/auth-guard.tsx client-side).
+ * Default module permissions per built-in role. For schools these are only
+ * starting values — each school gets its own editable copy as its default
+ * roles (lib/school-roles.ts); the database is then the source of truth.
+ * platform_admin has no school, so its row here is used directly (see
+ * lib/authorization.ts).
  */
 export const DEFAULT_ROLE_PERMISSIONS: Record<Role, Record<PermissionModule, boolean>> = {
   // Platform-level SaaS operator: manages the roster of schools (tenants) and

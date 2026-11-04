@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useGlobalLoading, useGlobalTransition, useLoadingRouter } from "@/components/layout/global-loader";
-import { Search, Bell, ChevronDown, LogOut, Settings, Check, Menu, Building2 } from "lucide-react";
+import { Search, Bell, ChevronDown, LogOut, Settings, Check, Menu, Building2, UserRound } from "lucide-react";
 import { Avatar } from "@/components/shared/avatar";
 import {
   DropdownMenu,
@@ -123,7 +123,7 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
             <Avatar name={user.name} />
             <span className="hidden text-left lg:block">
               <span className="block max-w-[10rem] truncate text-label-md font-semibold text-on-surface">{user.name}</span>
-              <span className="block text-label-sm text-on-surface-variant">{ROLE_LABEL[user.role]}</span>
+              <span className="block text-label-sm text-on-surface-variant">{perms?.roleName ?? ROLE_LABEL[user.role]}</span>
             </span>
             <ChevronDown className="hidden h-3.5 w-3.5 text-on-surface-variant lg:block" />
           </DropdownMenuTrigger>
@@ -132,10 +132,15 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
               <div className="flex flex-col normal-case tracking-normal">
                 <span className="font-semibold text-on-surface">{user.name}</span>
                 <span className="font-normal text-on-surface-variant">{user.email}</span>
-                <span className="mt-1 font-normal text-on-surface-variant">{ROLE_LABEL[user.role]}</span>
+                <span className="mt-1 font-normal text-on-surface-variant">{perms?.roleName ?? ROLE_LABEL[user.role]}</span>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/account">
+                <UserRound className="h-4 w-4" /> My Account
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/notifications">
                 <Bell className="h-4 w-4" /> Notifications

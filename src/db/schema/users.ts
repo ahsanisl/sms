@@ -1,9 +1,10 @@
-import { index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { roleEnum } from "@/db/schema/enums";
 import { schools } from "@/db/schema/schools";
 import { campuses } from "@/db/schema/campuses";
 import { teachers } from "@/db/schema/teachers";
 import { students } from "@/db/schema/students";
+import { schoolRoles } from "@/db/schema/school-roles";
 
 /**
  * Every account that can log in. schoolId is nullable only for
@@ -21,10 +22,15 @@ export const users = pgTable(
     schoolId: uuid("school_id").references(() => schools.id, { onDelete: "cascade" }),
     campusId: uuid("campus_id").references(() => campuses.id, { onDelete: "set null" }),
     teacherId: uuid("teacher_id").references(() => teachers.id, { onDelete: "set null" }),
+    /** The built-in role this account behaves as (data scope, dashboard). For a custom role this is the role's baseRole. */
     role: roleEnum("role").notNull(),
+    /** The school role whose permissions apply. Null = the school's default role for `role`. */
+    schoolRoleId: uuid("school_role_id").references(() => schoolRoles.id, { onDelete: "set null" }),
     name: text("name").notNull(),
     email: text("email").notNull(),
     passwordHash: text("password_hash").notNull(),
+    /** Set when an admin creates the account or resets its password — the user must choose their own password at next sign-in. */
+    mustChangePassword: boolean("must_change_password").notNull().default(false),
     avatarSeed: text("avatar_seed").notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

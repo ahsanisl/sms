@@ -72,10 +72,10 @@ export async function globalSearchAction(rawQuery: string): Promise<SearchResult
     const matches = (...values: (string | undefined | null)[]) => values.some((v) => v?.toLowerCase().includes(query));
 
     const [canStudents, canTeachers, canClasses, canAdmissions] = await Promise.all([
-      can(session.role, "students"),
-      can(session.role, "teachers"),
-      can(session.role, "classes"),
-      can(session.role, "admissions"),
+      can(session, "students"),
+      can(session, "teachers"),
+      can(session, "classes"),
+      can(session, "admissions"),
     ]);
     const isParent = session.role === "parent";
 
