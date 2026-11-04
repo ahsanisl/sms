@@ -50,6 +50,13 @@
       "when": 1793102178393,
       "tag": "0006_password_reset_and_drop_old_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793770004687,
+      "tag": "0007_login_lockout",
+      "breakpoints": true
     }
   ]
 }

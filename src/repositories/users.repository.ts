@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { users, parentChildren, type NewUser } from "@/db/schema";
 
@@ -58,7 +58,29 @@ export async function getUserWithinSchool(schoolId: string, userId: string) {
 
 /** Sets a new password hash. `mustChangePassword` true for an admin-issued temporary password, false when the user chose it themselves. */
 export async function setPassword(userId: string, passwordHash: string, mustChangePassword: boolean) {
-  await db.update(users).set({ passwordHash, mustChangePassword, updatedAt: new Date() }).where(eq(users.id, userId));
+  // A new password (self-chosen or an admin reset) also lifts any sign-in lockout.
+  await db.update(users).set({ passwordHash, mustChangePassword, failedLoginCount: 0, lockedUntil: null, updatedAt: new Date() }).where(eq(users.id, userId));
+}
+
+/**
+ * Counts one wrong password. On reaching `maxFailures` the account locks for
+ * `lockMinutes` and the counter restarts. A single atomic UPDATE, so parallel
+ * guesses can't race past the limit. Returns true if this attempt locked it.
+ */
+export async function recordFailedLogin(userId: string, maxFailures: number, lockMinutes: number): Promise<boolean> {
+  const [row] = await db
+    .update(users)
+    .set({
+      failedLoginCount: sql`CASE WHEN ${users.failedLoginCount} + 1 >= ${maxFailures} THEN 0 ELSE ${users.failedLoginCount} + 1 END`,
+      lockedUntil: sql`CASE WHEN ${users.failedLoginCount} + 1 >= ${maxFailures} THEN now() + make_interval(mins => ${lockMinutes}) ELSE ${users.lockedUntil} END`,
+    })
+    .where(eq(users.id, userId))
+    .returning({ lockedUntil: users.lockedUntil });
+  return !!row?.lockedUntil && row.lockedUntil.getTime() > Date.now();
+}
+
+export async function recordSuccessfulLogin(userId: string) {
+  await db.update(users).set({ failedLoginCount: 0, lockedUntil: null }).where(eq(users.id, userId));
 }
 
 /** Parent accounts linked to a student. */

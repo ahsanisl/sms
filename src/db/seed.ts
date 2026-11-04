@@ -80,6 +80,48 @@ import type { PermissionModule, Role } from "@/lib/types";
 const DEV_PASSWORD = "Password123!";
 const RESET = process.argv.includes("--reset");
 
+/**
+ * Safety guard, checked before connecting. This script loads demo accounts
+ * with a public password — and with --reset, first erases every table — so:
+ * - with NODE_ENV=production it always refuses;
+ * - against a database on this machine (localhost) it runs as before;
+ * - against any other host it requires the exact target to be typed:
+ *   --confirm=<host>/<database>.
+ * For a real deployment's first account use `npm run db:bootstrap` instead.
+ */
+function assertSafeTarget() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    console.error("DATABASE_URL is not set.");
+    process.exit(1);
+  }
+  let host = "";
+  let database = "";
+  try {
+    const parsed = new URL(url);
+    host = parsed.hostname.replace(/^\[|\]$/g, "");
+    database = decodeURIComponent(parsed.pathname.slice(1));
+  } catch {
+    console.error("DATABASE_URL isn't a valid connection string.");
+    process.exit(1);
+  }
+  const what = RESET ? "ERASE EVERY TABLE and then load demo data (public password, demo accounts)" : "load demo data (public password, demo accounts)";
+  if (process.env.NODE_ENV === "production") {
+    console.error(`Refusing: NODE_ENV is "production". This script would ${what}.`);
+    console.error("To create the first real account on a new deployment, use:  npm run db:bootstrap -- --email you@school.edu --name \"Your Name\"");
+    process.exit(1);
+  }
+  if (["localhost", "127.0.0.1", "::1"].includes(host)) return;
+  const target = `${host}/${database}`;
+  if (process.argv.includes(`--confirm=${target}`)) return;
+  console.error(`Refusing: this would ${what} in the REMOTE database "${database}" on ${host}.`);
+  console.error("If that really is a throwaway test database, run again with:");
+  console.error(`  npm run ${RESET ? "db:reset" : "db:seed"} -- --confirm=${target}`);
+  console.error("For a real deployment's first account, use npm run db:bootstrap instead.");
+  process.exit(1);
+}
+assertSafeTarget();
+
 const sql = postgres(process.env.DATABASE_URL!, { prepare: false, max: 1 });
 const db = drizzle(sql, { schema });
 

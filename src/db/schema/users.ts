@@ -1,4 +1,4 @@
-import { boolean, index, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import { roleEnum } from "@/db/schema/enums";
 import { schools } from "@/db/schema/schools";
 import { campuses } from "@/db/schema/campuses";
@@ -31,6 +31,10 @@ export const users = pgTable(
     passwordHash: text("password_hash").notNull(),
     /** Set when an admin creates the account or resets its password — the user must choose their own password at next sign-in. */
     mustChangePassword: boolean("must_change_password").notNull().default(false),
+    /** Consecutive wrong-password sign-ins; reset on success. See src/lib/login-throttle.ts. */
+    failedLoginCount: integer("failed_login_count").notNull().default(0),
+    /** Sign-in refused until this time after too many wrong passwords. Cleared on success or an admin password reset. */
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
     avatarSeed: text("avatar_seed").notNull().default(""),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

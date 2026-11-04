@@ -61,7 +61,10 @@ function todayDayCode(): TimetableDay | null {
   return (DAY_CODES as string[]).includes(code) ? (code as TimetableDay) : null;
 }
 
-const currentMonthLabel = new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+/** e.g. "November 2026" — matches invoice.month. A function, not a module constant: a module constant is evaluated once at server start and would go stale after the month changes. */
+function currentMonth() {
+  return new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+}
 
 const LEAVE_TYPE_LABEL: Record<string, string> = { sick: "Sick leave", casual: "Casual leave", annual: "Annual leave", other: "Leave" };
 
@@ -102,6 +105,7 @@ export default async function DashboardPage() {
 }
 
 async function renderParentDashboard(session: AuthSession) {
+  const currentMonthLabel = currentMonth();
   const today = isoDate(new Date());
   const [children, classes, allAnnouncements, homework, subjects] = await Promise.all([
     studentService.listMyChildren(session),
@@ -315,6 +319,7 @@ async function renderTeacherDashboard(session: AuthSession) {
 }
 
 async function renderAccountantDashboard(session: AuthSession) {
+  const currentMonthLabel = currentMonth();
   const perms = await permissionFlags(session);
   const [campuses, students, viewCampusId, quickActions] = await Promise.all([
     campusService.listCampusesInView(session),
@@ -397,6 +402,7 @@ async function renderAccountantDashboard(session: AuthSession) {
 }
 
 async function renderAdminDashboard(session: AuthSession) {
+  const currentMonthLabel = currentMonth();
   const perms = await permissionFlags(session);
   const [campuses, students, teachers, classes, viewCampusId, quickActions, config] = await Promise.all([
     campusService.listCampusesInView(session),

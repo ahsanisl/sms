@@ -36,6 +36,8 @@ function SessionBridge({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string): Promise<string | null> {
     const result = await nextAuthSignIn("credentials", { email, password, redirect: false });
+    // "too_many_attempts": account locked or IP blocked — see src/lib/login-throttle.ts.
+    if (result?.code === "too_many_attempts") return "Too many sign-in attempts. Please wait 15 minutes and try again, or ask your school to reset your password.";
     if (result?.error) return "Invalid email or password.";
     return null;
   }

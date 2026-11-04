@@ -7,6 +7,27 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Don't advertise the framework in an `X-Powered-By` header.
+  poweredByHeader: false,
+  // Security headers on every response. HSTS deliberately omits
+  // includeSubDomains/preload — opt into those once every subdomain is HTTPS.
+  // The CSP only sets frame-ancestors (clickjacking); a script-src policy
+  // needs per-request nonces for Next's inline scripts and is a separate task.
+  headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Strict-Transport-Security", value: "max-age=63072000" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+        ],
+      },
+    ];
+  },
   experimental: {
     // Server Actions cap request bodies at 1MB by default — too small for
     // homework/classwork file attachments (see src/lib/storage). 20mb leaves

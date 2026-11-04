@@ -76,6 +76,9 @@ src/
 - `npm run lint` — ESLint
 - `npm run db:generate` — generate a migration after changing `src/db/schema`
 - `npm run db:migrate` — apply migrations
-- `npm run db:seed` — load demo data into an empty database
+- `npm run db:seed` — load demo data into an empty database (dev only — demo accounts share a public password)
 - `npm run db:reset` — empty every table, then load demo data (dev only)
+- `npm run db:bootstrap -- --email you@yourcompany.com --name "Your Name"` — **production:** create the first Platform Admin on a freshly migrated database (one-time; prints a temporary password)
 - `npm run db:studio` — browse the database in Drizzle Studio
+
+`db:seed` and `db:reset` refuse to run when `NODE_ENV=production`, and against any database not on `localhost` unless you add `-- --confirm=<host>/<database>`. Going live? See [docs/go-live-checklist.md](docs/go-live-checklist.md).
