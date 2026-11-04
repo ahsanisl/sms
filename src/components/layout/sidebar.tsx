@@ -27,7 +27,7 @@ export function useVisibleNav(): NavGroup[] {
   }, [user, perms]);
 }
 
-/** Desktop sidebar — full width with collapsible groups, or a 72px icon rail. */
+/** Desktop sidebar — full width with collapsible groups, or a narrow icon rail (w-16). */
 export function Sidebar() {
   const { collapsed, setCollapsed } = useShell();
   return (
@@ -35,7 +35,7 @@ export function Sidebar() {
       className={cn(
         "fixed left-0 top-0 z-20 hidden h-screen flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex",
         "transition-[width] duration-200 motion-reduce:transition-none",
-        collapsed ? "w-[72px]" : "w-64",
+        collapsed ? "w-16" : "w-64",
       )}
     >
       <SidebarContent collapsed={collapsed} />
@@ -152,7 +152,7 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
           const open = collapsed || !folded.has(group.id);
           const listId = `nav-group-${group.id}`;
           return (
-            <div key={group.id} className={cn(index > 0 && (collapsed ? "mt-2 border-t border-sidebar-border pt-2" : "mt-4"))}>
+            <div key={group.id} className={cn(index > 0 && (collapsed ? "mt-2 border-t border-sidebar-border pt-2" : "mt-3"))}>
               {!collapsed && (
                 <button
                   type="button"
@@ -186,14 +186,14 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
                           title={collapsed ? item.label : undefined}
                           className={cn(
                             "relative flex items-center gap-3 rounded-lg text-body-md transition-colors outline-none focus-visible:ring-2 focus-visible:ring-secondary-fixed-dim",
-                            collapsed ? "mx-auto h-10 w-10 justify-center" : "px-3 py-2",
+                            collapsed ? "mx-auto h-9 w-9 justify-center" : "px-3 py-1.5",
                             active
                               ? "bg-secondary-container/90 font-semibold text-on-secondary-container shadow-sm shadow-secondary/20"
                               : "text-sidebar-foreground/80 hover:bg-sidebar-hover hover:text-on-primary",
                           )}
                         >
                           {active && !collapsed && <span aria-hidden className="absolute -left-2 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-secondary-fixed-dim" />}
-                          <Icon name={item.icon} className="h-[18px] w-[18px] shrink-0" />
+                          <Icon name={item.icon} className="h-4 w-4 shrink-0" />
                           {collapsed ? <span className="sr-only">{item.label}</span> : <span className="truncate">{item.label}</span>}
                           {!collapsed && <NavPendingSpinner />}
                         </Link>

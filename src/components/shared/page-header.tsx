@@ -25,11 +25,11 @@ export function BackLink({ href, label = "Back", className }: { href: string; la
 /** Standard page title + description + right-aligned action buttons row. */
 export function PageHeader({ title, description, actions, backHref, backLabel = "Back", className }: PageHeaderProps) {
   return (
-    <div className={cn("mb-6 flex flex-col justify-between gap-4 md:mb-8 md:flex-row md:items-end", className)}>
+    <div className={cn("mb-4 flex flex-col justify-between gap-3 md:mb-5 md:flex-row md:items-end", className)}>
       <div className="min-w-0">
         {backHref && <BackLink href={backHref} label={backLabel} />}
-        <h1 className="text-headline-md font-semibold tracking-tight text-primary md:text-headline-lg">{title}</h1>
-        {description && <p className="mt-1 max-w-[48rem] text-body-md text-on-surface-variant">{description}</p>}
+        <h1 className="text-headline-md font-semibold tracking-tight text-primary">{title}</h1>
+        {description && <p className="mt-0.5 max-w-[48rem] text-body-md text-on-surface-variant">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2 sm:gap-3">{actions}</div>}
     </div>

@@ -24,7 +24,7 @@ import { useShell } from "@/components/layout/shell-context";
 import type { TopbarCampusContext } from "@/components/layout/app-shell";
 
 const iconButton =
-  "inline-flex h-10 w-10 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-secondary";
+  "inline-flex h-9 w-9 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-low hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-secondary";
 
 export function Topbar({ campusContext }: { campusContext: TopbarCampusContext | null }) {
   const { user, logout } = useSession();
@@ -60,7 +60,7 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center gap-2 border-b border-outline-variant/70 bg-surface-container-lowest/90 px-md backdrop-blur supports-[backdrop-filter]:bg-surface-container-lowest/75 sm:px-lg">
+    <header className="sticky top-0 z-30 flex h-14 w-full items-center gap-2 border-b border-outline-variant/70 bg-surface-container-lowest/90 px-md backdrop-blur supports-[backdrop-filter]:bg-surface-container-lowest/75 sm:px-lg">
       <button type="button" className={`${iconButton} -ml-2 md:hidden`} onClick={() => setMobileNavOpen(true)} aria-label="Open navigation">
         <Menu className="h-5 w-5" />
       </button>
@@ -68,9 +68,9 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
       <button
         type="button"
         onClick={() => setSearchOpen(true)}
-        className="group hidden h-10 w-full max-w-[28rem] items-center gap-3 rounded-full border border-outline-variant bg-surface-container-low px-4 text-left text-body-md text-on-surface-variant transition-colors hover:border-secondary/50 hover:bg-surface-container-lowest outline-none focus-visible:ring-2 focus-visible:ring-secondary sm:flex"
+        className="group hidden h-9 w-full max-w-[28rem] items-center gap-3 rounded-full border border-outline-variant bg-surface-container-low px-4 text-left text-body-md text-on-surface-variant transition-colors hover:border-secondary/50 hover:bg-surface-container-lowest outline-none focus-visible:ring-2 focus-visible:ring-secondary sm:flex"
       >
-        <Search className="h-[18px] w-[18px] shrink-0" />
+        <Search className="h-4 w-4 shrink-0" />
         <span className="flex-1 truncate">Search students, teachers, classes…</span>
         <kbd className="rounded border border-outline-variant bg-surface-container-lowest px-1.5 py-0.5 font-sans text-[10px] text-on-surface-variant">Ctrl K</kbd>
       </button>
@@ -84,7 +84,7 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
           <DropdownMenu>
             <DropdownMenuTrigger
               disabled={isLoading}
-              className="flex h-10 items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 transition-colors hover:bg-surface-container-low outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:opacity-60"
+              className="flex h-9 items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 transition-colors hover:bg-surface-container-low outline-none focus-visible:ring-2 focus-visible:ring-secondary disabled:opacity-60"
               aria-label={`Viewing ${campusLabel(viewCampusId)}. Switch campus`}
             >
               <Building2 className="h-4 w-4 text-secondary" />
@@ -109,7 +109,7 @@ export function Topbar({ campusContext }: { campusContext: TopbarCampusContext |
           </DropdownMenu>
         )}
         {campusContext && !switchable && (
-          <div className="hidden h-10 items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 md:flex">
+          <div className="hidden h-9 items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-3 md:flex">
             <Building2 className="h-4 w-4 text-secondary" />
             <span className="max-w-[12rem] truncate text-label-md font-semibold text-on-surface">{campusLabel(user.campusId)}</span>
             {sessionLabel && <span className="rounded bg-surface-container px-1.5 py-0.5 text-[10px] font-semibold text-on-surface-variant">{sessionLabel}</span>}

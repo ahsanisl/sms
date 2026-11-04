@@ -36,7 +36,7 @@ export function AppShell({ children, campusContext }: { children: React.ReactNod
         </a>
         <Sidebar />
         <MobileSidebar />
-        <div className={cn("flex-1 flex flex-col h-screen overflow-hidden min-w-0 transition-[margin] duration-200 motion-reduce:transition-none", collapsed ? "md:ml-[72px]" : "md:ml-64")}>
+        <div className={cn("flex-1 flex flex-col h-screen overflow-hidden min-w-0 transition-[margin] duration-200 motion-reduce:transition-none", collapsed ? "md:ml-16" : "md:ml-64")}>
           <Topbar campusContext={campusContext} />
           <main id="main-content" tabIndex={-1} className="flex-1 overflow-y-auto px-md py-lg sm:px-lg lg:p-xl focus:outline-none">
             <div className="max-w-[1440px] mx-auto">{children}</div>

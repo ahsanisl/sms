@@ -16,10 +16,10 @@ export const buttonVariants = cva(
         link: "text-secondary hover:underline p-0 h-auto",
       },
       size: {
-        sm: "h-8 px-3 text-[13px] [&_svg]:size-4",
-        md: "h-10 px-4 [&_svg]:size-[18px]",
-        lg: "h-11 px-5 text-body-md [&_svg]:size-5",
-        icon: "h-9 w-9 rounded-full [&_svg]:size-5",
+        sm: "h-8 px-3 text-label-md [&_svg]:size-3.5",
+        md: "h-9 px-3.5 [&_svg]:size-4",
+        lg: "h-10 px-4 text-body-md [&_svg]:size-[18px]",
+        icon: "h-8 w-8 rounded-full [&_svg]:size-[18px]",
       },
     },
     defaultVariants: {

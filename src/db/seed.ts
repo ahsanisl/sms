@@ -4,7 +4,7 @@ config({ path: ".env.local" });
 import bcrypt from "bcryptjs";
 import postgres from "postgres";
 import { drizzle } from "drizzle-orm/postgres-js";
-import { eq, getTableName, is } from "drizzle-orm";
+import { eq, getTableName, inArray, is } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 // Deliberately NOT importing `db` from "@/db" — that module is guarded with
 // `import "server-only"`, which unconditionally throws outside Next's own
@@ -56,6 +56,7 @@ import {
   timetableSlots,
   timetableStatus,
   users,
+  auditLogs,
 } from "@/db/schema";
 import { SCHOOL_ROLE_MODULES, systemRoleRows } from "@/lib/school-roles";
 import type { PermissionModule, Role } from "@/lib/types";
@@ -193,6 +194,7 @@ function studentExtras(i: number, studentName: string) {
   return {
     bFormNumber: `42101-${String(1000000 + ((i * 48271) % 9000000)).slice(0, 7)}-${(i % 9) + 1}`,
     nationality: "Pakistani",
+    religion: i % 19 === 7 ? "Christianity" : i % 31 === 11 ? "Hinduism" : "Islam",
     previousSchool: i % 4 === 0 ? PREVIOUS_SCHOOLS[i % PREVIOUS_SCHOOLS.length] : "",
     medicalNotes: i % 7 === 3 ? MEDICAL_NOTES[i % MEDICAL_NOTES.length] : "",
     parentRelation: "Father",
@@ -287,16 +289,24 @@ async function main() {
     })
     .returning();
 
-  // -- School roles: the six defaults, plus one example custom role --------------------------------------------------------
+  // -- School roles: the six defaults, plus three example custom roles (each gets one login below) --------------------------------------------------------
   const { roles: defaultRoles, permissions: defaultRolePermissions } = systemRoleRows(school.id);
   await db.insert(schoolRoles).values(defaultRoles);
   await db.insert(schoolRolePermissions).values(defaultRolePermissions);
+  async function customRole(name: string, description: string, baseRole: Role, modules: PermissionModule[]) {
+    const [role] = await db.insert(schoolRoles).values({ schoolId: school.id, name, description, baseRole, isSystem: false }).returning();
+    await db.insert(schoolRolePermissions).values(SCHOOL_ROLE_MODULES.map((module) => ({ roleId: role.id, module, allowed: modules.includes(module) })));
+    return role;
+  }
   const RECEPTIONIST_MODULES: PermissionModule[] = ["dashboard", "admissions", "students", "announcements"];
-  const [receptionistRole] = await db
-    .insert(schoolRoles)
-    .values({ schoolId: school.id, name: "Receptionist", description: "Front desk: admission inquiries and looking up students.", baseRole: "school_admin", isSystem: false })
-    .returning();
-  await db.insert(schoolRolePermissions).values(SCHOOL_ROLE_MODULES.map((module) => ({ roleId: receptionistRole.id, module, allowed: RECEPTIONIST_MODULES.includes(module) })));
+  const receptionistRole = await customRole("Receptionist", "Front desk: admission inquiries and looking up students.", "school_admin", RECEPTIONIST_MODULES);
+  const examCoordinatorRole = await customRole("Exam Coordinator", "Schedules exams, enters and publishes results across the school.", "school_admin", [
+    "dashboard", "classes", "students", "exams", "examsCreate", "examsMarks", "syllabus", "timetable", "reports", "announcements", "announcementsCreate",
+  ]);
+  // Based on Campus Admin: everything it sees is limited to the one campus its users are assigned to.
+  const frontDeskRole = await customRole("Clifton Front Desk", "Campus reception: admissions, student look-ups and attendance for one campus.", "campus_admin", [
+    "dashboard", "admissions", "students", "attendance", "announcements",
+  ]);
 
   // The academic year runs August → June; pick the one today falls in.
   const sessionStartYear = TODAY.getUTCMonth() >= 7 ? TODAY.getUTCFullYear() : TODAY.getUTCFullYear() - 1;
@@ -511,7 +521,8 @@ async function main() {
   const ahmed = studentRows[0];
   const ayaan = studentRows[1];
 
-  // -- Users (one per role, dev password for all) --------------------------------------------------------
+  // -- Users: exactly one login per role — the 7 default roles and the 3 custom roles (dev password for all;
+  // keep src/app/(auth)/login/page.tsx's DEV_ACCOUNTS in step) --------------------------------------------------------
   const teacherUserTeacher = teacherByName("Ayesha Khan");
   const userRows = await db
     .insert(users)
@@ -524,8 +535,11 @@ async function main() {
       { schoolId: school.id, campusId: mainCampus.id, teacherId: teacherUserTeacher.id, role: "teacher", name: teacherUserTeacher.name, email: "teacher@eduflow.dev", passwordHash, avatarSeed: teacherUserTeacher.name },
       { schoolId: school.id, campusId: mainCampus.id, role: "parent", name: parentName, email: "parent@eduflow.dev", passwordHash, avatarSeed: parentName },
       { schoolId: school.id, role: "school_admin", schoolRoleId: receptionistRole.id, name: "Rabia Aslam", email: "reception@eduflow.dev", passwordHash, avatarSeed: "Rabia Aslam" },
+      { schoolId: school.id, role: "school_admin", schoolRoleId: examCoordinatorRole.id, name: "Faisal Qureshi", email: "exams@eduflow.dev", passwordHash, avatarSeed: "Faisal Qureshi" },
+      { schoolId: school.id, campusId: cliftonCampus.id, role: "campus_admin", schoolRoleId: frontDeskRole.id, name: "Hina Baig", email: "frontdesk@eduflow.dev", passwordHash, avatarSeed: "Hina Baig" },
     ])
     .returning();
+  const userByEmail = (email: string) => userRows.find((u) => u.email === email)!;
   const userByRole = (role: Role) => userRows.find((u) => u.role === role)!;
   const adminUser = userRows.find((u) => u.role === "school_admin" && !u.schoolRoleId)!;
   const accountantUser = userByRole("accountant");
@@ -591,7 +605,8 @@ async function main() {
   await db.insert(timetableStatus).values(classRows.map((c) => ({ classId: c.id, status: "published" as const })));
   /** The teacher who actually teaches this class+subject per the timetable — homework/classwork/syllabus are attributed to them, matching the app's own teacher authorization. */
   const teacherFor = (classId: string, code: string) => slotValues.find((s) => s.classId === classId && s.subjectId === subjectId(code))?.teacherId;
-  const userIdForTeacher = (teacherId: string) => (teacherId === teacherUserTeacher.id ? teacherUser.id : adminUser.id);
+  // Teachers with their own login record their own work; everyone else's is entered by the school admin.
+  const userIdForTeacher = (teacherId: string) => userRows.find((u) => u.teacherId === teacherId)?.id ?? adminUser.id;
 
   // -- Attendance (last ~8 weeks of school days) --------------------------------------------------------
   const schoolDays = recentSchoolDays(40, sessionStart);
@@ -898,6 +913,71 @@ async function main() {
     { schoolId: school.id, campusId: gulshanCampus.id, title: "Early Dismissal on Friday", body: "Due to water supply maintenance, Gulshan Campus will close at 11:30 AM this Friday.", audience: "all", priority: "important", author: adminUser.name, publishedAt: daysAgo(20) },
   ]);
 
+  // -- Audit log: a few weeks of history, built from what was seeded above --------------------------------------------------------
+  // Same action/entity names the services record (services/*.service.ts → logAudit). Times are Pakistan time (UTC+5).
+  const at = (day: string | Date, time = "10:00") => new Date(`${typeof day === "string" ? day : iso(day)}T${time}:00+05:00`);
+  const ownerUser = userByRole("school_owner");
+  const receptionUser = userByEmail("reception@eduflow.dev");
+  const examsUser = userByEmail("exams@eduflow.dev");
+  const frontDeskUser = userByEmail("frontdesk@eduflow.dev");
+  const parentUser = userByRole("parent");
+  const auditValues: (typeof auditLogs.$inferInsert)[] = [];
+  const log = (userId: string | null, action: string, entity: string, entityId: string | null, createdAt: Date, metadata?: Record<string, unknown>) =>
+    auditValues.push({ userId, schoolId: school.id, action, entity, entityId, metadata: metadata ?? null, createdAt });
+
+  // Accounts and roles (Settings → Users & Roles, student profiles).
+  log(ownerUser.id, "role.created", "SchoolRole", receptionistRole.id, at(daysAgo(40), "09:10"), { name: receptionistRole.name, baseRole: receptionistRole.baseRole });
+  log(adminUser.id, "role_permission.updated", "SchoolRole", receptionistRole.id, at(daysAgo(38), "11:30"), { role: receptionistRole.name, module: "students", allowed: true });
+  log(ownerUser.id, "user.created", "User", receptionUser.id, at(daysAgo(39), "09:20"), { email: receptionUser.email, role: receptionistRole.name });
+  log(ownerUser.id, "role.created", "SchoolRole", examCoordinatorRole.id, at(daysAgo(35), "10:05"), { name: examCoordinatorRole.name, baseRole: examCoordinatorRole.baseRole });
+  log(ownerUser.id, "user.created", "User", examsUser.id, at(daysAgo(34), "10:15"), { email: examsUser.email, role: "School Admin" });
+  log(ownerUser.id, "user.role_changed", "User", examsUser.id, at(daysAgo(33), "12:40"), { from: "school_admin", to: examCoordinatorRole.name });
+  log(adminUser.id, "parent.account_created", "User", parentUser.id, at(daysAgo(28), "13:15"), { studentId: ahmed.id });
+  log(adminUser.id, "parent.linked", "User", parentUser.id, at(daysAgo(28), "13:20"), { studentId: ayaan.id });
+  log(teacherUser.id, "user.password_changed", "User", teacherUser.id, at(daysAgo(14), "19:20"));
+  log(adminUser.id, "role.created", "SchoolRole", frontDeskRole.id, at(daysAgo(12), "14:00"), { name: frontDeskRole.name, baseRole: frontDeskRole.baseRole });
+  log(adminUser.id, "user.created", "User", frontDeskUser.id, at(daysAgo(12), "14:10"), { email: frontDeskUser.email, role: frontDeskRole.name });
+  log(frontDeskUser.id, "user.password_changed", "User", frontDeskUser.id, at(daysAgo(11), "08:35"));
+
+  // Fees: the 25 most recent payments, every reversal and discount.
+  const recentPayments = (await db.select().from(feePayments)).sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 25);
+  recentPayments.forEach((p, i) => log(p.receivedBy, "payment.recorded", "FeePayment", p.id, at(p.date, `${String(9 + (i % 7)).padStart(2, "0")}:${String((i * 13) % 60).padStart(2, "0")}`), { invoiceId: p.invoiceId, amount: p.amount, method: p.method }));
+  for (const r of await db.select().from(feePaymentReversals)) log(r.reversedBy, "payment.reversed", "FeePaymentReversal", r.id, at(r.date, "11:45"), { paymentId: r.paymentId, amount: r.amount, reason: r.reason });
+  for (const c of await db.select().from(feeConcessions)) log(c.approvedBy, "concession.applied", "FeeConcession", c.id, at(c.effectiveDate ?? iso(sessionStart), "12:00"), { studentId: c.studentId, label: c.label });
+
+  // Attendance: one entry per class per day for the last three school days (the services log one per marking).
+  const lastDays = schoolDays.slice(-3).map(iso);
+  const markings = new Map<string, typeof attendanceRecords.$inferSelect>();
+  for (const record of await db.select().from(attendanceRecords).where(inArray(attendanceRecords.date, lastDays))) {
+    markings.set(`${record.classId}:${record.date}`, markings.get(`${record.classId}:${record.date}`) ?? record);
+  }
+  for (const record of markings.values()) log(record.markedBy, "attendance.marked", "AttendanceRecord", record.id, at(record.date, "08:20"), { classId: record.classId, date: record.date });
+
+  // Exams: created by the Exam Coordinator; published results.
+  for (const exam of await db.select().from(exams).where(eq(exams.campusId, mainCampus.id))) {
+    log(examsUser.id, "exam.created", "Exam", exam.id, at(addDays(new Date(`${exam.startDate}T00:00:00Z`), -21), "10:30"), { name: exam.name });
+    if (exam.resultsPublished) log(examsUser.id, "marks.published", "Exam", exam.id, at(addDays(new Date(`${exam.endDate}T00:00:00Z`), 4), "16:00"), { name: exam.name });
+  }
+
+  // Leave requests and decisions.
+  for (const leave of await db.select().from(staffLeaveRequests)) {
+    const requester = userRows.find((u) => u.teacherId === leave.teacherId);
+    if (requester) log(requester.id, "leave.requested", "StaffLeaveRequest", leave.id, leave.requestedAt);
+    if (leave.reviewedBy) log(leave.reviewedBy, "leave.reviewed", "StaffLeaveRequest", leave.id, new Date(leave.requestedAt.getTime() + 20 * 3600000), { status: leave.status });
+  }
+
+  // Admissions, announcements, student withdrawals/transfers.
+  for (const inquiry of await db.select().from(inquiries)) log(receptionUser.id, "inquiry.created", "Inquiry", inquiry.id, inquiry.createdAt, { childName: inquiry.childName });
+  for (const a of await db.select().from(announcements).where(eq(announcements.schoolId, school.id))) {
+    log(userRows.find((u) => u.name === a.author)?.id ?? adminUser.id, "announcement.created", "Announcement", a.id, a.publishedAt, { title: a.title });
+  }
+  for (const event of await db.select().from(studentLifecycleEvents)) {
+    const action = event.type === "withdrawal" ? "student.withdrawn" : event.type === "transfer" ? "student.transferred" : null;
+    if (action) log(event.recordedBy, action, "Student", event.studentId, at(event.date, "11:00"), { reason: event.reason });
+  }
+
+  await db.insert(auditLogs).values(auditValues);
+
   const outstanding = await db.select({ status: feeInvoices.status }).from(feeInvoices);
   console.log("Seed complete.");
   console.log(
@@ -905,9 +985,10 @@ async function main() {
       `  ${attendanceValues.length} attendance records over ${schoolDays.length} school days, ${correctionValues.length} correction requests\n` +
       `  ${outstanding.length} invoices across ${invoiceMonths.map(monthLabel).join(", ")} (${outstanding.filter((i) => i.status !== "paid").length} not fully paid), ${paymentsCount} payments\n` +
       `  ${examPlan.length * campusRows.length} exams, ${marksCount} marks entries, ${slotValues.length} timetable slots\n` +
-      `  ${topicValues.length} syllabus topics, ${classworkValues.length} classwork entries, ${homeworkCount} homework, ${submissionCount} submissions`,
+      `  ${topicValues.length} syllabus topics, ${classworkValues.length} classwork entries, ${homeworkCount} homework, ${submissionCount} submissions\n` +
+      `  ${userRows.length} logins (one per role: 7 default + 3 custom roles); ${auditValues.length} audit log entries`,
   );
-  console.log("\nDev login credentials (password for every account):", DEV_PASSWORD);
+  console.log("\nDev login credentials — one per role, same password for every account:", DEV_PASSWORD);
   console.log("  platform@eduflow.dev       — Platform Admin");
   console.log("  owner@eduflow.dev          — School Owner");
   console.log("  admin@eduflow.dev          — School Admin");
@@ -915,7 +996,10 @@ async function main() {
   console.log("  accountant@eduflow.dev     — Accountant");
   console.log("  teacher@eduflow.dev        — Teacher (Ayesha Khan, class teacher of Grade 1-A, Main)");
   console.log("  parent@eduflow.dev         — Parent (Ahmed Raza, Grade 1-A, and Ayaan Raza, Grade 5-A)");
-  console.log("  reception@eduflow.dev      — Receptionist (custom role: Dashboard, Admissions, Students, Announcements)");
+  console.log("  Custom roles:");
+  console.log("  reception@eduflow.dev      — Receptionist (Dashboard, Admissions, Students, Announcements)");
+  console.log("  exams@eduflow.dev          — Exam Coordinator (exams, results, syllabus, timetable, reports)");
+  console.log("  frontdesk@eduflow.dev      — Clifton Front Desk (based on Campus Admin: Clifton only)");
 }
 
 main()

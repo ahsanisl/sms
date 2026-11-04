@@ -45,28 +45,23 @@ export function StatCard({ label, value, icon, trend, tone = "default", href, cl
     <>
       <div className="flex items-start justify-between gap-3">
         <p className="text-label-md font-medium uppercase tracking-wide text-on-surface-variant">{label}</p>
-        <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", TONE_CHIP[tone])}>
-          <Icon name={icon} className="h-[18px] w-[18px]" aria-hidden />
+        <span className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", TONE_CHIP[tone])}>
+          <Icon name={icon} className="h-4 w-4" aria-hidden />
         </span>
       </div>
-      <p className="mt-1 text-headline-lg font-semibold tracking-tight text-primary tabular-nums">{value}</p>
-      {(trend || href) && (
-        <div className="mt-2 flex items-center justify-between gap-2">
-          {trend ? (
-            <span className={cn("flex items-center gap-1 text-label-sm", TREND_COLOR[trend.direction])}>
-              <Icon name={TREND_ICON[trend.direction]} className="h-3.5 w-3.5" aria-hidden />
-              {trend.label}
-            </span>
-          ) : (
-            <span />
-          )}
-          {href && <ArrowUpRight aria-hidden className="h-4 w-4 text-on-surface-variant opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />}
-        </div>
+      <p className="mt-1 text-headline-md font-semibold tracking-tight text-primary tabular-nums">{value}</p>
+      {trend && (
+        <span className={cn("mt-1.5 flex items-center gap-1 pr-5 text-label-sm", TREND_COLOR[trend.direction])}>
+          <Icon name={TREND_ICON[trend.direction]} className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          {trend.label}
+        </span>
       )}
+      {/* Positioned, so a card without a trend line doesn't keep an empty row for it. */}
+      {href && <ArrowUpRight aria-hidden className="absolute bottom-3 right-3 h-4 w-4 text-on-surface-variant opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />}
     </>
   );
 
-  const classes = cn("group relative block rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-5 card-shadow", href && "card-hover-shadow hover:border-secondary/40", className);
+  const classes = cn("group relative block rounded-xl border border-outline-variant/70 bg-surface-container-lowest p-4 card-shadow", href && "card-hover-shadow hover:border-secondary/40", className);
 
   if (href) {
     return (

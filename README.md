@@ -25,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with one of the 
 - It produces the same data every time, but dates are counted back from the day you run it, so dashboards always show "today" and "this month".
 - It refuses to run on a database that already has data. To wipe **every table** and start fresh, run `npm run db:reset`. Development databases only.
 
-All demo accounts use the password `Password123!`:
+There is exactly one login per role, all with the password `Password123!` (also listed on the login page):
 
 | Role | Email | Notes |
 |---|---|---|
@@ -36,6 +36,11 @@ All demo accounts use the password `Password123!`:
 | Accountant | accountant@eduflow.dev | |
 | Teacher | teacher@eduflow.dev | Ayesha Khan, class teacher of Grade 1-A (Main) |
 | Parent | parent@eduflow.dev | Two children: Ahmed Raza (Grade 1-A) and Ayaan Raza (Grade 5-A) |
+| Receptionist *(custom role)* | reception@eduflow.dev | Dashboard, Admissions, Students, Announcements |
+| Exam Coordinator *(custom role)* | exams@eduflow.dev | Exams and results, syllabus, timetable, reports |
+| Clifton Front Desk *(custom role)* | frontdesk@eduflow.dev | Based on Campus Admin — Clifton Campus only |
+
+The seed also fills in recent features: student religion, B-Form, medical notes and guardians, and a few weeks of Audit Log history.
 
 ## Tech stack
 

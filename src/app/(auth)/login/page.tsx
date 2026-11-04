@@ -6,7 +6,7 @@ import { GraduationCap, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth/session-context";
 
-/** Mirrors src/db/seed.ts's seeded accounts — every one uses the same dev-only password (also printed by the seed script). Convenience only; the password is still genuinely required and checked server-side. */
+/** Mirrors src/db/seed.ts's seeded accounts (one per role) — every one uses the same dev-only password (also printed by the seed script). Convenience only; the password is still genuinely required and checked server-side. */
 const DEV_ACCOUNTS = [
   { role: "Platform Admin", email: "platform@eduflow.dev" },
   { role: "School Owner", email: "owner@eduflow.dev" },
@@ -15,6 +15,12 @@ const DEV_ACCOUNTS = [
   { role: "Accountant", email: "accountant@eduflow.dev" },
   { role: "Teacher", email: "teacher@eduflow.dev" },
   { role: "Parent", email: "parent@eduflow.dev" },
+];
+/** The seed's example custom roles (Settings → Users & Roles). */
+const DEV_CUSTOM_ROLE_ACCOUNTS = [
+  { role: "Receptionist", email: "reception@eduflow.dev" },
+  { role: "Exam Coordinator", email: "exams@eduflow.dev" },
+  { role: "Clifton Front Desk", email: "frontdesk@eduflow.dev" },
 ];
 const DEV_PASSWORD = "Password123!";
 
@@ -104,7 +110,7 @@ export default function LoginPage() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="admin@school.edu"
-                className="block w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none transition-all"
+                className="block w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none transition-all"
               />
             </div>
             <div className="space-y-2">
@@ -120,7 +126,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="block w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-3 pr-10 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none transition-all"
+                  className="block w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2.5 pr-10 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:border-secondary focus:ring-1 focus:ring-secondary focus:outline-none transition-all"
                 />
                 <button
                   type="button"
@@ -159,7 +165,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full justify-center items-center rounded-lg bg-secondary px-4 py-3 text-label-md font-semibold text-on-secondary shadow-sm hover:bg-secondary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-surface-container-lowest transition-all disabled:opacity-60"
+                className="flex w-full justify-center items-center rounded-lg bg-secondary px-4 py-2.5 text-label-md font-semibold text-on-secondary shadow-sm hover:bg-secondary/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-surface-container-lowest transition-all disabled:opacity-60"
               >
                 {submitting ? "Signing in…" : "Log In"}
               </button>
@@ -167,22 +173,33 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-8">
-            <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-3 text-center lg:text-left">
-              Dev environment — quick-fill a seeded account (password still required)
+            <p className="text-label-sm text-on-surface-variant uppercase tracking-wide mb-1 text-center lg:text-left">
+              Demo accounts — click one to fill the form
             </p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEV_ACCOUNTS.map((account) => (
-                <button
-                  key={account.email}
-                  type="button"
-                  onClick={() => fillDevAccount(account.email)}
-                  className="rounded-lg border border-outline-variant px-3 py-2 text-left hover:bg-surface-container-low transition-colors"
-                >
-                  <p className="text-label-md font-semibold text-primary">{account.role}</p>
-                  <p className="text-label-sm text-on-surface-variant truncate">{account.email}</p>
-                </button>
-              ))}
-            </div>
+            <p className="text-body-md text-on-surface-variant mb-3 text-center lg:text-left">
+              Password for every account: <span className="font-mono font-semibold text-on-surface">{DEV_PASSWORD}</span>
+            </p>
+            {[
+              { title: "Default roles", accounts: DEV_ACCOUNTS },
+              { title: "Custom roles", accounts: DEV_CUSTOM_ROLE_ACCOUNTS },
+            ].map((group) => (
+              <div key={group.title} className="mb-4">
+                <p className="text-label-sm text-on-surface-variant mb-2">{group.title}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {group.accounts.map((account) => (
+                    <button
+                      key={account.email}
+                      type="button"
+                      onClick={() => fillDevAccount(account.email)}
+                      className="rounded-lg border border-outline-variant px-3 py-2 text-left hover:bg-surface-container-low transition-colors"
+                    >
+                      <p className="text-label-md font-semibold text-primary">{account.role}</p>
+                      <p className="text-label-sm text-on-surface-variant truncate">{account.email}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

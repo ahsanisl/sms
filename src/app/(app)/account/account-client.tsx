@@ -86,7 +86,7 @@ export function AccountClient({ name, email, roleName, campusName, mustChangePas
 
         <Card>
           <CardHeader
-            icon={<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-fixed text-secondary"><KeyRound className="h-[18px] w-[18px]" aria-hidden /></span>}
+            icon={<span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-fixed text-secondary"><KeyRound className="h-4 w-4" aria-hidden /></span>}
             title="Change Password"
             description="Use at least 8 characters. A longer password with a mix of letters, numbers and symbols is safer."
           />

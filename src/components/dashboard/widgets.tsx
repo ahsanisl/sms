@@ -109,7 +109,7 @@ export function TaskList({ tasks, className }: { tasks: DashboardTask[]; classNa
               const content = (
                 <>
                   <span className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", TASK_TONE[task.tone])}>
-                    <Icon name={task.icon} className="h-[18px] w-[18px]" aria-hidden />
+                    <Icon name={task.icon} className="h-4 w-4" aria-hidden />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-body-md font-medium text-on-surface">{task.label}</span>
@@ -223,7 +223,7 @@ export function QuickActions({ actions, className, columns = "grid-cols-2 sm:gri
             className="group flex flex-col items-start gap-3 rounded-xl border border-outline-variant/70 p-4 transition-colors hover:border-secondary/50 hover:bg-secondary-fixed/30"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary-fixed text-secondary transition-colors group-hover:bg-secondary group-hover:text-on-secondary">
-              <Icon name={action.icon} className="h-[18px] w-[18px]" aria-hidden />
+              <Icon name={action.icon} className="h-4 w-4" aria-hidden />
             </span>
             <span className="text-body-md font-medium text-on-surface">{action.label}</span>
           </Link>

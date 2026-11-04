@@ -12,7 +12,7 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, placeholder = "Search…", className }: SearchBarProps) {
   return (
     <div className={cn("relative w-full lg:max-w-[28rem]", className)}>
-      <Search aria-hidden className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-on-surface-variant" />
+      <Search aria-hidden className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
       <input
         type="search"
         value={value}
@@ -26,7 +26,7 @@ export function SearchBar({ value, onChange, placeholder = "Search…", classNam
         placeholder={placeholder}
         aria-label={placeholder}
         className={cn(
-          "h-10 w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-9",
+          "h-9 w-full rounded-lg border border-outline-variant bg-surface-container-lowest pl-10 pr-9",
           "text-body-md text-on-surface placeholder:text-on-surface-variant/60 [&::-webkit-search-cancel-button]:hidden",
           "hover:border-outline focus:outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors",
         )}

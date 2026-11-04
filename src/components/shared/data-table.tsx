@@ -106,7 +106,7 @@ export function DataTable<T>({
   return (
     <div className="flex flex-col rounded-xl border border-outline-variant/70 bg-surface-container-lowest card-shadow">
       {(searchKeys || filters?.length || toolbarExtra) && (
-        <div className="flex flex-col justify-between gap-3 rounded-t-xl border-b border-outline-variant/50 p-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col justify-between gap-3 rounded-t-xl border-b border-outline-variant/50 p-3 lg:flex-row lg:items-center">
           {searchKeys ? (
             <SearchBar
               value={search}
@@ -163,7 +163,7 @@ export function DataTable<T>({
                       key={col.key}
                       scope="col"
                       aria-sort={col.sortable ? (sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : "none") : undefined}
-                      className={cn("whitespace-nowrap px-4 py-3 text-label-md font-semibold uppercase tracking-wide text-on-surface-variant", col.className)}
+                      className={cn("whitespace-nowrap px-3 py-2 text-label-md font-semibold uppercase tracking-wide text-on-surface-variant", col.className)}
                     >
                       {col.sortable ? (
                         <button
@@ -181,7 +181,7 @@ export function DataTable<T>({
                   );
                 })}
                 {rowActions && (
-                  <th scope="col" className="w-10 px-4 py-3">
+                  <th scope="col" className="w-10 px-3 py-2">
                     <span className="sr-only">Actions</span>
                   </th>
                 )}
@@ -210,12 +210,12 @@ export function DataTable<T>({
                   }
                 >
                   {columns.map((col) => (
-                    <td key={col.key} className={cn("px-4 py-3 align-middle text-body-md text-on-surface", col.className)}>
+                    <td key={col.key} className={cn("px-3 py-2 align-middle text-body-md text-on-surface", col.className)}>
                       {col.render ? col.render(row) : (col.accessor?.(row) ?? "")}
                     </td>
                   ))}
                   {rowActions && (
-                    <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                    <td className="px-3 py-1.5 text-right" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
                       {rowActions(row)}
                     </td>
                   )}
@@ -226,7 +226,7 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 border-t border-outline-variant/50 px-4 py-3 text-label-md text-on-surface-variant sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-2 border-t border-outline-variant/50 px-3 py-2 text-label-md text-on-surface-variant sm:flex-row sm:items-center sm:justify-between">
         <span aria-live="polite">
           {filtered.length === 0 ? (
             "No records"

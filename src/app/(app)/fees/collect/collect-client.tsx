@@ -83,7 +83,7 @@ function CollectFeeContent({ students, classes, invoices }: { students: Student[
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-[18px] w-[18px] text-on-surface-variant" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-variant" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
